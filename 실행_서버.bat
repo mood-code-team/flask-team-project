@@ -26,11 +26,28 @@ if errorlevel 1 (
     exit /b 1
 )
 
+if not exist ".env" (
+    if exist ".env.example" (
+        copy /Y ".env.example" ".env" >nul
+        echo [setup] .env created from .env.example
+    )
+)
+
 "%PY%" -m pip install -r requirements.txt -q
 if errorlevel 1 (
     echo pip install failed
     pause
     exit /b 1
+)
+
+if not exist "database\shop.db" (
+    echo [setup] First run: creating database and sample data...
+    "%PY%" scripts\seed_db.py
+    if errorlevel 1 (
+        echo seed_db.py failed
+        pause
+        exit /b 1
+    )
 )
 
 "%PY%" hspace_server.py
