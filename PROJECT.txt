@@ -1,0 +1,11 @@
+Mood Code — 인테리어 셀렉션 쇼핑몰
+================================
+
+실행: 실행_서버.bat 또는 python hspace_server.py
+문서: README.txt, docs/DB_DESIGN.md
+
+주요 파일
+  app.py
+  routes/
+  services/
+  templates/base.html

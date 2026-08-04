@@ -1,0 +1,66 @@
+{% extends "mypage/layout.html" %}
+
+{% block title %}문의 내역{% endblock %}
+
+{% block mypage_content %}
+<h2 class="mypage__section-title">문의 내역</h2>
+<p class="mypage__lead">고객센터 1:1 문의와 상품 Q&amp;A 답변을 확인할 수 있습니다.</p>
+
+<div class="mypage__actions" style="margin-bottom: 24px;">
+  <button type="button" class="mypage__link-btn" data-inquiry-open>1:1 문의하기</button>
+</div>
+
+{% if inquiries %}
+<h3 class="mypage__subsection-title">고객센터 1:1 문의</h3>
+<ul class="mypage__qna-list">
+  {% for item in inquiries %}
+  <li class="mypage__qna-item">
+    <p class="mypage__qna-product">
+      {{ item.inquiry_type_label }}
+      {% if item.order_number %} · {{ item.order_number }}{% endif %}
+      · {{ item.created_at.strftime('%Y.%m.%d') }}
+      · {{ item.status_label }}
+    </p>
+    <p class="mypage__qna-question"><strong>{{ item.title }}</strong></p>
+    <p class="mypage__qna-question">{{ item.content }}</p>
+    {% if item.answer %}
+    <p class="mypage__qna-answer"><strong>A.</strong> {{ item.answer }}</p>
+    {% else %}
+    <p class="mypage__qna-pending">답변 준비 중입니다.</p>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if questions %}
+<h3 class="mypage__subsection-title">상품 Q&amp;A</h3>
+<ul class="mypage__qna-list">
+  {% for q in questions %}
+  <li class="mypage__qna-item">
+    <p class="mypage__qna-product">
+      {% if q.product %}
+      <a href="{{ url_for('product.detail', slug=q.product.slug) }}">{{ q.product.name }}</a>
+      {% else %}
+      상품
+      {% endif %}
+      · {{ q.created_at.strftime('%Y.%m.%d') }}
+    </p>
+    <p class="mypage__qna-question"><strong>Q.</strong> {{ q.question }}</p>
+    {% if q.answer %}
+    <p class="mypage__qna-answer"><strong>A.</strong> {{ q.answer }}</p>
+    {% else %}
+    <p class="mypage__qna-pending">답변 준비 중입니다.</p>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if not inquiries and not questions %}
+<div class="mypage__empty-box">
+  <p class="mypage__empty">등록한 문의가 없습니다.</p>
+  <button type="button" class="mypage__link-btn" data-inquiry-open>1:1 문의하기</button>
+</div>
+{% endif %}
+{% endblock %}

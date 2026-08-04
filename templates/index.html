@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-home{% endblock %}
+{% block full_title %}Mood Code{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=20260804b">
+{% for slide in hero_slides %}
+<link rel="preload" as="image" href="{{ url_for('static', filename=slide.image_2k) }}">
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+
+<section class="hero-ad" aria-label="메인 프로모션">
+  <div class="hero-ad__bridge" aria-hidden="true"></div>
+
+  <div class="hero-ad__copy">
+    <h1 class="hero-ad__headline" data-hero-headline>혼자지만, 충분히.</h1>
+    <p class="hero-ad__lead" data-hero-lead>공간을 위한 가구 큐레이션</p>
+    <a href="{{ url_for('category.listing', slug='light') }}" class="hero-ad__cta" data-hero-cta>SHOP NOW</a>
+  </div>
+
+  <div class="hero-slider" aria-label="메인 배너" data-slide-count="{{ hero_slides|length }}">
+    <div class="hero-slider__viewport">
+      <div class="hero-slider__track">
+        {% for slide in hero_slides %}
+        <div class="hero-slider__slide">
+          <a
+            href="{{ url_for('category.listing', slug=slide.category_slug) }}"
+            class="hero-slide"
+            data-slide-line="{{ slide.tagline }}"
+            aria-label="{{ slide.title }} 상품 보기"
+          >
+            <img
+              class="hero-slide__img"
+              src="{{ url_for('static', filename=slide.image_2k) }}"
+              srcset="{{ url_for('static', filename=slide.image_2k) }} 1920w, {{ url_for('static', filename=slide.image) }} 3840w"
+              sizes="100vw"
+              alt="{{ slide.title }}"
+              loading="eager"
+              decoding="async"
+              draggable="false"
+            >
+            <div class="hero-slide__overlay"></div>
+            <div class="hero-slide__content">
+              <h2 class="hero-slide__title">{{ slide.title }}</h2>
+            </div>
+            {% if slide.concept %}
+            <p class="hero-slide__concept" aria-hidden="true">{{ slide.concept }}</p>
+            {% endif %}
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button type="button" class="hero-slider__prev" aria-label="이전 슬라이드">‹</button>
+    <button type="button" class="hero-slider__next" aria-label="다음 슬라이드">›</button>
+
+    <div class="hero-slider__ui">
+      <div class="hero-slider__dots" role="tablist" aria-label="슬라이드 선택">
+        {% for slide in hero_slides %}
+        <button
+          type="button"
+          class="hero-slider__dot{% if loop.first %} is-active{% endif %}"
+          data-slide-index="{{ loop.index0 }}"
+          aria-label="{{ slide.title }}"
+          aria-selected="{{ 'true' if loop.first else 'false' }}"
+        ></button>
+        {% endfor %}
+      </div>
+      <div class="hero-slider__counter" aria-live="polite" aria-atomic="true">
+        <span class="hero-slider__counter-current">1</span><span class="hero-slider__counter-sep"> / </span><span class="hero-slider__counter-total">{{ hero_slides|length }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="season-section" aria-label="시즌별 방 컨셉">
+  <div class="season-section__header">
+    <h2 class="season-section__title">SEASON CONCEPT</h2>
+    <p class="season-section__desc">계절의 온도와 감성에 맞춘 공간을 만나보세요.</p>
+  </div>
+
+  <div class="season-grid">
+    {% for room in season_rooms %}
+    <article class="season-card" id="season-{{ room.id }}">
+      <a href="{{ url_for('main.season_detail', season_id=room.id) }}" class="season-card__link">
+        <div class="season-card__image">
+          <img src="{{ room.image }}" alt="{{ room.name }} interior concept" loading="lazy">
+          <div class="season-card__overlay"></div>
+        </div>
+        <div class="season-card__body">
+          <div class="season-card__top">
+            <span class="season-card__label" style="--accent: {{ room.accent }}">{{ room.name_en }}</span>
+            <div class="season-card__temp">
+              {% include "components/temperature_display.html" %}
+            </div>
+          </div>
+          <h3 class="season-card__name">{{ room.name }}</h3>
+          <p class="season-card__concept">{{ room.concept }}</p>
+        </div>
+      </a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/hero-slider.js') }}?v=20260803r"></script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "mypage/layout.html" %}
+
+
+
+{% block title %}회원정보 수정{% endblock %}
+
+
+
+{% block mypage_content %}
+
+<h2 class="mypage__section-title">회원정보 수정</h2>
+
+<p class="mypage__lead">기본 정보를 최신 상태로 유지해 주세요.</p>
+
+
+
+<form class="mypage__form" method="post" action="{{ url_for('mypage.profile') }}">
+
+  <div class="mypage__form-row">
+
+    <label class="mypage__label" for="profile-username">아이디</label>
+
+    <input id="profile-username" class="mypage__input is-readonly" type="text" value="{{ user.username }}" readonly>
+
+  </div>
+
+
+
+  <div class="mypage__form-row">
+
+    <label class="mypage__label" for="profile-current-password">현재 비밀번호</label>
+
+    <input id="profile-current-password" class="mypage__input" type="password" name="current_password" autocomplete="current-password" placeholder="변경 시에만 입력">
+
+  </div>
+
+  <div class="mypage__form-row">
+
+    <label class="mypage__label" for="profile-new-password">비밀번호 변경</label>
+
+    <input id="profile-new-password" class="mypage__input" type="password" name="new_password" autocomplete="new-password" placeholder="8자 이상">
+
+  </div>
+
+  <div class="mypage__form-row">
+
+    <label class="mypage__label" for="profile-new-password-confirm">비밀번호 확인</label>
+
+    <input id="profile-new-password-confirm" class="mypage__input" type="password" name="new_password_confirm" autocomplete="new-password" placeholder="비밀번호 재입력">
+
+  </div>
+
+
+
+  <div class="mypage__form-row">
+
+    <label class="mypage__label" for="profile-name">이름 <span class="mypage__required">*</span></label>
+
+    <input id="profile-name" class="mypage__input" type="text" name="full_name" value="{{ user.full_name or '' }}" required>
+
+  </div>
+
+  <div class="mypage__form-row">
+
+    <label class="mypage__label" for="profile-email">이메일 <span class="mypage__required">*</span></label>
+
+    <input id="profile-email" class="mypage__input" type="email" name="email" value="{{ user.email }}" required>
+
+  </div>
+
+  <div class="mypage__form-row">
+
+    <label class="mypage__label" for="profile-phone">휴대폰 <span class="mypage__required">*</span></label>
+
+    <input id="profile-phone" class="mypage__input" type="tel" name="phone" value="{{ user.phone or '' }}" required>
+
+  </div>
+
+  <div class="mypage__form-row">
+
+    <label class="mypage__label" for="profile-region">지역 <span class="mypage__required">*</span></label>
+
+    <select id="profile-region" class="mypage__input" name="region" required>
+
+      {% for region in regions %}
+
+      <option value="{{ region }}" {% if user.region == region %}selected{% endif %}>{{ region }}</option>
+
+      {% endfor %}
+
+    </select>
+
+  </div>
+
+
+
+  <h3 class="mypage__subsection-title">배송지 수정하기</h3>
+
+  <p class="mypage__lead mypage__lead--compact">주문 시 사용할 기본 배송지입니다.</p>
+
+  <div class="mypage__form-row mypage__form-row--address">
+
+    {% with addr=parsed_address, name_prefix='profile', hidden_field_name='address' %}
+
+      {% include "components/address_fields.html" %}
+
+    {% endwith %}
+
+  </div>
+
+
+
+  {% if user.birth_year %}
+
+  <div class="mypage__form-row">
+
+    <span class="mypage__label">생년월일</span>
+
+    <p class="mypage__static">
+
+      {{ user.birth_year }}.{{ '%02d' | format(user.birth_month) }}.{{ '%02d' | format(user.birth_day) }}
+
+      ({{ '음력' if user.calendar_type == 'lunar' else '양력' }})
+
+    </p>
+
+  </div>
+
+  {% endif %}
+
+  <div class="mypage__form-actions">
+
+    <button type="submit" class="mypage__submit">저장하기</button>
+
+  </div>
+
+</form>
+
+{% endblock %}
+
+
+
+{% block mypage_js %}
+
+<script src="{{ url_for('static', filename='js/address-search.js') }}?v=20260803a"></script>
+
+{% endblock %}
+

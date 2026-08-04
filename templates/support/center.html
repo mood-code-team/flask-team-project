@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}고객센터{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/help-center.css') }}?v=20260801a">
+{% endblock %}
+
+{% block content %}
+<div class="help-center" id="help-center">
+  <header class="help-center__header">
+    <a href="{{ url_for('main.index') }}" class="help-center__back" aria-label="뒤로">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <h1 class="help-center__title">무엇을 도와드릴까요?</h1>
+  </header>
+
+  <div class="help-center__search-wrap">
+    <label class="help-center__search" for="help-search">
+      <svg class="help-center__search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5"/>
+        <path d="M16 16l5.5 5.5"/>
+      </svg>
+      <input
+        id="help-search"
+        type="search"
+        class="help-center__search-input"
+        placeholder="궁금한 내용을 검색해보세요"
+        autocomplete="off"
+      >
+    </label>
+  </div>
+
+  <div class="help-center__chips" role="tablist" aria-label="FAQ 카테고리">
+    {% for cat in categories %}
+    <button
+      type="button"
+      class="help-chip{% if cat.slug == active_category %} is-active{% endif %}"
+      data-category="{{ cat.slug }}"
+      role="tab"
+      aria-selected="{{ 'true' if cat.slug == active_category else 'false' }}"
+    >{{ cat.label }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="help-center__meta">
+    <span class="help-center__meta-label" id="help-meta-label">{{ active_label }}</span>
+    <span class="help-center__meta-count"><span id="help-meta-count">{{ faq_count }}</span>개 도움말</span>
+  </div>
+
+  <div class="help-center__list" id="help-list">
+    {% for group in faq_groups %}
+    <section class="help-group" data-category="{{ group.slug }}">
+      <h2 class="help-group__title">{{ group.label }}</h2>
+      <ul class="help-group__items">
+        {% for faq in group.items %}
+        <li class="help-item" data-question="{{ faq.question | lower }}">
+          <a href="{{ url_for('support.faq_detail', faq_id=faq.id) }}" class="help-item__link">
+            <span class="help-item__text">{{ faq.question }}</span>
+            <svg class="help-item__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M9 6l6 6-6 6"/>
+            </svg>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% else %}
+    <p class="help-center__empty">등록된 도움말이 없습니다.</p>
+    {% endfor %}
+  </div>
+
+  <p class="help-center__no-result" id="help-no-result" hidden>검색 결과가 없습니다.</p>
+
+  <aside class="help-inquiry">
+    <div class="help-inquiry__text">
+      <strong>원하는 답을 찾지 못했나요?</strong>
+      <p>접수된 문의는 고객센터에서 순차적으로 확인해드려요.</p>
+    </div>
+    <button type="button" class="help-inquiry__btn" data-inquiry-open>문의하기</button>
+  </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/help-center.js') }}?v=20260801a"></script>
+{% endblock %}
