@@ -1,0 +1,39 @@
+{% extends "mypage/layout.html" %}
+
+{% block title %}적립금{% endblock %}
+
+{% block mypage_content %}
+<h2 class="mypage__section-title">적립금</h2>
+
+<div class="mypage__point-balance">
+  <span class="mypage__point-label">사용 가능 적립금</span>
+  <strong class="mypage__point-amount">{{ summary.point_balance | currency }}<span>원</span></strong>
+</div>
+
+<p class="mypage__lead">구매 금액의 1%가 적립됩니다. 결제 시 적립금으로 사용할 수 있습니다.</p>
+
+<div class="mypage__table-wrap">
+  <table class="mypage__table">
+    <thead>
+      <tr>
+        <th scope="col">일자</th>
+        <th scope="col">내용</th>
+        <th scope="col">적립</th>
+        <th scope="col">잔액</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in point_history %}
+      <tr>
+        <td>{{ entry.date.strftime('%Y.%m.%d') }}</td>
+        <td>{{ entry.label }}</td>
+        <td class="{% if entry.amount >= 0 %}is-plus{% else %}is-minus{% endif %}">
+          {% if entry.amount >= 0 %}+{% endif %}{{ entry.amount | currency }}
+        </td>
+        <td>{{ entry.balance | currency }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

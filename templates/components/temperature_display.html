@@ -1,0 +1,9 @@
+{# 시즌 온도 — 소수점·체감·범위 표시 #}
+<div class="season-temp{% if variant %} season-temp--{{ variant }}{% endif %}" style="--temp-accent: {{ room.accent }}">
+  <p class="season-temp__label">Indoor Temp</p>
+  <div class="season-temp__reading" aria-label="{{ room.temperature }}">
+    <span class="season-temp__value">{{ room.temp_integer }}</span><span class="season-temp__decimal">.{{ '%01d'|format(room.temp_decimal) }}</span><span class="season-temp__unit">°C</span>
+  </div>
+  <span class="season-temp__feel">{{ room.temp_feel }}</span>
+  <span class="season-temp__range">{{ room.temp_range }}</span>
+</div>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}결제 실패{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="cart-page payment-page">
+  <div class="container cart-page__container payment-page__container">
+    <div class="payment-page__result payment-page__result--fail">
+      <p class="cart-page__eyebrow">FAILED</p>
+      <h1 class="cart-page__title">결제에 실패했습니다</h1>
+      <p class="payment-page__lead">{{ message }}</p>
+      {% if code %}
+      <p class="payment-page__code">오류 코드: {{ code }}</p>
+      {% endif %}
+      {% if order %}
+      <p class="payment-page__order-no">주문번호 {{ order.order_number }}</p>
+      {% endif %}
+
+      <div class="payment-page__actions">
+        {% if order %}
+        <a href="{{ url_for('payment.checkout', order_number=order.order_number) }}" class="cart-page__btn cart-page__btn--primary">다시 결제하기</a>
+        {% endif %}
+        <a href="{{ url_for('cart.index') }}" class="cart-page__btn cart-page__btn--outline">장바구니로</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

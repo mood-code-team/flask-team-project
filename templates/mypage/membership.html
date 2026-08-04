@@ -1,0 +1,30 @@
+{% extends "mypage/layout.html" %}
+
+{% block title %}멤버십 혜택{% endblock %}
+
+{% block mypage_content %}
+<h2 class="mypage__section-title">멤버십 혜택</h2>
+
+<div class="mypage__membership-card">
+  <p class="mypage__membership-tier">{{ membership.label }}</p>
+  <p class="mypage__membership-tagline">{{ membership.tagline }}</p>
+  {% if membership.next_tier and membership.orders_until_next > 0 %}
+  <p class="mypage__membership-next">
+    {{ membership.next_tier }} 등급까지 구매 {{ membership.orders_until_next }}회 남음
+  </p>
+  {% elif membership.next_tier is none %}
+  <p class="mypage__membership-next">최고 등급을 유지하고 있습니다.</p>
+  {% endif %}
+</div>
+
+<ul class="mypage__benefit-list">
+  {% for benefit in membership.benefits %}
+  <li>{{ benefit }}</li>
+  {% endfor %}
+</ul>
+
+<p class="mypage__note">
+  Mood Code 멤버십은 누적 구매 횟수에 따라 자동으로 승급됩니다.
+  <a href="{{ url_for('mypage.coupons') }}">보유 쿠폰 확인</a>
+</p>
+{% endblock %}

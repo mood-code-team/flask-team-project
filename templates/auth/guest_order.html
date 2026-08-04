@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}비회원 주문 조회{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="auth-card">
+    <h1 class="auth-page__title">비회원 주문 조회</h1>
+
+    <form class="auth-form" method="post" action="{{ url_for('auth.guest_order') }}" novalidate>
+      <div class="auth-field">
+        <label class="auth-label" for="guest-name">주문자명</label>
+        <input
+          id="guest-name"
+          class="auth-input"
+          type="text"
+          name="recipient_name"
+          value="{{ form.recipient_name }}"
+          placeholder="주문자명을 입력하세요"
+          autocomplete="name"
+          required
+        >
+      </div>
+
+      <div class="auth-field">
+        <label class="auth-label" for="guest-order-number">주문번호</label>
+        <input
+          id="guest-order-number"
+          class="auth-input"
+          type="text"
+          name="order_number"
+          value="{{ form.order_number }}"
+          placeholder="주문번호를 입력하세요"
+          autocomplete="off"
+          required
+        >
+      </div>
+
+      <div class="auth-field">
+        <label class="auth-label" for="guest-password">비회원주문 비밀번호</label>
+        <input
+          id="guest-password"
+          class="auth-input"
+          type="password"
+          name="guest_password"
+          placeholder="비회원주문 비밀번호를 입력하세요"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button type="submit" class="auth-submit">비회원 주문 조회</button>
+    </form>
+
+    <a href="{{ url_for('auth.login') }}" class="auth-back">로그인으로 돌아가기</a>
+  </div>
+</section>
+{% endblock %}

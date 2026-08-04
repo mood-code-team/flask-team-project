@@ -1,0 +1,65 @@
+<aside class="mypage__sidebar">
+  <div class="mypage__profile-head">
+    <h1 class="mypage__username">{{ summary.display_name }}님</h1>
+    <a href="{{ url_for('auth.logout') }}" class="mypage__logout">로그아웃</a>
+  </div>
+
+  <div class="mypage__badge-box">
+    <p class="mypage__tier">{{ summary.membership_label }}</p>
+    <dl class="mypage__benefits">
+      <div>
+        <dt>쿠폰</dt>
+        <dd>{{ summary.coupon_count }}개</dd>
+      </div>
+      <div>
+        <dt>적립금</dt>
+        <dd>{{ summary.point_balance | currency }}원</dd>
+      </div>
+    </dl>
+  </div>
+
+  <nav class="mypage__nav" aria-label="마이페이지 메뉴">
+    <div class="mypage__nav-group">
+      <p class="mypage__nav-title">쇼핑 정보</p>
+      <ul>
+        <li>
+          <a href="{{ url_for('mypage.index') }}" class="{% if active_page == 'orders' %}is-active{% endif %}">주문내역</a>
+        </li>
+        <li>
+          <a href="{{ url_for('mypage.wishlist') }}" class="{% if active_page == 'wishlist' %}is-active{% endif %}">위시리스트</a>
+        </li>
+      </ul>
+    </div>
+    <div class="mypage__nav-group">
+      <p class="mypage__nav-title">회원 혜택</p>
+      <ul>
+        <li>
+          <a href="{{ url_for('mypage.coupons') }}" class="{% if active_page == 'coupons' %}is-active{% endif %}">쿠폰</a>
+        </li>
+        <li>
+          <a href="{{ url_for('mypage.points') }}" class="{% if active_page == 'points' %}is-active{% endif %}">적립금</a>
+        </li>
+        <li>
+          <a href="{{ url_for('mypage.membership') }}" class="{% if active_page == 'membership' %}is-active{% endif %}">멤버십 혜택</a>
+        </li>
+      </ul>
+    </div>
+    <div class="mypage__nav-group">
+      <p class="mypage__nav-title">회원정보</p>
+      <ul>
+        <li>
+          <a href="{{ url_for('mypage.profile') }}" class="{% if active_page == 'profile' %}is-active{% endif %}">회원정보 수정</a>
+        </li>
+        <li>
+          <a href="{{ url_for('mypage.addresses') }}" class="{% if active_page == 'addresses' %}is-active{% endif %}">배송지 관리</a>
+        </li>
+        <li>
+          <a href="{{ url_for('mypage.qna') }}" class="{% if active_page == 'qna' %}is-active{% endif %}">상품 Q&amp;A</a>
+        </li>
+        <li>
+          <a href="{{ url_for('mypage.reviews') }}" class="{% if active_page == 'reviews' %}is-active{% endif %}">리뷰</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</aside>

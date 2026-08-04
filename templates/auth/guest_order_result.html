@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}주문 조회 결과{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="auth-card auth-card--wide">
+    <h1 class="auth-page__title">비회원 주문 조회</h1>
+
+    <div class="guest-order-result">
+      <dl class="guest-order-result__meta">
+        <div>
+          <dt>주문번호</dt>
+          <dd>{{ order.order_number }}</dd>
+        </div>
+        <div>
+          <dt>주문자</dt>
+          <dd>{{ order.recipient_name }}</dd>
+        </div>
+        <div>
+          <dt>주문 상태</dt>
+          <dd><span class="guest-order-result__status">{{ order.status_label }}</span></dd>
+        </div>
+        <div>
+          <dt>연락처</dt>
+          <dd>{{ order.recipient_phone }}</dd>
+        </div>
+        <div class="guest-order-result__full">
+          <dt>배송지</dt>
+          <dd>{{ order.shipping_address }}</dd>
+        </div>
+      </dl>
+
+      <h2 class="guest-order-result__subtitle">주문 상품</h2>
+      <ul class="guest-order-result__items">
+        {% for item in order.items %}
+        <li>
+          <span class="guest-order-result__name">{{ item.product_name }}</span>
+          <span class="guest-order-result__qty">{{ item.quantity }}개</span>
+          <span class="guest-order-result__price">{{ item.subtotal | currency }}원</span>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <p class="guest-order-result__total">
+        결제 금액 <strong>{{ order.total_amount | currency }}원</strong>
+      </p>
+    </div>
+
+    <a href="{{ url_for('auth.guest_order') }}" class="auth-back">다시 조회하기</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}?v=20260803b">
+{% endblock %}
+
+{% block content %}
+{% set sold_out = product.stock < 1 %}
+<article class="product-detail product-detail--hpix">
+  <div class="container product-detail__inner">
+    <nav class="product-detail__breadcrumb" aria-label="breadcrumb">
+      <a href="{{ url_for('main.index') }}">홈</a>
+      <span>/</span>
+      <a href="{{ url_for('category.listing', slug=product.category.slug) }}">{{ product.category | category_label }}</a>
+      <span>/</span>
+      <span>{{ product.name }}</span>
+    </nav>
+
+    <div
+      class="product-detail__shell"
+      data-product-detail
+      data-product-slug="{{ product.slug }}"
+      data-product-id="{{ product.id }}"
+      data-unit-price="{{ product.sale_price }}"
+    >
+      <div class="product-detail__gallery">
+        <div class="product-detail__image">
+          {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          {% endif %}
+          <div class="product-detail__placeholder"{% if product.image_url %} style="display:none"{% endif %}>🏠</div>
+        </div>
+      </div>
+
+      <aside class="product-detail__buybox" aria-label="구매 정보">
+        {% if product.brand %}
+          <p class="product-detail__brand">{{ product.brand | upper }}</p>
+        {% endif %}
+        <h1 class="product-detail__name">{{ product.name }}</h1>
+
+        <div class="product-detail__price">
+          {% if product.discount_price %}
+            <span class="product-detail__original">KRW {{ product.price | currency }}</span>
+            <span class="product-detail__discount">{{ product.discount_rate }}%</span>
+          {% endif %}
+          <span class="product-detail__sale">KRW {{ product.sale_price | currency }}</span>
+        </div>
+
+        {% if product.is_new or product.is_best or product.is_popular %}
+        <div class="product-detail__tags">
+          {% if product.is_new %}<span>NEW</span>{% endif %}
+          {% if product.is_best %}<span>BEST</span>{% endif %}
+          {% if product.is_popular %}<span>POPULAR</span>{% endif %}
+        </div>
+        {% endif %}
+
+        <p class="product-detail__lead">{{ product.description or '프리미엄 인테리어 가구' }}</p>
+
+        {% if summary_specs %}
+        <ul class="product-detail__summary-specs">
+          {% for line in summary_specs %}
+          <li>{{ line }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="product-detail__purchase" data-buybox-purchase>
+          <div class="product-detail__qty-row">
+            <span class="product-detail__qty-label">수량</span>
+            <div class="product-detail__qty" role="group" aria-label="수량 선택">
+              <button type="button" class="product-detail__qty-btn" data-qty-minus aria-label="수량 감소">−</button>
+              <input
+                type="number"
+                class="product-detail__qty-input"
+                data-product-qty
+                value="1"
+                min="1"
+                max="{{ product.stock if product.stock > 0 else 1 }}"
+                {% if sold_out %}disabled{% endif %}
+                aria-label="수량"
+              >
+              <button type="button" class="product-detail__qty-btn" data-qty-plus aria-label="수량 증가">+</button>
+            </div>
+          </div>
+
+          <div class="product-detail__total">
+            <span>TOTAL</span>
+            <strong data-detail-total>{{ product.sale_price | currency }}</strong>
+            <span class="product-detail__total-unit">원</span>
+          </div>
+
+          <div class="product-detail__actions">
+            {% if sold_out %}
+              <button type="button" class="btn btn--primary btn--block" disabled>SOLD OUT</button>
+            {% else %}
+              <button type="button" class="btn btn--primary btn--block" data-buy-now>바로구매</button>
+              <button type="button" class="btn btn--outline btn--block" data-add-to-cart="{{ product.slug }}">장바구니</button>
+            {% endif %}
+            <button
+              type="button"
+              class="btn btn--outline btn--block{% if in_wishlist %} is-active{% endif %}"
+              data-wishlist-toggle="{{ product.id }}"
+              aria-pressed="{{ 'true' if in_wishlist else 'false' }}"
+              data-label-add="위시리스트"
+              data-label-remove="위시리스트 해제"
+            >
+              {% if in_wishlist %}위시리스트 해제{% else %}위시리스트{% endif %}
+            </button>
+          </div>
+        </div>
+
+        <p class="product-detail__shipping-note">택배 · {{ shipping_label }}</p>
+        <span class="product-detail__buybox-sentinel" data-buybox-sentinel aria-hidden="true"></span>
+      </aside>
+
+      <div class="product-detail__content">
+        <nav class="product-detail__nav" aria-label="상품 정보">
+          <a href="#detail-description" class="is-active" data-detail-nav>DESCRIPTION</a>
+          <a href="#detail-specs" data-detail-nav>PRODUCT DETAIL</a>
+          <a href="#detail-shipping" data-detail-nav>SHIPPING</a>
+          <a href="#detail-exchange" data-detail-nav>EXCHANGE/REFUND</a>
+          <a href="#product-reviews" data-detail-nav>REVIEW</a>
+          <a href="#product-qna" data-detail-nav>Q&amp;A</a>
+        </nav>
+
+        <section class="product-detail__panel" id="detail-description">
+          <h2 class="product-detail__panel-title">DESCRIPTION</h2>
+          <div class="product-detail__panel-body">
+            <p>{{ product.description or '프리미엄 인테리어 가구입니다.' }}</p>
+          </div>
+        </section>
+
+        <section class="product-detail__panel" id="detail-specs">
+          <h2 class="product-detail__panel-title">PRODUCT DETAIL</h2>
+          <div class="product-detail__panel-body">
+            <table class="product-detail__table">
+              <tbody>
+                {% for row in detail_table %}
+                <tr>
+                  <th scope="row">{{ row.label }}</th>
+                  <td>{{ row.value }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="product-detail__panel" id="detail-shipping">
+          <h2 class="product-detail__panel-title">SHIPPING</h2>
+          <div class="product-detail__panel-body product-detail__richtext">
+            <p class="product-detail__shipping-lead">택배 · <strong>{{ shipping_label }}</strong></p>
+            {{ shipping_content | safe }}
+            <p class="product-detail__inquiry-link">
+              <a href="#product-qna">상품문의하기</a>
+            </p>
+          </div>
+        </section>
+
+        <section class="product-detail__panel" id="detail-exchange">
+          <h2 class="product-detail__panel-title">EXCHANGE/REFUND</h2>
+          <div class="product-detail__panel-body product-detail__richtext">
+            {{ exchange_content | safe }}
+          </div>
+        </section>
+
+        <section class="product-detail__panel" id="product-reviews">
+          <h2 class="product-detail__panel-title">REVIEW</h2>
+          <div class="product-detail__panel-body">
+            <p class="product-detail__review-note">텍스트 리뷰 · 포토 리뷰 작성 시 적립금이 지급됩니다.</p>
+            {% if reviews %}
+            <ul class="product-detail__reviews">
+              {% for review in reviews %}
+              <li>
+                <div class="product-detail__review-head">
+                  <strong>{{ review.user.full_name or review.user.username }}</strong>
+                  <span>{{ '★' * review.rating }}{% if review.rating < 5 %}{{ '☆' * (5 - review.rating) }}{% endif %}</span>
+                </div>
+                <p>{{ review.content }}</p>
+                <time>{{ review.created_at.strftime('%Y.%m.%d') }}</time>
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p class="product-detail__empty">게시물이 없습니다</p>
+            {% endif %}
+          </div>
+        </section>
+
+        <section class="product-detail__panel" id="product-qna">
+          <h2 class="product-detail__panel-title">Q&amp;A</h2>
+          <div class="product-detail__panel-body">
+            {% if current_user.is_authenticated %}
+            <form class="product-detail__qna-form" method="post" action="{{ url_for('product.ask_question', slug=product.slug) }}">
+              <label for="product-question">상품문의하기</label>
+              <textarea id="product-question" name="question" rows="3" placeholder="배송·재고·사이즈 등 궁금한 점을 남겨주세요" required></textarea>
+              <button type="submit" class="btn btn--primary">문의 등록</button>
+            </form>
+            {% else %}
+            <p class="product-detail__login-hint"><a href="{{ url_for('auth.login', next=request.path) }}">로그인</a> 후 문의를 남길 수 있습니다.</p>
+            {% endif %}
+
+            {% if questions %}
+            <ul class="product-detail__qna">
+              {% for q in questions %}
+              <li>
+                <p><strong>Q.</strong> {{ q.question }}</p>
+                {% if q.answer %}
+                <p class="product-detail__qna-answer"><strong>A.</strong> {{ q.answer }}</p>
+                {% else %}
+                <p class="product-detail__qna-pending">답변 준비 중</p>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p class="product-detail__empty">등록된 문의가 없습니다.</p>
+            {% endif %}
+          </div>
+        </section>
+
+        {% if related_products %}
+        <section class="product-detail__related">
+          <h2>RELATED PRODUCTS</h2>
+          <div class="product-grid product-grid--compact">
+            {% for item in related_products %}
+              {% with product=item %}
+                {% include "components/product_card.html" %}
+              {% endwith %}
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if not sold_out %}
+  <div class="product-detail__mobile-bar" aria-hidden="true">
+    <div class="product-detail__mobile-bar-price">
+      <span class="product-detail__mobile-bar-label">KRW</span>
+      <strong data-mobile-total>{{ product.sale_price | currency }}</strong>
+    </div>
+    <button type="button" class="btn btn--primary" data-buy-now>구매</button>
+    <button type="button" class="btn btn--outline" data-add-to-cart="{{ product.slug }}">장바구니</button>
+    <button
+      type="button"
+      class="btn btn--outline btn--icon{% if in_wishlist %} is-active{% endif %}"
+      data-wishlist-toggle="{{ product.id }}"
+      aria-pressed="{{ 'true' if in_wishlist else 'false' }}"
+      data-label-add="♡"
+      data-label-remove="♥"
+      aria-label="{% if in_wishlist %}위시리스트 해제{% else %}위시리스트{% endif %}"
+    >{% if in_wishlist %}♥{% else %}♡{% endif %}</button>
+  </div>
+  {% endif %}
+</article>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/product-detail.js') }}?v=20260803b"></script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "mypage/layout.html" %}
+
+{% block title %}배송지 관리{% endblock %}
+
+{% block mypage_content %}
+<h2 class="mypage__section-title">배송지 관리</h2>
+<p class="mypage__lead">기본 배송지를 등록하면 주문 시 자동으로 입력됩니다.</p>
+
+<form class="mypage__form" method="post" action="{{ url_for('mypage.addresses') }}">
+  <div class="mypage__form-row">
+    <label class="mypage__label" for="addr-name">수령인</label>
+    <input id="addr-name" class="mypage__input is-readonly" type="text" value="{{ user.full_name or user.username }}" readonly>
+  </div>
+  <div class="mypage__form-row">
+    <label class="mypage__label" for="addr-phone">연락처 <span class="mypage__required">*</span></label>
+    <input id="addr-phone" class="mypage__input" type="tel" name="phone" value="{{ user.phone or '' }}" required>
+  </div>
+  <div class="mypage__form-row mypage__form-row--address">
+    <span class="mypage__label">주소 <span class="mypage__required">*</span></span>
+    {% with addr=parsed_address, name_prefix='addr', hidden_field_name='address' %}
+      {% include "components/address_fields.html" %}
+    {% endwith %}
+  </div>
+  <div class="mypage__form-actions">
+    <button type="submit" class="mypage__submit">배송지 저장</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block mypage_js %}
+<script src="{{ url_for('static', filename='js/address-search.js') }}?v=20260803a"></script>
+{% endblock %}

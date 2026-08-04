@@ -1,0 +1,34 @@
+{% extends "mypage/layout.html" %}
+
+{% block title %}쿠폰{% endblock %}
+
+{% block mypage_content %}
+<h2 class="mypage__section-title">보유 쿠폰</h2>
+<p class="mypage__lead">사용 가능한 쿠폰 {{ coupons | length }}장</p>
+
+<ul class="mypage__coupon-list">
+  {% for coupon in coupons %}
+  <li class="mypage__coupon {% if not coupon.is_usable %}is-disabled{% endif %}">
+    <div class="mypage__coupon-discount">{{ coupon.discount_label }}</div>
+    <div class="mypage__coupon-body">
+      <p class="mypage__coupon-title">{{ coupon.title }}</p>
+      <p class="mypage__coupon-desc">{{ coupon.description }}</p>
+      <dl class="mypage__coupon-meta">
+        <div>
+          <dt>쿠폰 코드</dt>
+          <dd>{{ coupon.code }}</dd>
+        </div>
+        <div>
+          <dt>최소 주문</dt>
+          <dd>{% if coupon.min_amount > 0 %}KRW {{ coupon.min_amount | currency }}{% else %}제한 없음{% endif %}</dd>
+        </div>
+        <div>
+          <dt>유효기간</dt>
+          <dd>{{ coupon.expires_at }}까지</dd>
+        </div>
+      </dl>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

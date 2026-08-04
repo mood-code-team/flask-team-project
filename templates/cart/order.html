@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}주문하기{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="cart-page">
+  <div class="container cart-page__container">
+    <header class="cart-page__head">
+      <p class="cart-page__eyebrow">ORDER</p>
+      <h1 class="cart-page__title">주문 · 배송 정보</h1>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="auth-alerts">
+          {% for category, message in messages %}
+            <p class="auth-alert auth-alert--{{ category }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form class="cart-page__layout cart-page__layout--single" method="post" action="{{ url_for('cart.order', ids=selected_ids) if selected_ids else url_for('cart.order') }}">
+      {% if selected_ids %}
+      <input type="hidden" name="ids" value="{{ selected_ids }}">
+      {% endif %}
+
+      <div class="cart-page__main">
+        <h2 class="cart-page__section-title">배송지</h2>
+        <div class="cart-page__form-grid">
+          <div class="auth-field">
+            <label class="auth-label" for="recipient-name">수령인 <span class="auth-required">*</span></label>
+            <input id="recipient-name" class="auth-input" type="text" name="recipient_name" value="{{ form.recipient_name }}" required>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="recipient-phone">연락처 <span class="auth-required">*</span></label>
+            <input id="recipient-phone" class="auth-input" type="tel" name="recipient_phone" value="{{ form.recipient_phone }}" placeholder="010-0000-0000" required>
+          </div>
+          <div class="auth-field cart-page__form-full">
+            <span class="auth-label">주소 <span class="auth-required">*</span></span>
+            {% with addr=form.shipping_addr, name_prefix='shipping' %}
+              {% include "components/address_fields.html" %}
+            {% endwith %}
+          </div>
+          <div class="auth-field cart-page__form-full">
+            <label class="auth-label" for="shipping-memo">배송 메모</label>
+            <input id="shipping-memo" class="auth-input" type="text" name="shipping_memo" value="{{ form.shipping_memo }}" placeholder="부재 시 문 앞에 놓아주세요">
+          </div>
+        </div>
+
+        <h2 class="cart-page__section-title">주문 상품</h2>
+        <ul class="cart-page__list">
+          {% for line in lines %}
+          <li class="cart-page__row cart-page__row--readonly">
+            <div class="cart-page__row-body">
+              <div class="cart-page__row-top">
+                <div class="cart-page__detail">
+                  <p class="cart-page__name">{{ line.product.name }}</p>
+                  <div class="cart-page__price-block">
+                    <span class="cart-page__sale">KRW {{ line.product.sale_price | currency }}</span>
+                    <span class="cart-page__qty-label">× {{ line.quantity }}</span>
+                  </div>
+                </div>
+                <a href="{{ url_for('product.detail', slug=line.product.slug) }}" class="cart-page__thumb">
+                  {% if line.product.image_url %}
+                    <img src="{{ line.product.image_url }}" alt="{{ line.product.name }}" loading="lazy">
+                  {% else %}
+                    <span>🏠</span>
+                  {% endif %}
+                </a>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+
+        {% if coupons %}
+        <h2 class="cart-page__section-title">쿠폰 · 적립금</h2>
+        <div class="cart-page__form-grid">
+          <div class="auth-field cart-page__form-full">
+            <label class="auth-label" for="user-coupon">쿠폰 선택</label>
+            <select id="user-coupon" class="auth-input" name="user_coupon_id">
+              <option value="">사용 안 함</option>
+              {% for coupon in coupons %}
+              <option value="{{ coupon.user_coupon_id }}" {% if form.user_coupon_id == coupon.user_coupon_id|string %}selected{% endif %}>
+                {{ coupon.title }} ({{ coupon.discount_label }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="point-used">적립금 사용</label>
+            <input id="point-used" class="auth-input" type="number" name="point_used" min="0" max="{{ point_balance }}" value="{{ point_used or 0 }}" inputmode="numeric">
+            <p class="auth-hint">사용 가능 {{ point_balance | currency }}원</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <aside class="cart-page__aside">
+        <div class="cart-page__summary">
+          <h2 class="cart-page__summary-title">결제 예정</h2>
+          <dl class="cart-page__summary-list">
+            <div>
+              <dt>상품금액</dt>
+              <dd>KRW {{ product_total | currency }}</dd>
+            </div>
+            {% if coupon_discount and coupon_discount > 0 %}
+            <div>
+              <dt>쿠폰 할인</dt>
+              <dd>− KRW {{ coupon_discount | currency }}</dd>
+            </div>
+            {% endif %}
+            {% if point_used and point_used > 0 %}
+            <div>
+              <dt>적립금</dt>
+              <dd>− KRW {{ point_used | currency }}</dd>
+            </div>
+            {% endif %}
+            <div>
+              <dt>배송비</dt>
+              <dd>{% if shipping_fee == 0 %}무료{% else %}KRW {{ shipping_fee | currency }}{% endif %}</dd>
+            </div>
+            {% if discount_total > 0 %}
+            <div>
+              <dt>상품 할인</dt>
+              <dd>− KRW {{ discount_total | currency }}</dd>
+            </div>
+            {% endif %}
+          </dl>
+          <div class="cart-page__grand">
+            <span>총 결제 금액</span>
+            <strong>KRW {{ grand_total | currency }}</strong>
+          </div>
+          <button type="submit" class="cart-page__btn cart-page__btn--primary cart-page__btn--full">결제하기</button>
+          <p class="cart-page__notice">다음 단계에서 카드사 결제창이 열립니다.<br>토스페이먼츠 테스트 모드로 연동되어 있습니다.</p>
+          <a href="{{ url_for('cart.index') }}" class="cart-page__back">장바구니로 돌아가기</a>
+        </div>
+      </aside>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/address-search.js') }}?v=20260803a"></script>
+{% endblock %}

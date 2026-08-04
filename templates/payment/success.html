@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}결제 완료{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="cart-page payment-page">
+  <div class="container cart-page__container payment-page__container">
+    <div class="payment-page__result payment-page__result--success">
+      <p class="cart-page__eyebrow">COMPLETE</p>
+      <h1 class="cart-page__title">결제가 완료되었습니다</h1>
+      <p class="payment-page__lead">Mood Code 주문이 정상적으로 접수되었습니다.</p>
+
+      <dl class="payment-page__meta">
+        <div>
+          <dt>주문번호</dt>
+          <dd>{{ order.order_number }}</dd>
+        </div>
+        <div>
+          <dt>결제금액</dt>
+          <dd>KRW {{ order.total_amount | currency }}</dd>
+        </div>
+        <div>
+          <dt>결제수단</dt>
+          <dd>{{ payment.method if payment else order.payment_method }}</dd>
+        </div>
+        <div>
+          <dt>수령인</dt>
+          <dd>{{ order.recipient_name }} · {{ order.recipient_phone }}</dd>
+        </div>
+        <div>
+          <dt>배송지</dt>
+          <dd>{{ order.shipping_address }}</dd>
+        </div>
+      </dl>
+
+      <div class="payment-page__actions">
+        <a href="{{ url_for('main.index') }}" class="cart-page__btn cart-page__btn--primary">쇼핑 계속하기</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}장바구니{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="cart-page" id="cart-page" data-order-url="{{ url_for('cart.order') }}">
+  <div class="container cart-page__container">
+    <header class="cart-page__head">
+      <p class="cart-page__eyebrow">CART</p>
+      <h1 class="cart-page__title">장바구니 <span class="cart-page__count">({{ summary.item_count }})</span></h1>
+    </header>
+
+    {% if summary.lines %}
+    <div class="cart-page__layout">
+      <div class="cart-page__main">
+        <div class="cart-page__toolbar">
+          <label class="cart-page__select-all">
+            <input type="checkbox" id="cart-select-all" checked>
+            <span>전체 선택</span>
+          </label>
+        </div>
+
+        <ul class="cart-page__list" id="cart-item-list">
+          {% for line in summary.lines %}
+          {% set ship = line_shipping_info(line) %}
+          <li
+            class="cart-page__row"
+            data-product-id="{{ line.product.id }}"
+            data-original-subtotal="{{ line.original_subtotal }}"
+            data-subtotal="{{ line.subtotal }}"
+            data-discount="{{ line.discount_amount }}"
+            data-line-shipping="{{ ship.fee }}"
+            data-cod-separate="{{ '1' if ship.cod_separate else '0' }}"
+            data-standard-shipping="{{ '1' if ship.standard else '0' }}"
+            data-unit-price="{{ line.product.price }}"
+            data-has-installation="{{ '1' if line.product.has_installation else '0' }}"
+          >
+            <label class="cart-page__check">
+              <input type="checkbox" class="cart-item-check" name="cart_item" value="{{ line.product.id }}" checked>
+            </label>
+
+            <div class="cart-page__row-body">
+              <div class="cart-page__row-top">
+                <div class="cart-page__detail">
+                  <div class="cart-page__name-row">
+                    <a href="{{ url_for('product.detail', slug=line.product.slug) }}" class="cart-page__name">
+                      {{ line.product.name }}
+                    </a>
+                    <span class="cart-page__badge">바로배송</span>
+                  </div>
+                  <div class="cart-page__price-block">
+                    {% if line.product.discount_price %}
+                    <span class="cart-page__original">KRW {{ line.product.price | currency }}</span>
+                    {% endif %}
+                    <span class="cart-page__sale">KRW {{ line.product.sale_price | currency }}</span>
+                    {% if line.product.discount_rate > 0 %}
+                    <span class="cart-page__rate">{{ line.product.discount_rate }}%</span>
+                    {% endif %}
+                  </div>
+                  <p class="cart-page__ship-note">{{ ship.label }}</p>
+                </div>
+
+                <a href="{{ url_for('product.detail', slug=line.product.slug) }}" class="cart-page__thumb">
+                  {% if line.product.image_url %}
+                    <img src="{{ line.product.image_url }}" alt="{{ line.product.name }}" loading="lazy">
+                  {% else %}
+                    <span>🏠</span>
+                  {% endif %}
+                </a>
+
+                <button type="button" class="cart-page__remove" data-remove-id="{{ line.product.id }}" aria-label="상품 삭제">×</button>
+              </div>
+
+              <div class="cart-page__row-bottom">
+                <div class="cart-page__qty" data-product-id="{{ line.product.id }}">
+                  <button type="button" class="cart-page__qty-btn" data-qty-delta="-1" aria-label="수량 줄이기">−</button>
+                  <input type="number" class="cart-page__qty-input" value="{{ line.quantity }}" min="1" max="99" aria-label="수량">
+                  <button type="button" class="cart-page__qty-btn" data-qty-delta="1" aria-label="수량 늘리기">+</button>
+                </div>
+
+                <p class="cart-page__line-total">
+                  [상품] KRW {{ line.original_subtotal | currency }}
+                  {% if line.discount_amount > 0 %}
+                  − [할인] {{ line.discount_amount | currency }}
+                  {% endif %}
+                  = <strong>KRW {{ line.subtotal | currency }}</strong>
+                </p>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+
+        <p class="cart-page__footer-total" id="cart-footer-total">
+          [개별배송] 상품 {{ summary.original_total | currency }}
+          − 할인금액 {{ summary.discount_total | currency }}
+          + 배송비 {{ summary.shipping_fee | currency }}
+          {% if summary.cod_separate %}(착불 배송비 별도){% endif %}
+          총 {{ summary.grand_total | currency }}
+        </p>
+      </div>
+
+      <aside class="cart-page__aside">
+        <div class="cart-page__summary">
+          <h2 class="cart-page__summary-title">주문 요약</h2>
+          <dl class="cart-page__summary-list">
+            <div>
+              <dt>총 상품금액</dt>
+              <dd id="summary-original">KRW {{ summary.original_total | currency }}</dd>
+            </div>
+            <div>
+              <dt>총 배송비</dt>
+              <dd id="summary-shipping">KRW {{ summary.shipping_fee | currency }}</dd>
+            </div>
+            <div>
+              <dt>총 할인금액</dt>
+              <dd id="summary-discount">KRW {{ summary.discount_total | currency }}</dd>
+            </div>
+            <div class="cart-page__summary-sub">
+              <dt>기간할인</dt>
+              <dd id="summary-period-discount">KRW {{ summary.discount_total | currency }}</dd>
+            </div>
+          </dl>
+
+          <div class="cart-page__grand">
+            <span>총 결제 금액</span>
+            <strong id="summary-grand">KRW {{ summary.grand_total | currency }}</strong>
+          </div>
+
+          <p class="cart-page__cod-note" id="summary-cod-note"{% if not summary.cod_separate %} hidden{% endif %}>(착불 배송비 별도)</p>
+
+          <div class="cart-page__actions">
+            <button type="button" class="cart-page__btn cart-page__btn--outline" id="cart-order-selected">선택상품주문</button>
+            <button type="button" class="cart-page__btn cart-page__btn--primary" id="cart-order-all">전체상품주문</button>
+          </div>
+
+          <p class="cart-page__notice">
+            30만원 미만 주문 시 배송비 4,000원이 부과됩니다.<br>
+            고가·시공 상품은 개별 배송비가 적용됩니다.<br>
+            결제 문의: 010-0000-0000
+          </p>
+        </div>
+      </aside>
+    </div>
+    {% else %}
+    <div class="cart-page__empty-wrap">
+      <p class="cart-page__empty">장바구니가 비어 있습니다.</p>
+      <a href="{{ url_for('main.index') }}" class="cart-page__empty-link">쇼핑 계속하기</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<div class="shop-alert-overlay" id="shop-alert-overlay" hidden aria-hidden="true">
+  <div class="shop-alert" role="alertdialog" aria-modal="true" aria-labelledby="shop-alert-message">
+    <p class="shop-alert__site">Mood Code</p>
+    <p class="shop-alert__message" id="shop-alert-message"></p>
+    <button type="button" class="shop-alert__ok" id="shop-alert-ok">확인</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/cart-page.js') }}?v=20260801b"></script>
+{% endblock %}

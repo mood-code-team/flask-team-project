@@ -1,0 +1,47 @@
+{# 상품 카드 컴포넌트 — 재사용 #}
+<article class="product-card">
+  <button
+    type="button"
+    class="product-card__wishlist"
+    data-wishlist-add="{{ product.id }}"
+    aria-label="위시리스트에 담기"
+    aria-pressed="false"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+      <path d="M12 20.5s-7-4.6-7-10a4 4 0 017-2.6A4 4 0 0119 10.5c0 5.4-7 10-7 10z"/>
+    </svg>
+  </button>
+  <a href="{{ url_for('product.detail', slug=product.slug) }}" class="product-card__link">
+    <div class="product-thumb">
+      {% if product.is_new %}
+        <span class="product-badge badge-new">NEW</span>
+      {% elif product.is_best %}
+        <span class="product-badge badge-best">BEST</span>
+      {% elif product.discount_rate > 0 %}
+        <span class="product-badge badge-sale">{{ product.discount_rate }}%</span>
+      {% endif %}
+      {% if product.image_url %}
+        <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <span class="product-thumb__fallback" style="display:none">🏠</span>
+      {% else %}
+        🏠
+      {% endif %}
+    </div>
+    <div class="product-info">
+      {% if product.category %}
+        <p class="product-category">{{ product.category | category_label }}</p>
+      {% endif %}
+      <p class="product-name">{{ product.name }}</p>
+      <div class="product-price">
+        {% if product.discount_price %}
+          <span class="original">{{ product.price | currency }}원</span>
+          <span class="discount-rate">{{ product.discount_rate }}%</span>
+        {% endif %}
+        {{ product.sale_price | currency }}원
+      </div>
+      {% if product.has_installation %}
+        <p class="product-install">🔧 시공 서비스 포함</p>
+      {% endif %}
+    </div>
+  </a>
+</article>
