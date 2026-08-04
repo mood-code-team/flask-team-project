@@ -3,17 +3,23 @@ Mood Code — 인테리어 셀렉션 쇼핑몰
 
 Flask 풀스택 | SQLite
 
+팀 저장소: https://github.com/mood-code-team/flask-team-project
+
 
 ■ 실행
 
-  실행_서버.bat
-  또는
-    cd 프로젝트_2
+  Windows: 실행_서버.bat (더블클릭)
+  Mac/Linux: ./run.sh
+
+  또는 터미널:
+    cd flask-team-project
     pip install -r requirements.txt
     python scripts\seed_db.py
     python hspace_server.py
 
   http://127.0.0.1:5000/
+
+  ※ GitHub 상세 안내: README.md, docs/TEAM_SETUP.txt
 
 
 ■ 주요 기능
@@ -41,4 +47,4 @@ Flask 풀스택 | SQLite
 ■ 테스트 계정
 
   python scripts\seed_db.py
-  admin / admin1234
+  admin / admin1234  (이메일: admin@shop.local)

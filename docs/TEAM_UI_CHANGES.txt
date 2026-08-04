@@ -109,8 +109,8 @@ Mood Code — UI/기능 변경 이력 (팀 공유용)
 ================================================================================
 확인 방법
 ================================================================================
-1. cd 프로젝트_2 && python scripts/seed_db.py  (최초 1회)
-2. 실행_서버.bat 또는 python hspace_server.py
+1. cd flask-team-project && python scripts/seed_db.py  (최초 1회, bat/run.sh는 자동)
+2. 실행_서버.bat 또는 ./run.sh 또는 python hspace_server.py
 3. http://127.0.0.1:5000/ — 메인 광고 히어로·헤더
 4. /products/<slug> — HPIX형 상세 + sticky 구매박스
 

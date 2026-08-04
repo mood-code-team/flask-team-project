@@ -29,9 +29,9 @@ Notion 기획 → catalog_data.py (또는 Admin) → seed_db.py → MySQL/SQLite
 ### 개발 (혼자 / 로컬) — SQLite
 
 ```bash
-cd 프로젝트_2
+cd flask-team-project
 python scripts/seed_db.py
-python app.py
+python hspace_server.py
 ```
 
 - DB 파일: `database/shop.db`
@@ -135,7 +135,7 @@ python scripts/seed_db.py
 python scripts/seed_db.py
 
 # 서버 실행
-python app.py
+python hspace_server.py
 
 # MySQL 연결 확인
 python database/db.py

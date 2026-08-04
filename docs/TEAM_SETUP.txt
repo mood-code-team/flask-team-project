@@ -1,0 +1,95 @@
+Mood Code — 팀원 설치 · 실행 가이드
+=====================================
+
+저장소: https://github.com/mood-code-team/flask-team-project
+
+
+■ 0. 미리 준비
+
+  - Python 3.10+
+  - Git
+  - 확인: python --version  (또는 py --version)
+
+
+■ 1. 코드 받기 (최초 1회)
+
+  git clone https://github.com/mood-code-team/flask-team-project.git
+  cd flask-team-project
+
+
+■ 2. 실행
+
+  [Windows]
+    실행_서버.bat 더블클릭
+    → pip install, .env 생성, DB 없으면 seed, 서버 시작을 자동 처리
+
+  [Mac / Linux]
+    chmod +x run.sh
+    ./run.sh
+
+  [터미널 직접]
+    pip install -r requirements.txt
+    python scripts/seed_db.py
+    python hspace_server.py
+
+
+■ 3. 브라우저
+
+  http://127.0.0.1:5000/
+
+
+■ 4. 테스트 로그인
+
+  아이디: admin
+  이메일: admin@shop.local
+  비밀번호: admin1234
+
+
+■ GitHub에 없는 것 (정상)
+
+  database/shop.db  → seed_db.py로 생성
+  .env              → .env.example 복사 (bat/run.sh가 자동 생성)
+  venv/             → 각자 선택
+
+
+■ 자주 막히는 경우
+
+  Python not found
+    → Python 재설치, "Add Python to PATH" 체크
+
+  ModuleNotFoundError: flask
+    → pip install -r requirements.txt
+
+  상품·카테고리가 비어 있음
+    → python scripts/seed_db.py
+
+  Mac에서 .bat 안 됨
+    → ./run.sh 사용
+
+  5000 포트 사용 중
+    → 실행 중인 서버 Ctrl+C 종료
+
+
+■ 최신 코드 받기
+
+  cd flask-team-project
+  git pull
+
+
+■ 수정 후 올리기
+
+  git add .
+  git commit -m "수정 내용"
+  git push
+
+  main에 직접 push가 안 되면:
+    git checkout -b feature/내이름-작업
+    git push -u origin feature/내이름-작업
+    → GitHub에서 Pull Request 생성
+
+
+■ GitHub Projects 보드
+
+  Todo 카드 = Issue
+  작업 시작 → In Progress
+  PR merge (Closes #번호) → Done
