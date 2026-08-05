@@ -93,3 +93,20 @@ Mood Code — 팀원 설치 · 실행 가이드
   Todo 카드 = Issue
   작업 시작 → In Progress
   PR merge (Closes #번호) → Done
+
+
+■ 백엔드 팀 (4명)
+
+  역할 분담: docs/BACKEND_TEAM.md
+  Issue 초안: docs/github-issues/ (4개)
+
+  CSV 데이터 + DB import:
+    python scripts/fetch_csv_data.py
+    python scripts/seed_db.py
+    python scripts/import_csv.py
+
+  GitHub Issue 등록 (팀장, gh 로그인 후):
+    powershell -File scripts/create_github_issues.ps1
+
+  작업 브랜치: dvelop
+  PR: backend/작업명 → dvelop

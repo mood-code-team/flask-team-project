@@ -18,9 +18,21 @@
 
 ```
 Notion 기획 → catalog_data.py (또는 Admin) → seed_db.py → MySQL/SQLite
+data-analysis → fetch_csv_data.py → import_csv.py ────────┘
                                                       ↓
               브라우저 ← templates ← routes ← services ← models/DB
 ```
+
+### CSV 실데이터 import (스크래핑 700개 상품)
+
+```bash
+python scripts/fetch_csv_data.py   # data-analysis 브랜치에서 CSV 가져오기
+python scripts/seed_db.py          # 카테고리·관리자 시드
+python scripts/import_csv.py       # CSV → products 테이블
+python scripts/import_csv.py --dry-run   # 미리보기
+```
+
+CSV 위치: `data/csv/output_*/` (gitignore 대상, 각자 로컬에서 fetch)
 
 ---
 
