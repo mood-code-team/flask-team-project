@@ -25,4 +25,15 @@ if [ ! -f database/shop.db ]; then
   "$PY" scripts/seed_db.py
 fi
 
+if [ "${MOODCODE_NO_BROWSER:-0}" != "1" ]; then
+  (
+    sleep 4
+    if command -v xdg-open >/dev/null 2>&1; then
+      xdg-open "http://127.0.0.1:5000/"
+    elif command -v open >/dev/null 2>&1; then
+      open "http://127.0.0.1:5000/"
+    fi
+  ) &
+fi
+
 exec "$PY" hspace_server.py
