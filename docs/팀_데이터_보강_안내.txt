@@ -1,0 +1,176 @@
+Mood Code — 데이터 보강 안내 (팀 공유용)
+==========================================
+
+■ 한 줄 요약
+  백엔드·DB·실행 환경 골격은 완성.
+  지금은 CSV + DB 데이터를 더 채워서 실제 쇼핑몰처럼 보이게 만드는 단계.
+  CSV import → enrich 파이프라인은 dvelop / frontend 브랜치에 올려 둠.
+
+
+■ 현재 데이터 상태
+  ┌────────────────┬─────────────────┬──────────────┐
+  │ 항목           │ import만 했을 때 │ enrich 후    │
+  ├────────────────┼─────────────────┼──────────────┤
+  │ 상품 수        │ 522             │ 522          │
+  │ 할인 상품      │ 7               │ 150          │
+  │ 색상 필터      │ 거의 없음       │ 417          │
+  │ 스타일 필터    │ 없음            │ 522          │
+  │ 인기 뱃지      │ 11              │ 102          │
+  │ 리뷰           │ 0               │ 3            │
+  │ Q&A            │ 0               │ 15           │
+  └────────────────┴─────────────────┴──────────────┘
+
+  IKEA CSV 기반이라 브랜드·가격·기본 설명·이미지 URL은 이미 있음.
+  할인·필터·뱃지·리뷰·Q&A + 아래 [추가·수정 컬럼] 작업이 필요함.
+
+
+================================================================================
+■ CSV 컬럼 작업 안내 (data-analysis · Catalog 담당)
+================================================================================
+
+[1] 이번에 반드시 추가·보강할 컬럼 (지시사항 반영)
+────────────────────────────────────────────────
+
+  (1) 상품 설명
+      컬럼명 : description  (또는 product_description)
+      예시   : 2인용 패브릭 소파. 좁은 거실에도 어울리는 컴팩트 사이즈.
+      용도   : 상품 상세 페이지 DESCRIPTION 영역에 표시
+      비고   : 기존 description 컬럼이 있으면 내용을 더 풍부하게 수정·보강
+
+  (2) 무드코드 코드넘버
+      컬럼명 : mood_code_number  (또는 moodcode_no)
+      예시   : MC-SF-001
+      용도   : Mood Code 자체 상품 관리 코드 (팀 내부 검색·분류용)
+      비고   : 기존 mood_code(시즌/스타일)와 별개 컬럼임. 혼동 금지.
+
+      코드 규칙 예시 (팀에서 통일):
+        MC-SF-001  → Sofa
+        MC-LT-001  → Lighting
+        MC-BD-001  → Bed
+        MC-DT-001  → Dining Table
+        MC-ST-001  → Side Table
+        MC-DF-001  → Diffuser
+        MC-BC-001  → Balcony
+        (MC + 카테고리약어 2~3자 + 3자리 번호)
+
+  (3) 이미지 — 경로 삭제 후 순수 파일명만
+      컬럼명 : image_name  (또는 local_image_path 값 정제)
+      현재   : output_balcony\images\704.208.99.jpg   ← 폴더 경로 포함 (X)
+      수정   : 704.208.99.jpg                          ← 파일명만 (O)
+
+      정제 규칙:
+        - output_xxx\images\  같은 경로 전부 삭제
+        - 슬래시(\, /) 없이 파일명만 남기기
+        - 예: 104.890.09.jpg, glostad-sofa.jpg
+        - 실제 이미지 파일은 data/csv/output_*/images/ 폴더에 두고
+          CSV에는 파일명만 기록
+
+      thumbnail_url (IKEA CDN URL)은 그대로 두거나,
+      로컬 사용 시 image_name 기준으로 매칭
+
+
+[2] 기존에 안내했던 보조 컬럼 (있으면 import 시 자동 반영)
+────────────────────────────────────────────────
+
+  filter_color    beige          색상 필터
+  filter_style    winter         시즌 필터 (spring/summer/fall/winter)
+  filter_space    living         공간 필터 (living/bedroom/kitchen/balcony)
+  discount_rate   15             할인율 % → 할인가 자동 계산
+  discount_price  119000         할인가 직접 지정
+  is_popular      true           인기 뱃지
+  is_new          true           NEW 뱃지
+  is_best         true           BEST 뱃지
+  mood_code       winter         filter_style 별칭 (시즌용, 코드넘버와 다름)
+
+
+[3] filter / style / color 허용 값
+────────────────────────────────────────────────
+
+  space  : living, bedroom, kitchen, balcony
+  style  : spring, summer, fall, winter
+  color  : white, beige, gray, wood, black, pink, yellow, green, blue
+
+
+[4] CSV 수정 예시 (한 행)
+────────────────────────────────────────────────
+
+  product_name     : GLOSTAD 2인용 소파 - 크니사 다크그레이
+  description      : 컴팩트 2인용 패브릭 소파. 좁은 거실·원룸에 적합.
+  mood_code_number : MC-SF-042
+  mood_code        : winter
+  filter_color     : gray
+  filter_space     : living
+  discount_rate    : 10
+  image_name       : 104.890.09.jpg
+  thumbnail_url    : https://www.ikea.com/kr/ko/images/products/...
+  price            : 140000
+  brand            : IKEA
+  category_code    : SOFA
+
+
+================================================================================
+■ 데이터 반영 순서 (팀원 공통)
+================================================================================
+
+  1) CSV 가져오기
+     python scripts/fetch_csv_data.py
+
+  2) 카테고리·관리자 시드
+     python scripts/seed_db.py
+
+  3) CSV → DB
+     python scripts/import_csv.py
+
+  4) 할인·필터·뱃지 보강
+     python scripts/enrich_products.py
+
+  5) 리뷰·Q&A 데모 (선택)
+     python scripts/seed_demo_content.py
+
+  한 번에:
+     python scripts/setup_realistic_data.py
+
+  CSV 이미 받아 둔 경우:
+     python scripts/setup_realistic_data.py --skip-fetch
+
+
+================================================================================
+■ 역할 분담
+================================================================================
+
+  팀장          : 파이프라인 실행·관리, import/enrich 결과 확인, PR 리뷰
+  data-analysis : CSV 컬럼 추가·값 채우기
+                  (description, mood_code_number, image_name 정제, filter, discount)
+  4번 Catalog   : import 후 카테고리·필터·상품상세(설명) 화면 검증
+  3번 Commerce  : 데모 주문·결제 테스트
+  프론트        : frontend 브랜치, templates/ · static/ UI
+
+
+================================================================================
+■ 실행 (웹 확인)
+================================================================================
+
+  git clone https://github.com/mood-code-team/flask-team-project.git
+  cd flask-team-project
+  git checkout frontend    (프론트)
+  git checkout dvelop      (백엔드)
+
+  Windows: 실행_서버.bat 더블클릭
+  → http://127.0.0.1:5000/
+
+  테스트 계정: admin@shop.local / admin1234
+
+
+================================================================================
+■ 정리
+================================================================================
+
+  1. 지금: 골격 완성, 522개 상품, enrich로 할인·필터·뱃지 일부 자동 보강
+  2. 다음: CSV에 상품설명·무드코드 코드넘버 추가, 이미지는 경로 없이 파일명만
+  3. 그다음: import_csv → enrich_products 실행 후 화면에서 확인
+
+  ※ mood_code(시즌) vs mood_code_number(상품코드) — 두 컬럼 구분해서 작업
+  ※ image_name — 폴더 경로 빼고 순수 파일명만
+
+  상세 기술 문서: docs/DATA_ENRICHMENT.md
+  백엔드 역할:   docs/BACKEND_TEAM.md
