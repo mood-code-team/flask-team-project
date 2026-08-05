@@ -23,6 +23,7 @@ HOST = "127.0.0.1"
 PORT = 5000
 URL = f"http://{HOST}:{PORT}/"
 USE_RELOADER = os.environ.get("FLASK_USE_RELOADER", "0") == "1"
+_browser_opened = False
 
 
 def _server_ready() -> bool:
@@ -34,11 +35,19 @@ def _server_ready() -> bool:
 
 
 def open_browser() -> None:
-    """서버가 응답할 때까지 기다린 뒤 브라우저를 연다."""
+    """서버가 응답할 때까지 기다린 뒤 브라우저를 한 번만 연다."""
+    global _browser_opened
+    if _browser_opened:
+        return
+
     for _ in range(30):
         if _server_ready():
             break
         time.sleep(0.5)
+
+    if _browser_opened:
+        return
+    _browser_opened = True
 
     if sys.platform == "win32":
         os.startfile(URL)  # type: ignore[attr-defined]

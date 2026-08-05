@@ -50,9 +50,6 @@ if not exist "database\shop.db" (
     )
 )
 
-rem 서버 기동 후 브라우저 자동 열기 (Python webbrowser 백업)
-start "" cmd /c "timeout /t 4 /nobreak >nul && start http://127.0.0.1:5000/"
-
 "%PY%" hspace_server.py
 if errorlevel 1 (
     echo Server failed to start
