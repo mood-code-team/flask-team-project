@@ -14,6 +14,7 @@
   const prevBtn = slider.querySelector(".hero-slider__prev");
   const nextBtn = slider.querySelector(".hero-slider__next");
   const counterCurrent = slider.querySelector(".hero-slider__counter-current");
+  const headlineEl = document.querySelector("[data-hero-headline]");
   const leadEl = document.querySelector("[data-hero-lead]");
   const ctaEl = document.querySelector("[data-hero-cta]");
   const heroCopy = document.querySelector(".hero-ad__copy");
@@ -64,21 +65,24 @@
     counterCurrent.classList.add("is-changing");
   }
 
+  function swapCopyText(el, text, animate) {
+    if (!el || !text || el.textContent === text) return;
+    if (animate) {
+      el.classList.add("is-fading");
+      window.setTimeout(() => {
+        el.textContent = text;
+        el.classList.remove("is-fading");
+      }, 260);
+      return;
+    }
+    el.textContent = text;
+  }
+
   function updateAdCopy(index, animate) {
     const link = slideEls[index]?.querySelector(".hero-slide");
     if (!link) return;
-    const line = link.dataset.slideLine;
-    if (line && leadEl) {
-      if (animate) {
-        leadEl.classList.add("is-fading");
-        window.setTimeout(() => {
-          leadEl.textContent = line;
-          leadEl.classList.remove("is-fading");
-        }, 260);
-      } else {
-        leadEl.textContent = line;
-      }
-    }
+    swapCopyText(headlineEl, link.dataset.slideHeadline, animate);
+    swapCopyText(leadEl, link.dataset.slideLine, animate);
     if (ctaEl && link.href) ctaEl.href = link.href;
   }
 

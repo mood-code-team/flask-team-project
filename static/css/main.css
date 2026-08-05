@@ -25,10 +25,10 @@
 
 .hero-ad__copy {
   position: absolute;
-  z-index: 2;
+  z-index: 12;
   left: clamp(24px, 5vw, 80px);
-  top: calc(var(--header-height) + clamp(32px, 6vw, 56px));
-  max-width: min(420px, 78vw);
+  top: calc(var(--header-height) + clamp(40px, 7vw, 72px));
+  max-width: min(520px, 86vw);
   color: #fff;
   pointer-events: none;
   transform: translateY(var(--hero-copy-shift, 0));
@@ -37,10 +37,13 @@
 }
 
 .hero-ad__lead {
-  font-size: clamp(12px, 1.4vw, 14px);
-  opacity: 0.78;
-  margin-bottom: 18px;
-  max-width: 28ch;
+  font-size: clamp(13px, 1.6vw, 16px);
+  font-weight: 400;
+  line-height: 1.55;
+  opacity: 0.86;
+  margin-bottom: 22px;
+  max-width: 32ch;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.38);
   transition: opacity 0.45s var(--ease-out-soft), transform 0.45s var(--ease-out-soft);
 }
 
@@ -62,11 +65,18 @@
 }
 
 .hero-ad__headline {
-  font-size: clamp(28px, 4.8vw, 52px);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.08;
-  margin-bottom: 10px;
+  font-size: clamp(36px, 6.8vw, 68px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  margin: 0 0 14px;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.42);
+  transition: opacity 0.45s var(--ease-out-soft), transform 0.45s var(--ease-out-soft);
+}
+
+.hero-ad__headline.is-fading {
+  opacity: 0;
+  transform: translateY(6px);
 }
 
 .hero-ad__cta {
@@ -712,6 +722,7 @@
 /* ===== Responsive ===== */
 @media (prefers-reduced-motion: reduce) {
   .hero-slide__img,
+  .hero-ad__headline,
   .hero-ad__lead,
   .season-card__link,
   .season-card__image img {
@@ -736,9 +747,19 @@
   }
 
   .hero-ad__copy {
-    top: calc(var(--header-height) + 20px);
+    top: calc(var(--header-height) + 24px);
     left: 20px;
     max-width: calc(100% - 40px);
+  }
+
+  .hero-ad__headline {
+    font-size: clamp(30px, 9vw, 44px);
+    margin-bottom: 12px;
+  }
+
+  .hero-ad__lead {
+    font-size: 13px;
+    margin-bottom: 18px;
   }
 
   .hero-ad__bridge {

@@ -16,13 +16,14 @@ def _unsplash(photo_id: str) -> dict[str, str]:
     }
 
 
-# 히어로 — 카테고리 광고
+# 히어로 — 카테고리 광고 (3·4번 톤: 따뜻한 중성 베드룸 / 1·2번도 같은 계열)
 HERO_SLIDES = [
     {
         "image": "images/hero/lighting.jpg",
         "image_2k": "images/hero/lighting.jpg",
         "title": "Lighting",
-        "tagline": "작은 거실, 충분한 빛",
+        "headline": "작은 거실, 충분한 빛.",
+        "tagline": "은은한 조명으로 거실을 채우세요",
         "concept": "SOFT LIGHT",
         "category_slug": "light",
     },
@@ -30,6 +31,7 @@ HERO_SLIDES = [
         "image": "images/hero/sofa.jpg",
         "image_2k": "images/hero/sofa.jpg",
         "title": "Sofa",
+        "headline": "혼자지만, 충분히.",
         "tagline": "컴팩트 소파 · 아늑한 라운지",
         "concept": "SOLO LOUNGE",
         "category_slug": "sofa",
@@ -38,7 +40,8 @@ HERO_SLIDES = [
         "image": "images/hero/side-table.jpg",
         "image_2k": "images/hero/side-table.jpg",
         "title": "Side Table",
-        "tagline": "손 닿는 곳, 딱 맞는 크기",
+        "headline": "손 닿는 곳, 딱 맞게.",
+        "tagline": "좁은 공간을 위한 사이드 테이블",
         "concept": "JUST FIT",
         "category_slug": "side-table",
     },
@@ -46,7 +49,8 @@ HERO_SLIDES = [
         "image": "images/hero/diffuser.jpg",
         "image_2k": "images/hero/diffuser.jpg",
         "title": "Diffuser",
-        "tagline": "은은한 향, 좁은 공간도 OK",
+        "headline": "은은한 향, 작은 무드.",
+        "tagline": "좁은 공간도 OK",
         "concept": "SMALL MOOD",
         "category_slug": "diffuser",
     },
