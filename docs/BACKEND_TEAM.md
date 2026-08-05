@@ -2,7 +2,7 @@
 
 > **저장소:** https://github.com/mood-code-team/flask-team-project  
 > **작업 브랜치:** `dvelop` (PR도 `dvelop`으로)  
-> **팀:** 백엔드 4명 (팀장 1 + 멤버 3)
+> **팀:** 백엔드분류 4명 (팀장 1 + 멤버 3)
 
 ---
 
@@ -15,7 +15,10 @@
 | 시드 데이터 | ✅ `scripts/catalog_data.py` + `seed_db.py` |
 | CSV 실데이터 | ✅ `data-analysis` 브랜치 → `fetch_csv_data.py`로 가져오기 |
 | CSV → DB | ✅ `scripts/import_csv.py` |
+| 데이터 보강 | ✅ `scripts/enrich_products.py`, `seed_demo_content.py` |
 | Admin API | ❌ Phase 2 (미구현) |
+
+> **실제 쇼핑몰처럼 데이터 채우기:** [`docs/DATA_ENRICHMENT.md`](DATA_ENRICHMENT.md)
 
 ---
 

@@ -24,6 +24,7 @@ from app import create_app  # noqa: E402
 from extensions import db
 from models import Category, Product
 from scripts.seed_db import seed_admin, seed_catalog, seed_faqs, seed_notices
+from scripts.product_enrichment import enrich_row_fields, stable_hash
 from services.db_schema import (
     ensure_category_schema,
     ensure_product_filter_schema,
@@ -46,7 +47,6 @@ CATEGORY_CODE_TO_PARENT: dict[str, str] = {
     "BALCONY_OUTDOOR": "balcony",
 }
 
-# 상위 카테고리 → 기본 하위 카테고리 slug (CSV에 하위 분류 없을 때)
 DEFAULT_SUBCATEGORY: dict[str, str] = {
     "sofa": "sofa-3",
     "light": "table-lamp",
@@ -55,17 +55,6 @@ DEFAULT_SUBCATEGORY: dict[str, str] = {
     "table": "standard-dining",
     "bed": "bed-frame",
     "balcony": "outdoor-table",
-}
-
-# 카테고리 → filter_space 기본값
-CATEGORY_FILTER_SPACE: dict[str, str] = {
-    "sofa": "living",
-    "light": "living",
-    "diffuser": "living",
-    "side-table": "living",
-    "table": "kitchen",
-    "bed": "bedroom",
-    "balcony": "balcony",
 }
 
 
@@ -172,22 +161,34 @@ def import_products(
             continue
 
         parent_slug = CATEGORY_CODE_TO_PARENT.get(category_code.upper(), "")
+        pseudo_id = stable_hash(slug) % 1_000_000
+        enriched = enrich_row_fields(
+            product_id=pseudo_id,
+            slug=slug,
+            name=name,
+            description=(row.get("description") or name),
+            price=price,
+            parent_slug=parent_slug,
+            category_rank=stable_hash(slug) % 20 + 1,
+            csv_row=row,
+        )
+
         fields = {
             "name": name[:200],
             "category_id": category.id,
             "description": (row.get("description") or name)[:5000],
             "price": price,
-            "discount_price": None,
+            "discount_price": enriched["discount_price"],
             "stock": parse_stock(row.get("stock_status", "")),
             "image_url": pick_image_url(row, csv_path) or None,
-            "brand": (row.get("brand") or "IKEA")[:80],
-            "filter_space": CATEGORY_FILTER_SPACE.get(parent_slug, "living"),
-            "filter_style": "",
-            "filter_color": "",
+            "brand": (enriched.get("brand") or row.get("brand") or "IKEA")[:80],
+            "filter_space": enriched["filter_space"],
+            "filter_style": enriched["filter_style"],
+            "filter_color": enriched["filter_color"],
             "has_installation": parent_slug in {"sofa", "bed", "table"},
-            "is_popular": False,
-            "is_new": False,
-            "is_best": False,
+            "is_popular": enriched["is_popular"],
+            "is_new": enriched["is_new"],
+            "is_best": enriched["is_best"],
             "is_active": True,
         }
 
