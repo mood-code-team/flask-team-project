@@ -25,6 +25,14 @@ from extensions import db
 from models import Category, Product
 from scripts.seed_db import seed_admin, seed_catalog, seed_faqs, seed_notices
 from scripts.product_enrichment import enrich_row_fields, stable_hash
+from scripts.subcategory_mappings import (
+    BALCONY_SUBCATEGORY_SLUGS,
+    BED_SUBCATEGORY_SLUGS,
+    DIFFUSER_SUBCATEGORY_SLUGS,
+    normalize_balcony_sub_category,
+    normalize_bed_sub_category,
+    normalize_diffuser_sub_category,
+)
 from services.db_schema import (
     ensure_category_schema,
     ensure_product_filter_schema,
@@ -51,7 +59,7 @@ CATEGORY_CODE_TO_PARENT: dict[str, str] = {
 DEFAULT_SUBCATEGORY: dict[str, str] = {
     "sofa": "sofa-3",
     "light": "table-lamp",
-    "diffuser": "wood-diffuser",
+    "diffuser": "potpourri",
     "side-table": "side-table-item",
     "table": "standard-dining",
     "bed": "bed-frame",
@@ -155,6 +163,15 @@ def resolve_category(category_code: str, row: dict | None = None) -> Category | 
     if parent_slug == "sofa" and row:
         normalized = normalize_sofa_sub_category(row)
         sub_slug = SOFA_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
+    elif parent_slug == "balcony" and row:
+        normalized = normalize_balcony_sub_category(row)
+        sub_slug = BALCONY_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
+    elif parent_slug == "bed" and row:
+        normalized = normalize_bed_sub_category(row)
+        sub_slug = BED_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
+    elif parent_slug == "diffuser" and row:
+        normalized = normalize_diffuser_sub_category(row)
+        sub_slug = DIFFUSER_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
 
     category = Category.query.filter_by(slug=sub_slug).first()
     if category:

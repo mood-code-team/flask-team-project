@@ -68,6 +68,15 @@ def seed_catalog() -> None:
             db.session.flush()
             slug_map[child["slug"]] = sub
 
+        expected_child_slugs = {child["slug"] for child in group.get("children", [])}
+        for orphan in Category.query.filter_by(parent_id=parent.id).all():
+            if orphan.slug not in expected_child_slugs:
+                Product.query.filter_by(category_id=orphan.id).update(
+                    {"category_id": parent.id},
+                    synchronize_session=False,
+                )
+                orphan.is_active = False
+
         for raw in group.get("products", []):
             item = dict(raw)
             cat_slug = item.pop("category")
