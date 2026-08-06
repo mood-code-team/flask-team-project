@@ -42,6 +42,7 @@ CATEGORY_CODE_TO_PARENT: dict[str, str] = {
     "LIVING_TABLE": "side-table",
     "LIVING_ROOM_TABLE": "side-table",
     "DINING_TABLE": "table",
+    "DINING": "table",
     "BED": "bed",
     "BALCONY": "balcony",
     "BALCONY_OUTDOOR": "balcony",
@@ -56,6 +57,19 @@ DEFAULT_SUBCATEGORY: dict[str, str] = {
     "bed": "bed-frame",
     "balcony": "outdoor-table",
 }
+
+
+def resolve_external_id(row: dict) -> str:
+    """CSV external_id가 없으면 image_name(예: 104.890.09.jpg) stem을 사용."""
+    external_id = (row.get("external_id") or "").strip()
+    if external_id:
+        return external_id
+
+    image_name = (row.get("image_name") or "").strip()
+    if image_name:
+        return Path(image_name).stem
+
+    return ""
 
 
 def slugify(text: str, external_id: str, category_code: str) -> str:
@@ -151,7 +165,7 @@ def import_products(
             break
 
         category_code = (row.get("category_code") or "").strip()
-        external_id = (row.get("external_id") or "").strip()
+        external_id = resolve_external_id(row)
         name = (row.get("product_name") or "").strip()
 
         if not category_code or not external_id or not name:
