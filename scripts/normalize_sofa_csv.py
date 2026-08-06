@@ -19,11 +19,13 @@ def classify_sofa_subcategory(raw: str, product_name: str) -> str:
 
     if value in {"2인용", "2인소파"}:
         return "2인소파"
-    if value in {"3인용", "3인 소파"}:
+    if value in {"3인용", "3인 소파", "3인소파"}:
         if "4인" in name:
-            return "4인 소파"
-        return "3인 소파"
-    if value in {"4인 소파", "리클라이너", "코너소파", "암체어", "안락의자", "소파 기타"}:
+            return "4인소파"
+        return "3인소파"
+    if value in {"4인 소파", "4인소파", "리클라이너", "코너소파", "암체어", "안락의자", "소파 기타"}:
+        if value == "4인 소파":
+            return "4인소파"
         return value
 
     if value in {"기타", "기타소파"}:
