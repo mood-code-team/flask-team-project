@@ -59,12 +59,17 @@ DEFAULT_SUBCATEGORY: dict[str, str] = {
 }
 
 SOFA_SUBCATEGORY_SLUGS: dict[str, str] = {
-    "2인소파": "sofa-2",
-    "2인용": "sofa-2",
     "3인 소파": "sofa-3",
     "3인용": "sofa-3",
+    "4인 소파": "sofa-4",
+    "4인용": "sofa-4",
+    "리클라이너": "recliner",
+    "코너소파": "corner-sofa",
+    "2인소파": "sofa-2",
+    "2인용": "sofa-2",
     "암체어": "armchair",
     "안락의자": "lounge-chair",
+    "소파 기타": "sofa-other",
     "기타": "sofa-other",
     "기타소파": "sofa-other",
 }
@@ -80,18 +85,26 @@ def normalize_sofa_sub_category(row: dict) -> str:
     if raw in {"2인용", "2인소파"}:
         return "2인소파"
     if raw in {"3인용", "3인 소파"}:
+        if "4인" in name:
+            return "4인 소파"
         return "3인 소파"
-    if raw in {"암체어", "안락의자", "기타"}:
+    if raw in SOFA_SUBCATEGORY_SLUGS and raw not in {"기타", "기타소파", "3인용", "2인용"}:
         return raw
 
-    if raw == "기타소파":
+    if raw in {"기타", "기타소파", "소파 기타"}:
+        if "리클라이너" in name:
+            return "리클라이너"
+        if "코너" in name or "L형" in name:
+            return "코너소파"
+        if "4인" in name:
+            return "4인 소파"
         if any(keyword in name for keyword in ARMCHAIR_KEYWORDS):
             return "암체어"
         if any(keyword in name for keyword in LOUNGE_KEYWORDS):
             return "안락의자"
-        return "기타"
+        return "소파 기타"
 
-    return raw or "기타"
+    return raw or "소파 기타"
 
 
 def resolve_external_id(row: dict) -> str:

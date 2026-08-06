@@ -1,8 +1,9 @@
-"""소파 CSV sub_category를 팀 기획 5분류로 정규화."""
+"""소파 CSV sub_category를 팀 기획 8분류로 정규화."""
 
 from __future__ import annotations
 
 import csv
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -19,19 +20,26 @@ def classify_sofa_subcategory(raw: str, product_name: str) -> str:
     if value in {"2인용", "2인소파"}:
         return "2인소파"
     if value in {"3인용", "3인 소파"}:
+        if "4인" in name:
+            return "4인 소파"
         return "3인 소파"
+    if value in {"4인 소파", "리클라이너", "코너소파", "암체어", "안락의자", "소파 기타"}:
+        return value
 
-    if value == "기타소파" or value == "기타":
+    if value in {"기타", "기타소파"}:
+        if "리클라이너" in name:
+            return "리클라이너"
+        if "코너" in name or "L형" in name:
+            return "코너소파"
+        if "4인" in name:
+            return "4인 소파"
         if any(keyword in name for keyword in ARMCHAIR_KEYWORDS):
             return "암체어"
         if any(keyword in name for keyword in LOUNGE_KEYWORDS):
             return "안락의자"
-        return "기타"
+        return "소파 기타"
 
-    if value in {"암체어", "안락의자"}:
-        return value
-
-    return value or "기타"
+    return value or "소파 기타"
 
 
 def main() -> None:
@@ -49,8 +57,6 @@ def main() -> None:
         writer = csv.DictWriter(fh, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
-
-    from collections import Counter
 
     counts = Counter(row["sub_category"] for row in rows)
     print(f"[OK] updated {CSV_PATH}")

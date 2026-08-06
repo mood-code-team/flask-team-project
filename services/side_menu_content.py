@@ -33,11 +33,14 @@ SIDE_MENU_CATEGORIES: tuple[SideMenuCategory, ...] = (
         name="Sofa",
         subitems=(
             SideMenuSubItem("모두", category_slug="sofa"),
-            SideMenuSubItem("2인소파", category_slug="sofa-2"),
             SideMenuSubItem("3인 소파", category_slug="sofa-3"),
+            SideMenuSubItem("4인 소파", category_slug="sofa-4"),
+            SideMenuSubItem("리클라이너", category_slug="recliner"),
+            SideMenuSubItem("코너소파", category_slug="corner-sofa"),
+            SideMenuSubItem("2인소파", category_slug="sofa-2"),
             SideMenuSubItem("암체어", category_slug="armchair"),
             SideMenuSubItem("안락의자", category_slug="lounge-chair"),
-            SideMenuSubItem("기타", category_slug="sofa-other"),
+            SideMenuSubItem("소파 기타", category_slug="sofa-other"),
         ),
     ),
     SideMenuCategory(
