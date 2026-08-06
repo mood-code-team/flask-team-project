@@ -45,9 +45,15 @@ Mood Code — 팀원 설치 · 실행 가이드
   비밀번호: admin1234
 
 
-■ GitHub에 없는 것 (정상)
+■ GitHub frontend 브랜치에 포함된 것 (pull만 하면 됨)
 
-  database/shop.db  → seed_db.py로 생성
+  data/csv/                    → 스크래핑 CSV + 이미지
+  database/shop.db             → 상품 DB (670개+)
+  static/images/products/      → import된 상품 이미지
+  data-analysis/*.py           → 스크래핑·정제 스크립트
+
+■ GitHub에 없는 것 (각자 PC)
+
   .env              → .env.example 복사 (bat/run.sh가 자동 생성)
   venv/             → 각자 선택
 
@@ -100,8 +106,8 @@ Mood Code — 팀원 설치 · 실행 가이드
   역할 분담: docs/BACKEND_TEAM.md
   Issue 초안: docs/github-issues/ (4개)
 
-  CSV 데이터 + DB import:
-    python scripts/fetch_csv_data.py
+  CSV·DB (frontend pull 후 이미 포함 — 아래는 재생성할 때만):
+    python scripts/fetch_csv_data.py   # data-analysis 최신 CSV
     python scripts/seed_db.py
     python scripts/import_csv.py
 

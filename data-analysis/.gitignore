@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.env
+.flaskenv
+instance/
+
+# DB
+database/*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+static/images/uploads/*
+!static/images/uploads/.gitkeep
+
+# CSV scrape data (fetch locally via scripts/fetch_csv_data.py)
+data/csv/*
+!data/csv/README.txt
+output_*/

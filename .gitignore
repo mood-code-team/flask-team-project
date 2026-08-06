@@ -7,8 +7,9 @@ venv/
 .flaskenv
 instance/
 
-# DB
+# DB (shop.db는 frontend 브랜치에 포함 — 팀 공유용)
 database/*.db
+!database/shop.db
 *.sqlite3
 
 # IDE
@@ -23,7 +24,8 @@ Thumbs.db
 static/images/uploads/*
 !static/images/uploads/.gitkeep
 
-# CSV scrape data (fetch locally via scripts/fetch_csv_data.py)
-data/csv/*
-!data/csv/README.txt
-output_*/
+# CSV scrape data (frontend 브랜치에 포함 — 팀 공유용)
+# fetch_csv_data.py로 data-analysis 최신본 갱신 가능
+/data-analysis/output_*/
+/data-analysis/crawling/
+/data-analysis/__pycache__/
