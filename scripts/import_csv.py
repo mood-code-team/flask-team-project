@@ -58,6 +58,41 @@ DEFAULT_SUBCATEGORY: dict[str, str] = {
     "balcony": "outdoor-table",
 }
 
+SOFA_SUBCATEGORY_SLUGS: dict[str, str] = {
+    "2인소파": "sofa-2",
+    "2인용": "sofa-2",
+    "3인 소파": "sofa-3",
+    "3인용": "sofa-3",
+    "암체어": "armchair",
+    "안락의자": "lounge-chair",
+    "기타": "sofa-other",
+    "기타소파": "sofa-other",
+}
+
+LOUNGE_KEYWORDS = ("안락", "라운지체어", "이지체어", "게이밍안락", "회전라운지")
+ARMCHAIR_KEYWORDS = ("암체어", "윙체어")
+
+
+def normalize_sofa_sub_category(row: dict) -> str:
+    raw = (row.get("sub_category") or "").strip()
+    name = (row.get("product_name") or "").strip()
+
+    if raw in {"2인용", "2인소파"}:
+        return "2인소파"
+    if raw in {"3인용", "3인 소파"}:
+        return "3인 소파"
+    if raw in {"암체어", "안락의자", "기타"}:
+        return raw
+
+    if raw == "기타소파":
+        if any(keyword in name for keyword in ARMCHAIR_KEYWORDS):
+            return "암체어"
+        if any(keyword in name for keyword in LOUNGE_KEYWORDS):
+            return "안락의자"
+        return "기타"
+
+    return raw or "기타"
+
 
 def resolve_external_id(row: dict) -> str:
     """CSV external_id가 없으면 image_name(예: 104.890.09.jpg) stem을 사용."""
@@ -94,12 +129,16 @@ def parse_stock(stock_status: str) -> int:
     return 50
 
 
-def resolve_category(category_code: str) -> Category | None:
+def resolve_category(category_code: str, row: dict | None = None) -> Category | None:
     parent_slug = CATEGORY_CODE_TO_PARENT.get(category_code.upper())
     if not parent_slug:
         return None
 
     sub_slug = DEFAULT_SUBCATEGORY.get(parent_slug, parent_slug)
+    if parent_slug == "sofa" and row:
+        normalized = normalize_sofa_sub_category(row)
+        sub_slug = SOFA_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
+
     category = Category.query.filter_by(slug=sub_slug).first()
     if category:
         return category
@@ -172,7 +211,7 @@ def import_products(
             stats["skipped"] += 1
             continue
 
-        category = resolve_category(category_code)
+        category = resolve_category(category_code, row)
         if not category:
             stats["errors"] += 1
             continue
