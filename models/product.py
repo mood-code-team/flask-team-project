@@ -27,7 +27,7 @@ class Product(db.Model):
     image_url = db.Column(db.String(500))
     brand = db.Column(db.String(80), index=True)
     filter_space = db.Column(db.String(20), index=True)   # living, bedroom, kitchen, balcony
-    filter_style = db.Column(db.String(20), index=True)   # spring, summer, fall, winter
+    filter_style = db.Column(db.String(20), index=True)   # spring, summer, fall, winter, all
     filter_color = db.Column(db.String(20), index=True)   # white, beige, gray, ...
     mood_code_number = db.Column(db.String(32), index=True)  # MC-SF-001 (팀 내부 상품 코드)
     # 시공 서비스 포함 여부 (HFIX 참고)

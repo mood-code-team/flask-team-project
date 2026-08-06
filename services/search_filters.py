@@ -33,6 +33,7 @@ FILTER_GROUPS: dict[str, dict] = {
             "summer": "Summer",
             "fall": "Fall",
             "winter": "Winter",
+            "all": "All Season",
         },
     },
     "color": {
@@ -82,6 +83,10 @@ COLOR_TO_SEASON: dict[str, str] = {
 # 화이트·베이지 — 시즌 필터/전체 목록에 항상 노출 (베이지는 fall 배정 + 공통 노출)
 NEUTRAL_COLORS = frozenset({"white", "beige"})
 
+# 사계절 공통 상품 — filter_style / mood_code 에 all 입력
+UNIVERSAL_STYLE = "all"
+SEASON_STYLES = ("spring", "summer", "fall", "winter")
+
 SEASON_ID_TO_STYLE: dict[str, str] = {
     "spring": "spring",
     "summer": "summer",
@@ -91,21 +96,34 @@ SEASON_ID_TO_STYLE: dict[str, str] = {
 }
 
 
+def normalize_filter_style(raw: str) -> str:
+    """시즌 값 정규화 — spring/summer/fall/winter/all."""
+    value = (raw or "").strip().lower()
+    if value == UNIVERSAL_STYLE:
+        return UNIVERSAL_STYLE
+    if value in SEASON_STYLES:
+        return value
+    return ""
+
+
 def infer_style_from_color(color: str) -> str:
-    """지정 컬러 팔레트 → 시즌. 화이트는 공통 컬러(시즌 미배정)."""
+    """지정 컬러 팔레트 → 시즌. 화이트는 사계절(all)."""
     value = (color or "").strip().lower()
     if value == "white":
-        return ""
+        return UNIVERSAL_STYLE
     return COLOR_TO_SEASON.get(value, "")
 
 
 def product_matches_style(product: Product, style: str) -> bool:
-    """시즌(스타일) 필터 — 공통 컬러(화이트·베이지)는 모든 시즌에 노출."""
-    if not style:
+    """시즌(스타일) 필터 — all·공통 컬러(화이트·베이지)는 모든 시즌에 노출."""
+    if not style or style == UNIVERSAL_STYLE:
+        return True
+    product_style = (product.filter_style or "").lower()
+    if product_style == UNIVERSAL_STYLE:
         return True
     if (product.filter_color or "") in NEUTRAL_COLORS:
         return True
-    return (product.filter_style or "") == style
+    return product_style == style
 
 
 def season_id_to_style(season_id: str) -> str:

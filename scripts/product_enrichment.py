@@ -11,16 +11,16 @@ import hashlib
 import re
 from typing import Any
 
-from services.search_filters import infer_style_from_color
+from services.search_filters import (
+    SEASON_STYLES,
+    infer_style_from_color,
+    normalize_filter_style,
+)
 
 # 지정 색상 팔레트 (search_filters.py 와 동일)
 PALETTE_COLORS = frozenset({
     "white", "beige", "gray", "wood", "black", "pink", "yellow", "green", "blue",
 })
-
-STYLES = ("spring", "summer", "fall", "winter")
-
-# 한/영 색상 키워드 → filter_color
 COLOR_KEYWORDS: list[tuple[str, str]] = [
     ("화이트", "white"),
     ("white", "white"),
@@ -89,11 +89,6 @@ def normalize_filter_color(
     return infer_color(name, description)
 
 
-def normalize_filter_style(raw: str) -> str:
-    value = (raw or "").strip().lower()
-    return value if value in STYLES else ""
-
-
 def parse_mood_code_number(row: dict | None) -> str:
     """CSV mood_code_number / moodcode_no."""
     if not row:
@@ -106,8 +101,8 @@ def parse_mood_code_number(row: dict | None) -> str:
 
 
 def infer_style(product_id: int, slug: str) -> str:
-    idx = stable_hash(f"{product_id}:{slug}") % len(STYLES)
-    return STYLES[idx]
+    idx = stable_hash(f"{product_id}:{slug}") % len(SEASON_STYLES)
+    return SEASON_STYLES[idx]
 
 
 def infer_discount(price: int, slug: str) -> int | None:
@@ -188,7 +183,7 @@ def enrich_row_fields(
         filter_style = str(prev["filter_style"])
     elif filter_color:
         filter_style = infer_style_from_color(filter_color)
-        if not filter_style and filter_color != "white":
+        if not filter_style:
             filter_style = infer_style(product_id, slug)
     else:
         filter_style = infer_style(product_id, slug)
