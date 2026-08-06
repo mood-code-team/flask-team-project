@@ -2,6 +2,7 @@
 상품 데이터 보강 — CSV/DB import 후 실제 쇼핑몰처럼 메타데이터 추론.
 
 색상·스타일 키워드, 할인율, 뱃지(is_popular/new/best) 규칙.
+2차 육안 검수 CSV 값은 import 시 우선 반영되며, enrich_products는 빈 값만 채움.
 """
 
 from __future__ import annotations
@@ -9,6 +10,15 @@ from __future__ import annotations
 import hashlib
 import re
 from typing import Any
+
+from services.search_filters import infer_style_from_color
+
+# 지정 색상 팔레트 (search_filters.py 와 동일)
+PALETTE_COLORS = frozenset({
+    "white", "beige", "gray", "wood", "black", "pink", "yellow", "green", "blue",
+})
+
+STYLES = ("spring", "summer", "fall", "winter")
 
 # 한/영 색상 키워드 → filter_color
 COLOR_KEYWORDS: list[tuple[str, str]] = [
@@ -46,8 +56,6 @@ COLOR_KEYWORDS: list[tuple[str, str]] = [
     ("네이비", "blue"),
 ]
 
-STYLES = ("spring", "summer", "fall", "winter")
-
 # 할인율 후보 (%)
 DISCOUNT_RATES = (5, 10, 15, 20, 25, 30)
 
@@ -61,6 +69,39 @@ def infer_color(name: str, description: str = "") -> str:
     for keyword, color in COLOR_KEYWORDS:
         if keyword.lower() in text:
             return color
+    return ""
+
+
+def normalize_filter_color(
+    raw: str,
+    *,
+    name: str = "",
+    description: str = "",
+) -> str:
+    """지정 팔레트 명칭으로 통일. 없으면 키워드 추론."""
+    value = (raw or "").strip().lower()
+    if value in PALETTE_COLORS:
+        return value
+    if value:
+        mapped = infer_color(value, "")
+        if mapped:
+            return mapped
+    return infer_color(name, description)
+
+
+def normalize_filter_style(raw: str) -> str:
+    value = (raw or "").strip().lower()
+    return value if value in STYLES else ""
+
+
+def parse_mood_code_number(row: dict | None) -> str:
+    """CSV mood_code_number / moodcode_no."""
+    if not row:
+        return ""
+    for key in ("mood_code_number", "moodcode_no", "mood_code_no"):
+        value = (row.get(key) or "").strip().upper()
+        if value:
+            return value[:32]
     return ""
 
 
@@ -118,24 +159,49 @@ def enrich_row_fields(
     parent_slug: str,
     category_rank: int,
     csv_row: dict | None = None,
+    existing: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """CSV optional columns 우선, 없으면 추론."""
+    """CSV optional columns 우선, existing(이미 DB에 있는 값) 다음, 없으면 추론."""
     row = csv_row or {}
+    prev = existing or {}
 
-    filter_space = (row.get("filter_space") or "").strip() or _default_space(parent_slug)
-    filter_style = (row.get("filter_style") or row.get("mood_code") or "").strip().lower()
-    filter_color = (row.get("filter_color") or "").strip().lower()
+    filter_space = (row.get("filter_space") or prev.get("filter_space") or "").strip()
+    if not filter_space:
+        filter_space = _default_space(parent_slug)
 
-    if filter_style not in STYLES:
+    csv_color = normalize_filter_color(
+        row.get("filter_color") or "",
+        name=name,
+        description=description,
+    )
+    if row.get("filter_color"):
+        filter_color = csv_color
+    elif prev.get("filter_color"):
+        filter_color = str(prev["filter_color"])
+    else:
+        filter_color = csv_color or infer_color(name, description)
+
+    csv_style = normalize_filter_style(row.get("filter_style") or row.get("mood_code") or "")
+    if csv_style:
+        filter_style = csv_style
+    elif normalize_filter_style(str(prev.get("filter_style") or "")):
+        filter_style = str(prev["filter_style"])
+    elif filter_color:
+        filter_style = infer_style_from_color(filter_color)
+        if not filter_style and filter_color != "white":
+            filter_style = infer_style(product_id, slug)
+    else:
         filter_style = infer_style(product_id, slug)
-    if not filter_color:
-        filter_color = infer_color(name, description)
+
+    mood_code_number = parse_mood_code_number(row) or str(prev.get("mood_code_number") or "").strip().upper()
 
     discount_price = parse_optional_int(row.get("discount_price"))
     if discount_price is None:
         rate = parse_optional_int(row.get("discount_rate"))
         if rate and 0 < rate < 100:
             discount_price = int(price * (100 - rate) / 100)
+        elif prev.get("discount_price") is not None:
+            discount_price = prev.get("discount_price")
         else:
             discount_price = infer_discount(price, slug)
 
@@ -144,8 +210,10 @@ def enrich_row_fields(
         parsed = parse_optional_bool(row.get(key))
         if parsed is not None:
             badges[key] = parsed
+        elif key in prev and prev[key] is not None:
+            badges[key] = bool(prev[key])
 
-    brand = (row.get("brand") or "").strip()
+    brand = (row.get("brand") or prev.get("brand") or "").strip()
     if brand.upper() == "IKEA":
         brand = "IKEA"
 
@@ -153,6 +221,7 @@ def enrich_row_fields(
         "filter_space": filter_space,
         "filter_style": filter_style,
         "filter_color": filter_color,
+        "mood_code_number": mood_code_number or None,
         "discount_price": discount_price,
         "brand": brand or None,
         **badges,

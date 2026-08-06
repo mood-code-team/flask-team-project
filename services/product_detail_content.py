@@ -20,6 +20,8 @@ def get_product_summary_specs(product: Product) -> list[str]:
         lines.append(get_option_label("style", product.filter_style))
     if product.filter_color:
         lines.append(get_option_label("color", product.filter_color))
+    if product.mood_code_number:
+        lines.append(product.mood_code_number)
     if product.has_installation:
         lines.append("시공 서비스 포함")
     return lines

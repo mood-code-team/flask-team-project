@@ -67,6 +67,51 @@ COLOR_SWATCHES: dict[str, str] = {
     "blue": "#7ba7d7",
 }
 
+# 컬러 → 시즌(filter_style) 매핑 (2차 데이터 정제 가이드)
+COLOR_TO_SEASON: dict[str, str] = {
+    "blue": "summer",
+    "yellow": "summer",
+    "pink": "spring",
+    "green": "spring",
+    "black": "winter",
+    "gray": "winter",
+    "wood": "fall",
+    "beige": "fall",
+}
+
+# 화이트·베이지 — 시즌 필터/전체 목록에 항상 노출 (베이지는 fall 배정 + 공통 노출)
+NEUTRAL_COLORS = frozenset({"white", "beige"})
+
+SEASON_ID_TO_STYLE: dict[str, str] = {
+    "spring": "spring",
+    "summer": "summer",
+    "autumn": "fall",
+    "fall": "fall",
+    "winter": "winter",
+}
+
+
+def infer_style_from_color(color: str) -> str:
+    """지정 컬러 팔레트 → 시즌. 화이트는 공통 컬러(시즌 미배정)."""
+    value = (color or "").strip().lower()
+    if value == "white":
+        return ""
+    return COLOR_TO_SEASON.get(value, "")
+
+
+def product_matches_style(product: Product, style: str) -> bool:
+    """시즌(스타일) 필터 — 공통 컬러(화이트·베이지)는 모든 시즌에 노출."""
+    if not style:
+        return True
+    if (product.filter_color or "") in NEUTRAL_COLORS:
+        return True
+    return (product.filter_style or "") == style
+
+
+def season_id_to_style(season_id: str) -> str:
+    """시즌 페이지 id → filter_style 값."""
+    return SEASON_ID_TO_STYLE.get((season_id or "").strip().lower(), "")
+
 
 SEASON_STYLE_NAV: tuple[dict[str, str], ...] = (
     {"style": "spring", "label": "Spring", "scroll_id": "season-spring"},
@@ -251,15 +296,14 @@ def parse_filters(args) -> ActiveFilters:
 
 def product_matches_filters(product: Product, filters: ActiveFilters) -> bool:
     """상품이 선택 필터에 맞는지 확인 (DB 컬럼 기준)."""
-    checks = (
-        ("space", product.filter_space or ""),
-        ("style", product.filter_style or ""),
-        ("color", product.filter_color or ""),
-    )
-    for key, value in checks:
-        selected = getattr(filters, key)
-        if selected and value != selected:
-            return False
+    if filters.space and (product.filter_space or "") != filters.space:
+        return False
+
+    if filters.style and not product_matches_style(product, filters.style):
+        return False
+
+    if filters.color and (product.filter_color or "") != filters.color:
+        return False
 
     if filters.brand and (product.brand or "") != filters.brand:
         return False
@@ -278,6 +322,8 @@ def get_product_specs(product: Product) -> list[dict[str, str]]:
         specs.append({"label": "스타일", "value": get_option_label("style", product.filter_style)})
     if product.filter_color:
         specs.append({"label": "컬러", "value": get_option_label("color", product.filter_color)})
+    if product.mood_code_number:
+        specs.append({"label": "무드코드", "value": product.mood_code_number})
     flags = []
     if product.is_new:
         flags.append("신상품")

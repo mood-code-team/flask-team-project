@@ -25,7 +25,7 @@ def season_detail(season_id: str):
     if season is None:
         abort(404)
 
-    products = get_season_products(season["category_slugs"])
+    products = get_season_products(season["category_slugs"], season_id=season_id)
     return render_template(
         "season/detail.html",
         season=season,

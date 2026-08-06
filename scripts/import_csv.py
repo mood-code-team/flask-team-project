@@ -98,11 +98,20 @@ def pick_image_url(row: dict, csv_path: Path) -> str:
     if thumbnail.startswith("http"):
         return thumbnail[:500]
 
+    image_name = (row.get("image_name") or "").strip()
+    if image_name:
+        image_name = Path(image_name).name
+
     local = (row.get("local_image_path") or "").strip()
+    if image_name and not local:
+        local = f"images/{image_name}"
+
     if local:
         local_path = (csv_path.parent / local).resolve()
         if not local_path.is_file():
             local_path = (ROOT / local).resolve()
+        if not local_path.is_file() and image_name:
+            local_path = (csv_path.parent / "images" / image_name).resolve()
         if local_path.is_file():
             dest_dir = ROOT / "static" / "images" / "products" / "imported"
             dest_dir.mkdir(parents=True, exist_ok=True)
@@ -162,6 +171,21 @@ def import_products(
 
         parent_slug = CATEGORY_CODE_TO_PARENT.get(category_code.upper(), "")
         pseudo_id = stable_hash(slug) % 1_000_000
+        existing_product = Product.query.filter_by(slug=slug).first()
+        existing = {}
+        if existing_product:
+            existing = {
+                "filter_space": existing_product.filter_space,
+                "filter_style": existing_product.filter_style,
+                "filter_color": existing_product.filter_color,
+                "mood_code_number": existing_product.mood_code_number,
+                "discount_price": existing_product.discount_price,
+                "brand": existing_product.brand,
+                "is_popular": existing_product.is_popular,
+                "is_new": existing_product.is_new,
+                "is_best": existing_product.is_best,
+            }
+
         enriched = enrich_row_fields(
             product_id=pseudo_id,
             slug=slug,
@@ -171,6 +195,7 @@ def import_products(
             parent_slug=parent_slug,
             category_rank=stable_hash(slug) % 20 + 1,
             csv_row=row,
+            existing=existing,
         )
 
         fields = {
@@ -185,6 +210,7 @@ def import_products(
             "filter_space": enriched["filter_space"],
             "filter_style": enriched["filter_style"],
             "filter_color": enriched["filter_color"],
+            "mood_code_number": enriched.get("mood_code_number"),
             "has_installation": parent_slug in {"sofa", "bed", "table"},
             "is_popular": enriched["is_popular"],
             "is_new": enriched["is_new"],
@@ -196,7 +222,7 @@ def import_products(
             stats["created"] += 1
             continue
 
-        product = Product.query.filter_by(slug=slug).first()
+        product = existing_product
         if product:
             if skip_existing:
                 stats["skipped"] += 1
