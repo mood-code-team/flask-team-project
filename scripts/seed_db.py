@@ -63,6 +63,7 @@ def seed_catalog() -> None:
             else:
                 sub.name = child["name"]
                 sub.parent_id = parent.id
+                sub.sort_order = child.get("sort_order", 0)
                 sub.is_active = True
             db.session.flush()
             slug_map[child["slug"]] = sub
