@@ -15,8 +15,8 @@
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --season-spring: #F6CAD2;
   --season-summer: #E3F2FD;
-  --season-autumn: #D99427;
-  --season-winter: #F8F9FA;
+  --season-autumn: #ffcc7b;
+  --season-winter: #bebebe;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

@@ -14,27 +14,6 @@ season-{{ season.id }}
 
 {% block content %}
 <section class="season-detail">
-  <div class="season-detail__hero" style="--season-accent: {{ season.accent }}">
-    <img
-      class="season-detail__hero-img"
-      src="{{ season.hero_image }}"
-      alt="{{ season.name }} season interior concept"
-      loading="eager"
-    >
-    <div class="season-detail__hero-overlay"></div>
-    <div class="season-detail__hero-content container">
-      <p class="season-detail__eyebrow">{{ season.name_en }}</p>
-      <h1 class="season-detail__title">{{ season.name }}</h1>
-      <p class="season-detail__intro">{{ season.intro }}</p>
-      <div class="season-detail__meta">
-        <div class="season-detail__temp">
-          {% set room = season %}
-          {% set variant = 'hero' %}
-          {% include "components/temperature_display.html" %}
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="container season-detail__body">
     <div class="season-detail__summary">
@@ -63,15 +42,6 @@ season-{{ season.id }}
           {% endfor %}
         </ul>
       </section>
-
-      <section class="season-detail__panel season-detail__panel--wide">
-        <h2 class="season-detail__panel-title">STYLING TIPS</h2>
-        <ul class="season-detail__tips">
-          {% for tip in season.tips %}
-          <li>{{ tip }}</li>
-          {% endfor %}
-        </ul>
-      </section>
     </div>
 
     {% if products %}
@@ -82,24 +52,71 @@ season-{{ season.id }}
       </div>
       <div class="product-grid">
         {% for product in products %}
-          {% include "components/product_card.html" %}
+        {% include "components/product_card.html" %}
         {% endfor %}
       </div>
     </section>
     {% endif %}
 
     <nav class="season-detail__nav" aria-label="Other seasons">
-      <p class="season-detail__nav-label">EXPLORE OTHER SEASONS</p>
+
+      <p class="season-detail__nav-label">
+        EXPLORE OTHER SEASONS
+      </p>
+
       <div class="season-detail__nav-links">
+
         {% for room in season_rooms %}
-        <a
-          href="{{ url_for('main.season_detail', season_id=room.id) }}"
-          class="season-detail__nav-link{% if room.id == season.id %} is-active{% endif %}"
-          {% if room.id == season.id %}aria-current="page"{% endif %}
-        >{{ room.name }}</a>
+
+        <a href="{{ url_for('main.season_detail', season_id=room.id) }}"
+          class="season-detail__nav-link{% if room.id == season.id %} is-active{% endif %}" {% if room.id==season.id
+          %}aria-current="page" {% endif %}>
+          {{ room.name }}
+        </a>
+
         {% endfor %}
+
       </div>
+
     </nav>
+
+
+    {% if season.id == "spring" %}
+
+    <section class="season-space">
+
+      <h2 class="season-space__title">
+        SPRING SPACE
+      </h2>
+
+      <div class="season-space__grid">
+
+        <a href="{{ url_for('main.space') }}" class="season-space__card">
+          <img src="{{ url_for('static', filename='images/spring/spring_space_01.jpg') }}"
+            class="season-space__image" alt="Spring Space 01">
+        </a>
+
+        <a href="{{ url_for('main.space') }}" class="season-space__card">
+          <img src="{{ url_for('static', filename='images/spring/spring_space_02.jpg') }}"
+            class="season-space__image" alt="Spring Space 02">
+        </a>
+
+        <a href="{{ url_for('main.space') }}" class="season-space__card">
+          <img src="{{ url_for('static', filename='images/spring/spring_space_03.jpg') }}"
+            class="season-space__image" alt="Spring Space 03">
+        </a>
+
+        <a href="{{ url_for('main.space') }}" class="season-space__card">
+          <img src="{{ url_for('static', filename='images/spring/spring_space_04.jpg') }}"
+            class="season-space__image" alt="Spring Space 04">
+        </a>
+
+      </div>
+
+    </section>
+
+    {% endif %}
+
   </div>
 </section>
 {% endblock %}

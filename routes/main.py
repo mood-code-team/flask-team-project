@@ -32,3 +32,8 @@ def season_detail(season_id: str):
         products=products,
         season_rooms=SEASON_ROOMS,
     )
+
+@main_bp.route("/space")
+def space():
+    """공간 상세페이지."""
+    return render_template("space/space_detail.html")

@@ -741,6 +741,54 @@ body:has(.season-winter:hover) .site-footer{
   pointer-events: none;
 }
 
+/* ===== Spring Space ===== */
+
+.season-space{
+    margin-top:60px;
+}
+
+.season-space__title{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:2px;
+    margin-bottom:24px;
+}
+
+.season-space__grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.season-space__card{
+    display:block;
+    overflow:hidden;
+}
+
+.season-space__image{
+    width:100%;
+    display:block;
+    aspect-ratio:4/5;
+    object-fit:cover;
+    transition:.3s;
+}
+
+.season-space__card:hover .season-space__image{
+    transform:scale(1.03);
+}
+
+@media (max-width:900px){
+
+    .season-space__grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+
+
 /* ===== Responsive ===== */
 @media (prefers-reduced-motion: reduce) {
   .hero-slide__img,
