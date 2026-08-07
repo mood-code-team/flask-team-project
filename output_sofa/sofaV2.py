@@ -3,13 +3,13 @@ import numpy as np
 import re
 import os
 
-# 1. 파일 로드
+# 1. 파일 로드 (엑셀 파일인 sofa_100_products.xlsx를 읽도록 수정)
 script_dir = os.path.dirname(os.path.abspath(__file__))
-filepath = os.path.join(script_dir, 'sofa_100_products.csv')
+filepath = os.path.join(script_dir, 'sofa_100_products.xlsx')
 
 try:
-    df = pd.read_csv(filepath)
-    print("✅ 데이터 로드 성공!")
+    df = pd.read_excel(filepath)
+    print("✅ 엑셀 데이터 로드 성공!")
 except FileNotFoundError:
     print(f"❌ 오류: {filepath} 파일을 찾을 수 없습니다. 경로와 파일명을 다시 확인해 주세요.")
     exit()
@@ -31,6 +31,10 @@ if 'description' in df.columns:
 
 df['brand'] = 'Mood Code'
 df['category_code'] = 'SOFA'
+
+# image_name 컬럼 안전 장치
+if 'image_name' not in df.columns:
+    df['image_name'] = np.nan
 
 # ---------------------------------------------------------
 # 💡 [핵심] 2인소파 분리 및 세부 분류 맵핑 로직
@@ -100,7 +104,7 @@ def extract_color(row):
 df['filter_color'] = df.apply(extract_color, axis=1)
 
 # ---------------------------------------------------------
-# [핵심 2] 컬러 기반 시즌(계절) 자동 매핑 (autumn -> fall 변경)
+# [핵심 2] 컬러 기반 시즌(계절) 자동 매핑 (autumn -> fall)
 # ---------------------------------------------------------
 def map_season(color):
     if color in ['블루', '옐로우']: return 'summer'
@@ -132,7 +136,7 @@ df['is_new'] = np.nan
 df['is_best'] = np.nan
 
 # ---------------------------------------------------------
-# [최종 정리] 결과 저장
+# [최종 정리] 결과 저장 (다시 CSV 파일로 내보내기 원하시면 .csv로 저장 가능)
 # ---------------------------------------------------------
 required_columns = [
     'product_name', 'brand', 'price', 'category_code', 'sub_category',
@@ -144,6 +148,8 @@ required_columns = [
 final_cols = [c for c in required_columns if c in df.columns]
 df_final = df[final_cols]
 
-df_final.to_csv(filepath, index=False, encoding='utf-8-sig')
+# 결과를 다시 csv로 저장하고 싶다면 아래 경로를 사용하세요
+output_csv_path = os.path.join(script_dir, 'sofa_100_products.csv')
+df_final.to_csv(output_csv_path, index=False, encoding='utf-8-sig')
 
-print(f"✅ 작업 완료! '{filepath}' 파일에 fall 시즌 반영 및 모든 규칙이 적용되었습니다.")
+print(f"✅ 작업 완료! 엑셀을 읽어 정제한 뒤 '{output_csv_path}' 파일로 저장했습니다.")
