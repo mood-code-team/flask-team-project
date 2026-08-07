@@ -4,7 +4,7 @@
 {% block full_title %}Mood Code{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=20260805f">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=20260804b">
 {% for slide in hero_slides %}
 <link rel="preload" as="image" href="{{ url_for('static', filename=slide.image_2k) }}">
 {% endfor %}
@@ -16,9 +16,9 @@
   <div class="hero-ad__bridge" aria-hidden="true"></div>
 
   <div class="hero-ad__copy">
-    <h1 class="hero-ad__headline" data-hero-headline>{{ hero_slides[0].headline }}</h1>
-    <p class="hero-ad__lead" data-hero-lead>{{ hero_slides[0].tagline }}</p>
-    <a href="{{ url_for('category.listing', slug=hero_slides[0].category_slug) }}" class="hero-ad__cta" data-hero-cta>SHOP NOW</a>
+    <h1 class="hero-ad__headline" data-hero-headline>혼자지만, 충분히.</h1>
+    <p class="hero-ad__lead" data-hero-lead>공간을 위한 가구 큐레이션</p>
+    <a href="{{ url_for('category.listing', slug='light') }}" class="hero-ad__cta" data-hero-cta>SHOP NOW</a>
   </div>
 
   <div class="hero-slider" aria-label="메인 배너" data-slide-count="{{ hero_slides|length }}">
@@ -29,7 +29,6 @@
           <a
             href="{{ url_for('category.listing', slug=slide.category_slug) }}"
             class="hero-slide"
-            data-slide-headline="{{ slide.headline }}"
             data-slide-line="{{ slide.tagline }}"
             aria-label="{{ slide.title }} 상품 보기"
           >
@@ -86,7 +85,7 @@
 
   <div class="season-grid">
     {% for room in season_rooms %}
-    <article class="season-card" id="season-{{ room.id }}">
+    <article class="season-card season-{{ room.id }}" id="season-{{ room.id }}">
       <a href="{{ url_for('main.season_detail', season_id=room.id) }}" class="season-card__link">
         <div class="season-card__image">
           <img src="{{ room.image }}" alt="{{ room.name }} interior concept" loading="lazy">
@@ -111,5 +110,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/hero-slider.js') }}?v=20260805f"></script>
+<script src="{{ url_for('static', filename='js/hero-slider.js') }}?v=20260803r"></script>
 {% endblock %}

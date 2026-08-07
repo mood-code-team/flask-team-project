@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block body_class %}
+season-{{ season.id }}
+{% endblock %}
+
 {% block title %}{{ season.name }} — Season Concept{% endblock %}
 {% block meta_description %}{{ season.intro }}{% endblock %}
 
