@@ -17,7 +17,6 @@ Mood Code — 공간·무드 갤러리 (선영 팀)
   static/originals/                             — 고해상도 원본 64장
   static/moodcode_season_color_palette_package/ — 계절 컬러 팔레트
   templates/gallery/                            — card_grid, gallery_detail
-  data/gallery_data.csv                         — 초기 Unsplash 샘플 (참고용)
   routes/gallery.py                             — URL 라우트
   services/gallery_service.py                   — CSV·이미지 로직
 
