@@ -81,6 +81,11 @@ def _complete_social_login(user: User, *, created: bool) -> str:
 def login():
     """로그인 페이지."""
     if current_user.is_authenticated:
+        next_url = request.args.get("next", "")
+        if next_url.startswith("/"):
+            return redirect(next_url)
+        if current_user.is_admin:
+            return redirect(url_for("admin.dashboard"))
         return redirect(url_for("main.index"))
 
     if request.method == "POST":

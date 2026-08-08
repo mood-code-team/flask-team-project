@@ -378,6 +378,32 @@
   pointer-events: none;
 }
 
+/* ===== Season Hover (메인) ===== */
+.season-section,
+.site-footer {
+  transition: background-color 0.5s ease;
+}
+
+body:has(.season-spring:hover) .season-section,
+body:has(.season-spring:hover) .site-footer {
+  background: var(--season-spring);
+}
+
+body:has(.season-summer:hover) .season-section,
+body:has(.season-summer:hover) .site-footer {
+  background: var(--season-summer);
+}
+
+body:has(.season-autumn:hover) .season-section,
+body:has(.season-autumn:hover) .site-footer {
+  background: var(--season-autumn);
+}
+
+body:has(.season-winter:hover) .season-section,
+body:has(.season-winter:hover) .site-footer {
+  background: var(--season-winter);
+}
+
 .season-card__body {
   padding: 16px 4px 0;
 }
@@ -394,6 +420,42 @@
   font-weight: 700;
   letter-spacing: 1.5px;
   color: var(--accent, #111);
+}
+
+.season-card__mood {
+  text-align: right;
+  min-width: 92px;
+}
+
+.season-mood {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.season-mood__label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: var(--color-text-light);
+  margin: 0;
+}
+
+.season-mood__feel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mood-accent, var(--color-text));
+  letter-spacing: 0.2px;
+}
+
+.season-mood--hero .season-mood__label {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.season-mood--hero .season-mood__feel {
+  color: #fff;
+  font-size: 16px;
 }
 
 .season-card__temp {
@@ -566,6 +628,11 @@
   gap: 16px;
 }
 
+.season-detail__mood {
+  display: flex;
+  align-items: flex-end;
+}
+
 .season-detail__temp {
   display: flex;
   align-items: flex-end;
@@ -717,6 +784,73 @@
   color: #fff;
   border-color: var(--color-text);
   pointer-events: none;
+}
+
+/* ===== Spring Space (봄 시즌 갤러리) ===== */
+.season-space {
+  margin-top: 60px;
+}
+
+.season-space__title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.season-space__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.season-space__card {
+  display: block;
+  overflow: hidden;
+}
+
+.season-space__image {
+  width: 100%;
+  display: block;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  transition: 0.3s;
+}
+
+.season-space__card:hover .season-space__image {
+  transform: scale(1.03);
+}
+
+@media (max-width: 900px) {
+  .season-space__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== Season Detail page background ===== */
+.site-main,
+.site-footer {
+  transition: background-color 0.5s ease;
+}
+
+body.season-spring .site-main,
+body.season-spring .site-footer {
+  background: var(--season-spring);
+}
+
+body.season-summer .site-main,
+body.season-summer .site-footer {
+  background: var(--season-summer);
+}
+
+body.season-autumn .site-main,
+body.season-autumn .site-footer {
+  background: var(--season-autumn);
+}
+
+body.season-winter .site-main,
+body.season-winter .site-footer {
+  background: var(--season-winter);
 }
 
 /* ===== Responsive ===== */

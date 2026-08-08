@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+{% set active_menu = 'faqs' %}
+{% block title %}{% if faq %}FAQ 수정{% else %}FAQ 작성{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="admin-topbar">
+  <div>
+    <h1>{% if faq %}FAQ 수정{% else %}FAQ 작성{% endif %}</h1>
+  </div>
+  <a href="{{ url_for('admin.faqs') }}" class="admin-btn admin-btn--ghost">목록으로</a>
+</div>
+
+<section class="admin-panel">
+  <form class="admin-form admin-form--wide" method="post">
+    <div class="admin-field">
+      <label for="category">카테고리</label>
+      <input id="category" name="category" type="text" value="{{ faq.category if faq else '배송문의' }}" required>
+    </div>
+    <div class="admin-field">
+      <label for="question">질문</label>
+      <input id="question" name="question" type="text" value="{{ faq.question if faq else '' }}" required>
+    </div>
+    <div class="admin-field">
+      <label for="answer">답변</label>
+      <textarea id="answer" name="answer" required>{{ faq.answer if faq else '' }}</textarea>
+    </div>
+    <div class="admin-field">
+      <label for="sort_order">정렬 순서</label>
+      <input id="sort_order" name="sort_order" type="number" min="0" value="{{ faq.sort_order if faq else 0 }}">
+    </div>
+    <div class="admin-checks">
+      <label><input type="checkbox" name="is_active"{% if not faq or faq.is_active %} checked{% endif %}> 노출</label>
+    </div>
+    <div><button type="submit" class="admin-btn">저장</button></div>
+  </form>
+</section>
+{% endblock %}

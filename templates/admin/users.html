@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+{% set active_menu = 'users' %}
+{% block title %}회원 관리{% endblock %}
+
+{% block admin_content %}
+<div class="admin-topbar">
+  <div>
+    <h1>회원 관리</h1>
+    <p>가입 회원 조회 및 계정 상태 관리</p>
+  </div>
+</div>
+
+<form class="admin-search" method="get" action="{{ url_for('admin.users') }}">
+  <input type="search" name="q" value="{{ q }}" placeholder="아이디, 이메일, 이름 검색">
+  <button type="submit" class="admin-btn admin-btn--ghost">검색</button>
+</form>
+
+<section class="admin-panel">
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>아이디</th>
+          <th>이름</th>
+          <th>이메일</th>
+          <th>가입일</th>
+          <th>상태</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in pagination.items %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.full_name or '-' }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+          <td>
+            {% if user.is_active %}
+            <span class="admin-badge admin-badge--on">활성</span>
+            {% else %}
+            <span class="admin-badge admin-badge--off">비활성</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('admin.user_toggle', user_id=user.id, q=q) }}">
+              <button type="submit" class="admin-btn admin-btn--ghost admin-btn--small">
+                {% if user.is_active %}비활성화{% else %}활성화{% endif %}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">회원이 없습니다.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if pagination.pages > 1 %}
+  <div class="admin-pagination">
+    {% if pagination.has_prev %}
+    <a class="admin-btn admin-btn--ghost admin-btn--small" href="{{ url_for('admin.users', page=pagination.prev_num, q=q) }}">이전</a>
+    {% endif %}
+    <span class="admin-meta">{{ pagination.page }} / {{ pagination.pages }}</span>
+    {% if pagination.has_next %}
+    <a class="admin-btn admin-btn--ghost admin-btn--small" href="{{ url_for('admin.users', page=pagination.next_num, q=q) }}">다음</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
