@@ -81,12 +81,12 @@
 <section class="season-section" aria-label="시즌별 방 컨셉">
   <div class="season-section__header">
     <h2 class="season-section__title">SEASON CONCEPT</h2>
-    <p class="season-section__desc">계절의 온도와 감성에 맞춘 공간을 만나보세요.</p>
+    <p class="season-section__desc">계절의 감성에 맞춘 공간을 만나보세요.</p>
   </div>
 
   <div class="season-grid">
     {% for room in season_rooms %}
-    <article class="season-card" id="season-{{ room.id }}">
+    <article class="season-card season-{{ room.id }}" id="season-{{ room.id }}">
       <a href="{{ url_for('main.season_detail', season_id=room.id) }}" class="season-card__link">
         <div class="season-card__image">
           <img src="{{ room.image }}" alt="{{ room.name }} interior concept" loading="lazy">
@@ -95,8 +95,8 @@
         <div class="season-card__body">
           <div class="season-card__top">
             <span class="season-card__label" style="--accent: {{ room.accent }}">{{ room.name_en }}</span>
-            <div class="season-card__temp">
-              {% include "components/temperature_display.html" %}
+            <div class="season-card__mood">
+              {% include "components/season_mood_display.html" %}
             </div>
           </div>
           <h3 class="season-card__name">{{ room.name }}</h3>

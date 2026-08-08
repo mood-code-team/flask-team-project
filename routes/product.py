@@ -20,6 +20,20 @@ from services.wishlist_service import is_in_wishlist
 
 product_bp = Blueprint("product", __name__)
 
+DEFAULT_SHOP_CATEGORY = "light"
+
+
+@product_bp.route("/products")
+def product_index():
+    """상품목록 진입 — 기본 카테고리로 이동."""
+    return redirect(url_for("category.listing", slug=DEFAULT_SHOP_CATEGORY))
+
+
+@product_bp.route("/product/<slug>")
+def detail_alias(slug: str):
+    """예전 URL(/product/...) 호환."""
+    return redirect(url_for("product.detail", slug=slug))
+
 
 @product_bp.route("/products/<slug>")
 def detail(slug: str):

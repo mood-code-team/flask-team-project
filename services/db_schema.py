@@ -100,6 +100,7 @@ _PRODUCT_FILTER_PATCHES: dict[str, str] = {
     "filter_space": "VARCHAR(20)",
     "filter_style": "VARCHAR(20)",
     "filter_color": "VARCHAR(20)",
+    "mood_code_number": "VARCHAR(32)",
 }
 
 

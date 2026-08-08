@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block body_class %}
+season-{{ season.id }}
+{% endblock %}
+
 {% block title %}{{ season.name }} — Season Concept{% endblock %}
 {% block meta_description %}{{ season.intro }}{% endblock %}
 
@@ -23,10 +27,10 @@
       <h1 class="season-detail__title">{{ season.name }}</h1>
       <p class="season-detail__intro">{{ season.intro }}</p>
       <div class="season-detail__meta">
-        <div class="season-detail__temp">
+        <div class="season-detail__mood">
           {% set room = season %}
           {% set variant = 'hero' %}
-          {% include "components/temperature_display.html" %}
+          {% include "components/season_mood_display.html" %}
         </div>
       </div>
     </div>
@@ -96,6 +100,26 @@
         {% endfor %}
       </div>
     </nav>
+
+    {% if season.id == "spring" %}
+    <section class="season-space">
+      <h2 class="season-space__title">SPRING SPACE</h2>
+      <div class="season-space__grid">
+        <a href="{{ url_for('main.space') }}" class="season-space__card">
+          <img src="{{ url_for('static', filename='images/spring/spring_space_01.jpg') }}" class="season-space__image" alt="Spring Space 01">
+        </a>
+        <a href="{{ url_for('main.space') }}" class="season-space__card">
+          <img src="{{ url_for('static', filename='images/spring/spring_space_02.jpg') }}" class="season-space__image" alt="Spring Space 02">
+        </a>
+        <a href="{{ url_for('main.space') }}" class="season-space__card">
+          <img src="{{ url_for('static', filename='images/spring/spring_space_03.jpg') }}" class="season-space__image" alt="Spring Space 03">
+        </a>
+        <a href="{{ url_for('main.space') }}" class="season-space__card">
+          <img src="{{ url_for('static', filename='images/spring/spring_space_04.jpg') }}" class="season-space__image" alt="Spring Space 04">
+        </a>
+      </div>
+    </section>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

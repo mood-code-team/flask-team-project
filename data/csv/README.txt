@@ -1,8 +1,9 @@
 Mood Code — CSV 데이터 폴더
 ============================
 
-스크래핑 CSV는 Git main/dvelop 브랜치에 포함되지 않습니다.
-data-analysis 브랜치에서 아래 명령으로 가져옵니다.
+frontend 브랜치에는 CSV·이미지가 포함되어 있습니다 (git pull).
+
+data-analysis 브랜치 최신본으로 갱신하려면:
 
   python scripts/fetch_csv_data.py
 

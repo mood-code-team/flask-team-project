@@ -73,7 +73,7 @@ Mood Code — 데이터 보강 안내 (팀 공유용)
 ────────────────────────────────────────────────
 
   filter_color    beige          색상 필터
-  filter_style    winter         시즌 필터 (spring/summer/fall/winter)
+  filter_style    winter         시즌 필터 (spring/summer/fall/winter/all)
   filter_space    living         공간 필터 (living/bedroom/kitchen/balcony)
   discount_rate   15             할인율 % → 할인가 자동 계산
   discount_price  119000         할인가 직접 지정
@@ -81,13 +81,15 @@ Mood Code — 데이터 보강 안내 (팀 공유용)
   is_new          true           NEW 뱃지
   is_best         true           BEST 뱃지
   mood_code       winter         filter_style 별칭 (시즌용, 코드넘버와 다름)
+                                  ※ all 입력 시 사계절(Spring~Winter) 전체에 노출
 
 
 [3] filter / style / color 허용 값
 ────────────────────────────────────────────────
 
   space  : living, bedroom, kitchen, balcony
-  style  : spring, summer, fall, winter
+  style  : spring, summer, fall, winter, all
+           all = 사계절 공통 (모든 시즌 필터·시즌 페이지에 표시)
   color  : white, beige, gray, wood, black, pink, yellow, green, blue
 
 

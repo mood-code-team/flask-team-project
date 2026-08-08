@@ -25,10 +25,16 @@ def season_detail(season_id: str):
     if season is None:
         abort(404)
 
-    products = get_season_products(season["category_slugs"])
+    products = get_season_products(season["category_slugs"], season_id=season_id)
     return render_template(
         "season/detail.html",
         season=season,
         products=products,
         season_rooms=SEASON_ROOMS,
     )
+
+
+@main_bp.route("/space")
+def space():
+    """공간 상세페이지."""
+    return render_template("space/space_detail.html")

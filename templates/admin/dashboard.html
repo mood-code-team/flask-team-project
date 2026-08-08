@@ -1,0 +1,106 @@
+{% extends "admin/base.html" %}
+{% set active_menu = 'dashboard' %}
+{% block title %}대시보드{% endblock %}
+
+{% block admin_content %}
+<div class="admin-topbar">
+  <div>
+    <h1>대시보드</h1>
+    <p>Mood Code 쇼핑몰 운영 현황</p>
+  </div>
+  <div class="admin-topbar__actions">
+    <a href="{{ url_for('admin.product_form') }}" class="admin-btn">상품 등록</a>
+    <a href="{{ url_for('admin.notice_form') }}" class="admin-btn admin-btn--ghost">공지 작성</a>
+  </div>
+</div>
+
+<div class="admin-stats">
+  <div class="admin-stat">
+    <div class="admin-stat__label">총 매출</div>
+    <div class="admin-stat__value">{{ stats.revenue_total | currency }}<span style="font-size:16px">원</span></div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat__label">주문</div>
+    <div class="admin-stat__value">{{ stats.orders_total }}</div>
+    <div class="admin-stat__sub">접수 대기 {{ stats.orders_pending }}건</div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat__label">상품</div>
+    <div class="admin-stat__value">{{ stats.products_active }}</div>
+    <div class="admin-stat__sub">전체 {{ stats.products_total }}개</div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat__label">회원</div>
+    <div class="admin-stat__value">{{ stats.users_total }}</div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat__label">문의 대기</div>
+    <div class="admin-stat__value">{{ stats.inquiries_pending }}</div>
+    <div class="admin-stat__sub">공지 {{ stats.notices_active }} · FAQ {{ stats.faqs_active }}</div>
+  </div>
+</div>
+
+<div class="admin-grid-2">
+  <section class="admin-panel">
+    <div class="admin-panel__head">
+      <span>최근 주문</span>
+      <a href="{{ url_for('admin.orders') }}">전체 보기</a>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>주문번호</th>
+            <th>상태</th>
+            <th>결제금액</th>
+            <th>주문일</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in recent_orders %}
+          <tr>
+            <td><a href="{{ url_for('admin.order_detail', order_id=order.id) }}">{{ order.order_number }}</a></td>
+            <td><span class="admin-badge admin-badge--{{ order.status }}">{{ order_labels.get(order.status, order.status) }}</span></td>
+            <td>{{ order.total_amount | currency }}원</td>
+            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4">주문 내역이 없습니다.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="admin-panel">
+    <div class="admin-panel__head">
+      <span>답변 대기 문의</span>
+      <a href="{{ url_for('admin.inquiries') }}">전체 보기</a>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>유형</th>
+            <th>제목</th>
+            <th>회원</th>
+            <th>접수일</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inquiry in pending_inquiries %}
+          <tr>
+            <td>{{ inquiry.inquiry_type_label }}</td>
+            <td><a href="{{ url_for('admin.inquiry_detail', inquiry_id=inquiry.id) }}">{{ inquiry.title }}</a></td>
+            <td>{{ inquiry.user.username if inquiry.user else '-' }}</td>
+            <td>{{ inquiry.created_at.strftime('%Y-%m-%d') }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4">대기 중인 문의가 없습니다.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

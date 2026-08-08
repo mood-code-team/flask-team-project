@@ -68,11 +68,24 @@ def enrich_all(*, dry_run: bool = False) -> dict[str, int]:
             price=product.price,
             parent_slug=parent_slug,
             category_rank=rank,
+            existing={
+                "filter_space": product.filter_space,
+                "filter_style": product.filter_style,
+                "filter_color": product.filter_color,
+                "mood_code_number": product.mood_code_number,
+                "discount_price": product.discount_price,
+                "brand": product.brand,
+                "is_popular": product.is_popular,
+                "is_new": product.is_new,
+                "is_best": product.is_best,
+            },
         )
 
         changed = False
         for key, value in fields.items():
             if key == "brand" and value is None:
+                continue
+            if key == "mood_code_number" and not value:
                 continue
             if getattr(product, key) != value:
                 if not dry_run:

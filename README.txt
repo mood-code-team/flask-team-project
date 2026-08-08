@@ -6,19 +6,21 @@ Flask 풀스택 | SQLite
 팀 저장소: https://github.com/mood-code-team/flask-team-project
 
 
-■ 실행
+■ 실행 (frontend 브랜치)
+
+  git checkout frontend
+  git pull team frontend
 
   Windows: 실행_서버.bat (더블클릭)
   Mac/Linux: ./run.sh
 
   또는 터미널:
-    cd flask-team-project
     pip install -r requirements.txt
-    python scripts\seed_db.py
     python hspace_server.py
 
   http://127.0.0.1:5000/
 
+  ※ frontend 브랜치에 CSV · DB · 상품 이미지 포함 (pull만 하면 실행 가능)
   ※ GitHub 상세 안내: README.md, docs/TEAM_SETUP.txt
 
 

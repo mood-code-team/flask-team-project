@@ -1,0 +1,90 @@
+{% extends "admin/base.html" %}
+{% set active_menu = 'products' %}
+{% block title %}{% if product %}상품 수정{% else %}상품 등록{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="admin-topbar">
+  <div>
+    <h1>{% if product %}상품 수정{% else %}상품 등록{% endif %}</h1>
+    <p>{% if product %}{{ product.slug }}{% else %}새 상품을 등록합니다{% endif %}</p>
+  </div>
+  <a href="{{ url_for('admin.products') }}" class="admin-btn admin-btn--ghost">목록으로</a>
+</div>
+
+<section class="admin-panel">
+  <form class="admin-form admin-form--wide" method="post">
+    <div class="admin-form-grid">
+      <div class="admin-field admin-field--full">
+        <label for="name">상품명</label>
+        <input id="name" name="name" type="text" value="{{ product.name if product else '' }}" required>
+      </div>
+      <div class="admin-field">
+        <label for="category_id">카테고리</label>
+        <select id="category_id" name="category_id" required>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}"{% if product and product.category_id == cat.id %} selected{% endif %}>
+            {{ cat.parent.name if cat.parent else cat.name }} · {{ cat.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="admin-field">
+        <label for="brand">브랜드</label>
+        <input id="brand" name="brand" type="text" value="{{ product.brand if product else 'Mood Code' }}">
+      </div>
+      <div class="admin-field">
+        <label for="price">정가 (원)</label>
+        <input id="price" name="price" type="number" min="0" value="{{ product.price if product else 0 }}" required>
+      </div>
+      <div class="admin-field">
+        <label for="discount_price">할인가 (원)</label>
+        <input id="discount_price" name="discount_price" type="number" min="0" value="{{ product.discount_price if product and product.discount_price else '' }}">
+      </div>
+      <div class="admin-field">
+        <label for="stock">재고</label>
+        <input id="stock" name="stock" type="number" min="0" value="{{ product.stock if product else 50 }}" required>
+      </div>
+      <div class="admin-field">
+        <label for="image_url">이미지 URL</label>
+        <input id="image_url" name="image_url" type="text" value="{{ product.image_url if product else '' }}" placeholder="/static/images/products/...">
+      </div>
+      <div class="admin-field admin-field--full">
+        <label for="description">상품 설명</label>
+        <textarea id="description" name="description">{{ product.description if product else '' }}</textarea>
+      </div>
+      <div class="admin-field">
+        <label for="filter_space">공간 필터</label>
+        <select id="filter_space" name="filter_space">
+          {% for val in ['living', 'bedroom', 'kitchen', 'balcony', ''] %}
+          <option value="{{ val }}"{% if product and product.filter_space == val %} selected{% endif %}>{{ val or '없음' }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="admin-field">
+        <label for="filter_style">시즌 필터</label>
+        <select id="filter_style" name="filter_style">
+          {% for val in ['spring', 'summer', 'fall', 'winter', ''] %}
+          <option value="{{ val }}"{% if product and product.filter_style == val %} selected{% endif %}>{{ val or '없음' }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="admin-field">
+        <label for="filter_color">색상 필터</label>
+        <input id="filter_color" name="filter_color" type="text" value="{{ product.filter_color if product else '' }}" placeholder="white, wood, gray...">
+      </div>
+    </div>
+    <div class="admin-checks">
+      <label><input type="checkbox" name="is_active"{% if not product or product.is_active %} checked{% endif %}> 노출</label>
+      <label><input type="checkbox" name="is_popular"{% if product and product.is_popular %} checked{% endif %}> 인기</label>
+      <label><input type="checkbox" name="is_new"{% if product and product.is_new %} checked{% endif %}> 신상</label>
+      <label><input type="checkbox" name="is_best"{% if product and product.is_best %} checked{% endif %}> 베스트</label>
+    </div>
+    <div>
+      <button type="submit" class="admin-btn">저장</button>
+      {% if product %}
+      <a href="{{ url_for('product.detail', slug=product.slug) }}" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">쇼핑몰에서 보기</a>
+      {% endif %}
+    </div>
+  </form>
+</section>
+{% endblock %}

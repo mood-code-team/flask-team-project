@@ -25,6 +25,14 @@ from extensions import db
 from models import Category, Product
 from scripts.seed_db import seed_admin, seed_catalog, seed_faqs, seed_notices
 from scripts.product_enrichment import enrich_row_fields, stable_hash
+from scripts.subcategory_mappings import (
+    BALCONY_SUBCATEGORY_SLUGS,
+    BED_SUBCATEGORY_SLUGS,
+    DIFFUSER_SUBCATEGORY_SLUGS,
+    normalize_balcony_sub_category,
+    normalize_bed_sub_category,
+    normalize_diffuser_sub_category,
+)
 from services.db_schema import (
     ensure_category_schema,
     ensure_product_filter_schema,
@@ -42,6 +50,7 @@ CATEGORY_CODE_TO_PARENT: dict[str, str] = {
     "LIVING_TABLE": "side-table",
     "LIVING_ROOM_TABLE": "side-table",
     "DINING_TABLE": "table",
+    "DINING": "table",
     "BED": "bed",
     "BALCONY": "balcony",
     "BALCONY_OUTDOOR": "balcony",
@@ -50,12 +59,70 @@ CATEGORY_CODE_TO_PARENT: dict[str, str] = {
 DEFAULT_SUBCATEGORY: dict[str, str] = {
     "sofa": "sofa-3",
     "light": "table-lamp",
-    "diffuser": "wood-diffuser",
+    "diffuser": "potpourri",
     "side-table": "side-table-item",
     "table": "standard-dining",
-    "bed": "bed-frame",
+    "bed": "bed-other",
     "balcony": "outdoor-table",
 }
+
+SOFA_SUBCATEGORY_SLUGS: dict[str, str] = {
+    "2인소파": "sofa-2",
+    "2인용": "sofa-2",
+    "3인소파": "sofa-3",
+    "3인 소파": "sofa-3",
+    "3인용": "sofa-3",
+    "4인소파": "sofa-other",
+    "4인 소파": "sofa-other",
+    "4인용": "sofa-other",
+    "리클라이너": "sofa-other",
+    "코너소파": "sofa-other",
+    "2인소파": "sofa-2",
+    "2인용": "sofa-2",
+    "암체어": "armchair",
+    "안락의자": "lounge-chair",
+    "소파 기타": "sofa-other",
+    "소파기타": "sofa-other",
+    "기타": "sofa-other",
+    "기타소파": "sofa-other",
+}
+
+LOUNGE_KEYWORDS = ("안락", "라운지체어", "이지체어", "게이밍안락", "회전라운지")
+ARMCHAIR_KEYWORDS = ("암체어", "윙체어")
+
+
+def normalize_sofa_sub_category(row: dict) -> str:
+    raw = (row.get("sub_category") or "").strip()
+    name = (row.get("product_name") or "").strip()
+
+    if raw in {"2인용", "2인소파"}:
+        return "2인소파"
+    if raw in {"3인용", "3인 소파", "3인소파"}:
+        return "3인소파"
+    if raw in SOFA_SUBCATEGORY_SLUGS and raw not in {"기타", "기타소파", "3인용", "2인용"}:
+        return raw
+
+    if raw in {"기타", "기타소파", "소파 기타", "소파기타"}:
+        if any(keyword in name for keyword in ARMCHAIR_KEYWORDS):
+            return "암체어"
+        if any(keyword in name for keyword in LOUNGE_KEYWORDS):
+            return "안락의자"
+        return "소파기타"
+
+    return raw or "소파기타"
+
+
+def resolve_external_id(row: dict) -> str:
+    """CSV external_id가 없으면 image_name(예: 104.890.09.jpg) stem을 사용."""
+    external_id = (row.get("external_id") or "").strip()
+    if external_id:
+        return external_id
+
+    image_name = (row.get("image_name") or "").strip()
+    if image_name:
+        return Path(image_name).stem
+
+    return ""
 
 
 def slugify(text: str, external_id: str, category_code: str) -> str:
@@ -80,12 +147,25 @@ def parse_stock(stock_status: str) -> int:
     return 50
 
 
-def resolve_category(category_code: str) -> Category | None:
+def resolve_category(category_code: str, row: dict | None = None) -> Category | None:
     parent_slug = CATEGORY_CODE_TO_PARENT.get(category_code.upper())
     if not parent_slug:
         return None
 
     sub_slug = DEFAULT_SUBCATEGORY.get(parent_slug, parent_slug)
+    if parent_slug == "sofa" and row:
+        normalized = normalize_sofa_sub_category(row)
+        sub_slug = SOFA_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
+    elif parent_slug == "balcony" and row:
+        normalized = normalize_balcony_sub_category(row)
+        sub_slug = BALCONY_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
+    elif parent_slug == "bed" and row:
+        normalized = normalize_bed_sub_category(row)
+        sub_slug = BED_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
+    elif parent_slug == "diffuser" and row:
+        normalized = normalize_diffuser_sub_category(row)
+        sub_slug = DIFFUSER_SUBCATEGORY_SLUGS.get(normalized, sub_slug)
+
     category = Category.query.filter_by(slug=sub_slug).first()
     if category:
         return category
@@ -98,11 +178,20 @@ def pick_image_url(row: dict, csv_path: Path) -> str:
     if thumbnail.startswith("http"):
         return thumbnail[:500]
 
+    image_name = (row.get("image_name") or "").strip()
+    if image_name:
+        image_name = Path(image_name).name
+
     local = (row.get("local_image_path") or "").strip()
+    if image_name and not local:
+        local = f"images/{image_name}"
+
     if local:
         local_path = (csv_path.parent / local).resolve()
         if not local_path.is_file():
             local_path = (ROOT / local).resolve()
+        if not local_path.is_file() and image_name:
+            local_path = (csv_path.parent / "images" / image_name).resolve()
         if local_path.is_file():
             dest_dir = ROOT / "static" / "images" / "products" / "imported"
             dest_dir.mkdir(parents=True, exist_ok=True)
@@ -142,14 +231,14 @@ def import_products(
             break
 
         category_code = (row.get("category_code") or "").strip()
-        external_id = (row.get("external_id") or "").strip()
+        external_id = resolve_external_id(row)
         name = (row.get("product_name") or "").strip()
 
         if not category_code or not external_id or not name:
             stats["skipped"] += 1
             continue
 
-        category = resolve_category(category_code)
+        category = resolve_category(category_code, row)
         if not category:
             stats["errors"] += 1
             continue
@@ -162,6 +251,21 @@ def import_products(
 
         parent_slug = CATEGORY_CODE_TO_PARENT.get(category_code.upper(), "")
         pseudo_id = stable_hash(slug) % 1_000_000
+        existing_product = Product.query.filter_by(slug=slug).first()
+        existing = {}
+        if existing_product:
+            existing = {
+                "filter_space": existing_product.filter_space,
+                "filter_style": existing_product.filter_style,
+                "filter_color": existing_product.filter_color,
+                "mood_code_number": existing_product.mood_code_number,
+                "discount_price": existing_product.discount_price,
+                "brand": existing_product.brand,
+                "is_popular": existing_product.is_popular,
+                "is_new": existing_product.is_new,
+                "is_best": existing_product.is_best,
+            }
+
         enriched = enrich_row_fields(
             product_id=pseudo_id,
             slug=slug,
@@ -171,6 +275,7 @@ def import_products(
             parent_slug=parent_slug,
             category_rank=stable_hash(slug) % 20 + 1,
             csv_row=row,
+            existing=existing,
         )
 
         fields = {
@@ -185,6 +290,7 @@ def import_products(
             "filter_space": enriched["filter_space"],
             "filter_style": enriched["filter_style"],
             "filter_color": enriched["filter_color"],
+            "mood_code_number": enriched.get("mood_code_number"),
             "has_installation": parent_slug in {"sofa", "bed", "table"},
             "is_popular": enriched["is_popular"],
             "is_new": enriched["is_new"],
@@ -196,7 +302,7 @@ def import_products(
             stats["created"] += 1
             continue
 
-        product = Product.query.filter_by(slug=slug).first()
+        product = existing_product
         if product:
             if skip_existing:
                 stats["skipped"] += 1
