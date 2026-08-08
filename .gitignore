@@ -29,3 +29,8 @@ static/images/uploads/*
 /data-analysis/output_*/
 /data-analysis/crawling/
 /data-analysis/__pycache__/
+
+# Local temp / scratch (do not commit)
+_tmp_counts.txt
+subcats.txt
+static/images/hero/_candidates/
