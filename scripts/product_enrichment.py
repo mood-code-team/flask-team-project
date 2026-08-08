@@ -21,9 +21,52 @@ from services.search_filters import (
 PALETTE_COLORS = frozenset({
     "white", "beige", "gray", "wood", "black", "pink", "yellow", "green", "blue",
 })
+
+# CSV 한글 filter_color → 영문 팔레트
+KOREAN_COLOR_MAP: dict[str, str] = {
+    "화이트": "white",
+    "오프화이트": "white",
+    "옐로우": "yellow",
+    "옐로": "yellow",
+    "그레이": "gray",
+    "그레이그린": "green",
+    "라이트그레이": "gray",
+    "다크그레이": "gray",
+    "그린": "green",
+    "블루": "blue",
+    "라이트블루": "blue",
+    "블랙": "black",
+    "베이지": "beige",
+    "라이트베이지": "beige",
+    "우드": "wood",
+    "핑크": "pink",
+    "레드": "pink",
+    "다크레드": "pink",
+    "오렌지": "yellow",
+    "황동색": "wood",
+    "황동": "wood",
+    "니켈": "gray",
+    "앤트러싸이트": "black",
+    "다크베이지": "beige",
+    "다크그린": "green",
+    "다크블루": "blue",
+    "브라이트레드": "pink",
+    "레드브라운": "pink",
+    "라이트오렌지": "yellow",
+    "브라운오렌지": "yellow",
+    "옐로베이지": "beige",
+    "다크브라운": "wood",
+}
+
+# 복합색상명에서 필터 우선순위 (액센트/패브릭 > 프레임 우드)
+COLOR_FILTER_PRIORITY = (
+    "white", "beige", "yellow", "green", "blue", "pink", "black", "gray", "wood",
+)
+
 COLOR_KEYWORDS: list[tuple[str, str]] = [
     ("화이트", "white"),
     ("white", "white"),
+    ("오프화이트", "white"),
     ("흰", "white"),
     ("베이지", "beige"),
     ("beige", "beige"),
@@ -45,8 +88,12 @@ COLOR_KEYWORDS: list[tuple[str, str]] = [
     ("핑크", "pink"),
     ("pink", "pink"),
     ("옐로", "yellow"),
+    ("옐로우", "yellow"),
     ("yellow", "yellow"),
     ("노란", "yellow"),
+    ("옐로그린", "green"),
+    ("다크옐로", "yellow"),
+    ("브라이트옐로", "yellow"),
     ("그린", "green"),
     ("green", "green"),
     ("초록", "green"),
@@ -54,6 +101,24 @@ COLOR_KEYWORDS: list[tuple[str, str]] = [
     ("blue", "blue"),
     ("파란", "blue"),
     ("네이비", "blue"),
+    ("다크블루", "blue"),
+    ("앤트러싸이트", "black"),
+    ("다크베이지", "beige"),
+    ("라이트베이지", "beige"),
+    ("다크그린", "green"),
+    ("브라이트레드", "pink"),
+    ("레드브라운", "pink"),
+    ("레드", "pink"),
+    ("라이트오렌지", "yellow"),
+    ("브라운오렌지", "yellow"),
+    ("옐로베이지", "beige"),
+    ("다크브라운", "wood"),
+    ("블랙브라운", "black"),
+    ("브라운", "wood"),
+    ("소나무", "wood"),
+    ("아카시아", "wood"),
+    ("아카시아나무", "wood"),
+    ("나무", "wood"),
 ]
 
 # 할인율 후보 (%)
@@ -66,10 +131,63 @@ def stable_hash(text: str) -> int:
 
 def infer_color(name: str, description: str = "") -> str:
     text = f"{name} {description}".lower()
-    for keyword, color in COLOR_KEYWORDS:
+    for keyword, color in sorted(COLOR_KEYWORDS, key=lambda item: len(item[0]), reverse=True):
         if keyword.lower() in text:
             return color
     return ""
+
+
+def infer_primary_color_from_name(name: str) -> str:
+    """IKEA 상품명에서 대표 필터 색 추출 (변형명 `-` 뒤, `/` 구분)."""
+    if not name:
+        return ""
+    segment = name.split(" - ")[-1].strip()
+    parts = [part.strip() for part in re.split(r"[/]", segment) if part.strip()]
+    found: list[str] = []
+    for part in parts or [segment]:
+        color = infer_color(part, "")
+        if color and color not in found:
+            found.append(color)
+    if not found:
+        return infer_color(segment, "")
+    if len(found) == 1:
+        return found[0]
+
+    non_wood = [color for color in found if color != "wood"]
+    if non_wood:
+        for preferred in COLOR_FILTER_PRIORITY:
+            if preferred in non_wood:
+                return preferred
+        return non_wood[0]
+    return found[0]
+
+
+def _map_raw_color_to_palette(raw: str) -> str:
+    """CSV filter_color(한/영, 복합) → 팔레트."""
+    text = (raw or "").strip()
+    if not text:
+        return ""
+
+    lowered = text.lower()
+    if lowered in PALETTE_COLORS:
+        return lowered
+
+    if text in KOREAN_COLOR_MAP:
+        return KOREAN_COLOR_MAP[text]
+
+    for token in re.split(r"[\s/]+", text):
+        token = token.strip()
+        if not token:
+            continue
+        if token.lower() in PALETTE_COLORS:
+            return token.lower()
+        if token in KOREAN_COLOR_MAP:
+            return KOREAN_COLOR_MAP[token]
+        mapped = infer_color(token, "")
+        if mapped:
+            return mapped
+
+    return infer_color(text, "")
 
 
 def normalize_filter_color(
@@ -78,14 +196,15 @@ def normalize_filter_color(
     name: str = "",
     description: str = "",
 ) -> str:
-    """지정 팔레트 명칭으로 통일. 없으면 키워드 추론."""
-    value = (raw or "").strip().lower()
-    if value in PALETTE_COLORS:
-        return value
-    if value:
-        mapped = infer_color(value, "")
-        if mapped:
-            return mapped
+    """지정 팔레트 명칭으로 통일. CSV 오기 시 상품명 대표색 우선."""
+    name_color = infer_primary_color_from_name(name)
+    mapped = _map_raw_color_to_palette(raw)
+    if mapped and name_color and mapped != name_color:
+        return name_color
+    if mapped:
+        return mapped
+    if name_color:
+        return name_color
     return infer_color(name, description)
 
 
@@ -169,12 +288,8 @@ def enrich_row_fields(
         name=name,
         description=description,
     )
-    if row.get("filter_color"):
-        filter_color = csv_color
-    elif prev.get("filter_color"):
-        filter_color = str(prev["filter_color"])
-    else:
-        filter_color = csv_color or infer_color(name, description)
+    # CSV 값이 있어도 상품명과 충돌하면 normalize 결과(상품명 우선) 사용
+    filter_color = csv_color or str(prev.get("filter_color") or "").strip() or infer_color(name, description)
 
     csv_style = normalize_filter_style(row.get("filter_style") or row.get("mood_code") or "")
     if csv_style:
