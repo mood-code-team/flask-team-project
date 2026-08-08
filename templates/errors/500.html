@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block title %}서버 오류{% endblock %}
-{% block content %}
-<div class="container" style="text-align:center;padding:80px 0;">
-  <h1 style="font-size:64px;font-weight:800;color:#e03131;">500</h1>
-  <p style="margin:16px 0 24px;color:var(--color-text-light);">일시적인 오류가 발생했습니다.</p>
-  <a href="{{ url_for('main.index') }}" class="btn btn-primary">홈으로 돌아가기</a>
-</div>
-{% endblock %}
