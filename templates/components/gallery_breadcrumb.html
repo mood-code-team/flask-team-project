@@ -1,0 +1,9 @@
+<nav class="gallery-breadcrumb" aria-label="breadcrumb">
+  <a href="{{ url_for('main.index') }}">Home</a>
+  <span aria-hidden="true">/</span>
+  <a href="{{ url_for('gallery.mood_gallery') }}">Mood Gallery</a>
+  {% if mood_detail %}
+  <span aria-hidden="true">/</span>
+  <span aria-current="page">{{ mood_detail.title }}</span>
+  {% endif %}
+</nav>

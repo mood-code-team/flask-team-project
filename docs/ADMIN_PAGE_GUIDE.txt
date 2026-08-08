@@ -1,0 +1,81 @@
+Mood Code — 관리자 페이지 안내
+================================
+
+■ 접속 정보
+
+  URL      : http://127.0.0.1:5000/admin
+  아이디   : gygs1010
+  이메일   : gygs1010@gmail.com
+  비밀번호 : dnjsdlf@102360
+
+  ※ 팀 내부 공유용. 외부 유출 금지.
+
+
+■ Windows — 실행_관리자.bat
+
+  1) 프로젝트 폴더에서 실행_관리자.bat 더블클릭
+  2) 터미널에 "Mood Code Admin Server" 표시 확인
+  3) 브라우저가 /admin/ 으로 자동 연결 (안 되면 주소 직접 입력)
+  4) gygs1010 / 비밀번호 로그인
+  5) 종료: Ctrl+C
+
+  bat이 하는 일:
+    - 5000 포트 기존 서버 종료
+    - venv 자동 생성/복구 (ensure_venv.py)
+    - DB 없으면 seed_db.py
+    - 관리자 계정 시드
+    - hspace_server.py 실행 + /admin 자동 열기
+
+
+■ Mac / Linux
+
+  ./run.sh 또는 python hspace_server.py
+  브라우저: http://127.0.0.1:5000/admin
+  (위 관리자 계정으로 로그인)
+
+
+■ 관리자 메뉴
+
+  대시보드   /admin/dashboard   — 매출·주문·문의 요약
+  주문 관리  /admin/orders      — 주문 상태 변경
+  상품 관리  /admin/products    — 상품 등록·수정
+  카테고리   /admin/categories  — 소분류별 상품 개수 (조회)
+  1:1 문의   /admin/inquiries   — 문의 답변
+  공지사항   /admin/notices     — 공지 작성
+  FAQ        /admin/faqs        — FAQ 작성
+  회원 관리  /admin/users       — 회원 검색·비활성화
+
+
+■ 안 될 때
+
+  Python not found
+    → Python 3.10+ 설치, PATH 체크
+
+  venv setup failed
+    → py -3 scripts\ensure_venv.py 수동 실행
+
+  로그인 실패 / 403 Forbidden
+    → 관리자 계정(gygs1010) 사용, 일반 회원 계정 불가
+    → 아래 계정 재설정 실행:
+
+    venv\Scripts\python.exe -c "from app import create_app; from scripts.seed_db import seed_admin; app=create_app(); ctx=app.app_context(); ctx.push(); seed_admin(); ctx.pop(); print('OK')"
+
+  5000 포트 사용 중
+    → 실행_서버.bat 등 다른 서버 Ctrl+C 종료
+
+  창이 바로 닫힘
+    → cmd에서 cd 프로젝트폴더 후 실행_관리자.bat 입력해 오류 확인
+
+
+■ 왜 만들었나 (팀원용 요약)
+
+  - CSV/DB 상품 600개+ 를 브라우저에서 수정
+  - 주문 상태(결제→배송) 변경
+  - 공지·FAQ·1:1 문의 운영
+  - 발표/데모 시 "운영 중인 쇼핑몰"처럼 보여주기
+
+  코드 위치:
+    routes/admin.py
+    services/admin_service.py
+    templates/admin/
+    static/css/admin.css

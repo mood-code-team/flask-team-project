@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% set active_menu = 'categories' %}
+{% block title %}카테고리{% endblock %}
+
+{% block admin_content %}
+<div class="admin-topbar">
+  <div>
+    <h1>카테고리</h1>
+    <p>쇼핑몰 카테고리 및 상품 수 현황</p>
+  </div>
+</div>
+
+<section class="admin-panel">
+  <div class="admin-panel__head">카테고리 목록</div>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>대분류</th>
+          <th>서브카테고리</th>
+          <th>Slug</th>
+          <th>노출 상품</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in category_rows %}
+        <tr>
+          <td>{{ row.parent.name_en or row.parent.name }}</td>
+          <td>{{ row.category.name }}</td>
+          <td><code>{{ row.category.slug }}</code></td>
+          <td>{{ row.product_count }}개</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="admin-meta" style="padding:16px 20px">카테고리 구조 변경은 <code>scripts/catalog_data.py</code> 및 <code>seed_db.py</code> 기준으로 관리됩니다.</p>
+</section>
+{% endblock %}

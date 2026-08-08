@@ -46,7 +46,24 @@ Flask 풀스택 | SQLite
   마이페이지    http://127.0.0.1:5000/mypage/
 
 
-■ 테스트 계정
+■ 테스트 계정 (일반)
 
   python scripts\seed_db.py
   admin / admin1234  (이메일: admin@shop.local)
+  ※ 최신 seed는 관리자 계정 gygs1010 으로 통일됨
+
+
+■ 관리자 페이지
+
+  Windows: 실행_관리자.bat (더블클릭)
+  URL: http://127.0.0.1:5000/admin
+
+  아이디   : gygs1010
+  이메일   : gygs1010@gmail.com
+  비밀번호 : dnjsdlf@102360
+
+  안 될 때:
+    - Python PATH 확인
+    - 5000 포트 다른 서버 종료 (Ctrl+C)
+    - 로그인 실패 → docs/ADMIN_PAGE_GUIDE.txt 참고
+    - 상세: README.md "5. 관리자 페이지" 섹션

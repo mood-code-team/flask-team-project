@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% set active_menu = 'inquiries' %}
+{% block title %}문의 상세{% endblock %}
+
+{% block admin_content %}
+<div class="admin-topbar">
+  <div>
+    <h1>문의 상세</h1>
+    <p>{{ inquiry.title }}</p>
+  </div>
+  <a href="{{ url_for('admin.inquiries') }}" class="admin-btn admin-btn--ghost">목록으로</a>
+</div>
+
+<section class="admin-panel">
+  <div class="admin-panel__head">문의 내용</div>
+  <dl class="admin-detail-grid">
+    <div><dt>유형</dt><dd>{{ inquiry.inquiry_type_label }}</dd></div>
+    <div><dt>상태</dt><dd>{{ inquiry.status_label }}</dd></div>
+    <div><dt>회원</dt><dd>{{ inquiry.user.username if inquiry.user else '-' }} ({{ inquiry.user.email if inquiry.user else '-' }})</dd></div>
+    <div><dt>접수일</dt><dd>{{ inquiry.created_at.strftime('%Y-%m-%d %H:%M') }}</dd></div>
+    {% if inquiry.order_number %}<div><dt>주문번호</dt><dd>{{ inquiry.order_number }}</dd></div>{% endif %}
+    <div class="admin-detail-full"><dt>제목</dt><dd>{{ inquiry.title }}</dd></div>
+    <div class="admin-detail-full"><dt>내용</dt><dd style="white-space:pre-wrap">{{ inquiry.content }}</dd></div>
+  </dl>
+</section>
+
+<section class="admin-panel" style="margin-top:20px">
+  <div class="admin-panel__head">답변 작성</div>
+  <form class="admin-form admin-form--wide" method="post">
+    <div class="admin-field">
+      <label for="status">처리 상태</label>
+      <select id="status" name="status">
+        {% for key, label in inquiry_statuses.items() %}
+        <option value="{{ key }}"{% if inquiry.status == key %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="admin-field">
+      <label for="answer">답변</label>
+      <textarea id="answer" name="answer">{{ inquiry.answer or '' }}</textarea>
+    </div>
+    <div><button type="submit" class="admin-btn">답변 저장</button></div>
+  </form>
+</section>
+{% endblock %}

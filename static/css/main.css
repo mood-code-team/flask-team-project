@@ -378,6 +378,47 @@
   pointer-events: none;
 }
 
+/* ===== Mood Hover (메인 — MOOD GALLERY 카드 호버 시 페이지 전체 배경) ===== */
+.page-home,
+.page-home .site-main,
+.page-home .hero-ad,
+.page-home .gallery-entry,
+.page-home .site-footer {
+  transition: background-color 0.5s ease;
+}
+
+body.page-home.mood-hover-bloom,
+body.page-home.mood-hover-bloom .site-main,
+body.page-home.mood-hover-bloom .hero-ad,
+body.page-home.mood-hover-bloom .gallery-entry,
+body.page-home.mood-hover-bloom .site-footer {
+  background-color: var(--season-spring) !important;
+}
+
+body.page-home.mood-hover-clear,
+body.page-home.mood-hover-clear .site-main,
+body.page-home.mood-hover-clear .hero-ad,
+body.page-home.mood-hover-clear .gallery-entry,
+body.page-home.mood-hover-clear .site-footer {
+  background-color: var(--season-summer) !important;
+}
+
+body.page-home.mood-hover-calm,
+body.page-home.mood-hover-calm .site-main,
+body.page-home.mood-hover-calm .hero-ad,
+body.page-home.mood-hover-calm .gallery-entry,
+body.page-home.mood-hover-calm .site-footer {
+  background-color: var(--season-autumn) !important;
+}
+
+body.page-home.mood-hover-chic,
+body.page-home.mood-hover-chic .site-main,
+body.page-home.mood-hover-chic .hero-ad,
+body.page-home.mood-hover-chic .gallery-entry,
+body.page-home.mood-hover-chic .site-footer {
+  background-color: var(--season-winter) !important;
+}
+
 .season-card__body {
   padding: 16px 4px 0;
 }
@@ -394,6 +435,149 @@
   font-weight: 700;
   letter-spacing: 1.5px;
   color: var(--accent, #111);
+}
+
+.season-card__mood {
+  text-align: right;
+  min-width: 92px;
+}
+
+/* ===== Gallery entry (메인 MOOD GALLERY) ===== */
+.gallery-entry {
+  padding: 48px clamp(16px, 3vw, 40px) 72px;
+}
+
+.gallery-entry__header {
+  margin-bottom: 24px;
+  padding: 0 8px;
+}
+
+.gallery-entry__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 2vw, 20px);
+  margin-bottom: 28px;
+}
+
+.gallery-entry__card {
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery-entry__card:hover {
+  transform: translateY(-6px);
+}
+
+.gallery-entry__card-img {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--color-bg-gray);
+}
+
+.gallery-entry__card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery-entry__card:hover .gallery-entry__card-img img {
+  transform: scale(1.05);
+}
+
+.gallery-entry__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.gallery-entry__body {
+  padding: 16px 4px 0;
+}
+
+.gallery-entry__card-label {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.gallery-entry__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 8px;
+}
+
+.gallery-entry__section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.gallery-entry__section-desc {
+  font-size: 12px;
+  color: var(--color-text-light);
+  line-height: 1.45;
+}
+
+.gallery-entry__link {
+  display: inline-block;
+  padding: 12px 22px;
+  border: 1px solid var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.gallery-entry__link:hover {
+  background: var(--color-text);
+  color: #fff;
+}
+
+.gallery-entry__link--ghost {
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.gallery-entry__link--ghost:hover {
+  border-color: var(--color-text);
+}
+
+.season-mood {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.season-mood__label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: var(--color-text-light);
+  margin: 0;
+}
+
+.season-mood__feel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mood-accent, var(--color-text));
+  letter-spacing: 0.2px;
+}
+
+.season-mood--hero .season-mood__label {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.season-mood--hero .season-mood__feel {
+  color: #fff;
+  font-size: 16px;
 }
 
 .season-card__temp {
@@ -566,6 +750,11 @@
   gap: 16px;
 }
 
+.season-detail__mood {
+  display: flex;
+  align-items: flex-end;
+}
+
 .season-detail__temp {
   display: flex;
   align-items: flex-end;
@@ -719,6 +908,73 @@
   pointer-events: none;
 }
 
+/* ===== Spring Space (봄 시즌 갤러리) ===== */
+.season-space {
+  margin-top: 60px;
+}
+
+.season-space__title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.season-space__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.season-space__card {
+  display: block;
+  overflow: hidden;
+}
+
+.season-space__image {
+  width: 100%;
+  display: block;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  transition: 0.3s;
+}
+
+.season-space__card:hover .season-space__image {
+  transform: scale(1.03);
+}
+
+@media (max-width: 900px) {
+  .season-space__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== Season Detail page background ===== */
+.site-main,
+.site-footer {
+  transition: background-color 0.5s ease;
+}
+
+body.season-spring .site-main,
+body.season-spring .site-footer {
+  background: var(--season-spring);
+}
+
+body.season-summer .site-main,
+body.season-summer .site-footer {
+  background: var(--season-summer);
+}
+
+body.season-autumn .site-main,
+body.season-autumn .site-footer {
+  background: var(--season-autumn);
+}
+
+body.season-winter .site-main,
+body.season-winter .site-footer {
+  background: var(--season-winter);
+}
+
 /* ===== Responsive ===== */
 @media (prefers-reduced-motion: reduce) {
   .hero-slide__img,
@@ -737,6 +993,10 @@
 
 @media (max-width: 1024px) {
   .season-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gallery-entry__grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -798,6 +1058,10 @@
 
 @media (max-width: 540px) {
   .season-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-entry__grid {
     grid-template-columns: 1fr;
   }
 

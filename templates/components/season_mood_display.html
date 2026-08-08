@@ -1,0 +1,5 @@
+{# 시즌 무드 — 온도 대신 감성 태그 표시 #}
+<div class="season-mood{% if variant %} season-mood--{{ variant }}{% endif %}" style="--mood-accent: {{ room.accent }}">
+  <p class="season-mood__label">MOOD</p>
+  <span class="season-mood__feel">{{ room.temp_feel }}</span>
+</div>

@@ -1,0 +1,15 @@
+<nav class="gallery-mood-nav" aria-label="무드 갤러리">
+  <div class="gallery-mood-nav__inner">
+    <div class="gallery-mood-nav__tabs" role="tablist">
+      {% for slug, label in gallery_moods %}
+      <a
+        href="{{ url_for('gallery.mood_gallery_detail', mood_slug=slug) }}"
+        class="gallery-mood-nav__tab{% if active_mood == slug %} is-active{% endif %}"
+        role="tab"
+        {% if active_mood == slug %}aria-current="page"{% endif %}
+      >{{ label }}</a>
+      {% endfor %}
+    </div>
+    <a href="{{ url_for('gallery.space_main') }}" class="gallery-mood-nav__secondary">공간별 보기</a>
+  </div>
+</nav>

@@ -19,13 +19,17 @@
       {% endif %}
     {% endwith %}
 
+    {% if next_url == '/admin' %}
+    <p class="auth-promo auth-promo--admin">관리자 로그인 — 아이디 <strong>gygs1010</strong></p>
+    {% else %}
     <p class="auth-promo">지금 가입하면, 신규 할인 쿠폰 즉시 발급</p>
+    {% endif %}
 
     {% include "components/auth_social_buttons.html" %}
 
     <div class="auth-divider" aria-hidden="true"><span>또는</span></div>
 
-    <form class="auth-form" method="post" action="{{ url_for('auth.login') }}" novalidate>
+    <form class="auth-form" method="post" action="{{ url_for('auth.login', next=next_url) if next_url else url_for('auth.login') }}" novalidate>
       <div class="auth-field">
         <label class="auth-label" for="login-id">아이디 / 이메일</label>
         <input
@@ -72,5 +76,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/auth.js') }}?v=20260803b"></script>
+<script src="{{ url_for('static', filename='js/auth.js') }}?v=20260807a"></script>
 {% endblock %}

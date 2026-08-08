@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-gallery{% endblock %}
+{% block title %}{{ page_title }} — Mood Code{% endblock %}
+{% block meta_description %}{{ page_subtitle }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809d">
+{% endblock %}
+
+{% block content %}
+<section class="gallery-picker">
+  <div class="gallery-picker__header">
+    <h1 class="gallery-picker__title">{{ page_title | upper }}</h1>
+    <p class="gallery-picker__desc">{{ page_subtitle }}</p>
+  </div>
+
+  {% if gallery_mode == 'mood' %}
+  <div class="gallery-entry__nav-wrap" style="margin-bottom: 28px;">
+    {% set active_mood = none %}
+    {% include "components/gallery_mood_nav.html" %}
+  </div>
+  {% endif %}
+
+  <div class="gallery-picker__grid">
+    {% for item in gallery_items %}
+    <a href="{{ item.link if item.link else url_for('gallery.mood_gallery_detail', mood_slug='bloom') }}" class="gallery-picker__card">
+      <div class="gallery-picker__img">
+        <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy" onerror="this.closest('.gallery-picker__card').style.display='none';">
+        <div class="gallery-picker__overlay" aria-hidden="true"></div>
+      </div>
+      <p class="gallery-picker__label">{{ item.name }}</p>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if gallery_mode == 'mood' %}
+  <div class="gallery-entry__nav-wrap">
+    {% set active_mood = none %}
+    {% include "components/gallery_mood_nav.html" %}
+  </div>
+  {% elif gallery_mode == 'space' %}
+  <div class="gallery-entry__nav-wrap">
+    <nav class="gallery-mood-nav" aria-label="갤러리 이동">
+      <div class="gallery-mood-nav__inner">
+        <a href="{{ url_for('gallery.mood_gallery') }}" class="gallery-mood-nav__secondary">← 무드 갤러리로</a>
+      </div>
+    </nav>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

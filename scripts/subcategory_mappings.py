@@ -23,7 +23,7 @@ BED_SUBCATEGORY_SLUGS: dict[str, str] = {
     "수납침대": "storage-bed",
     "수납침대프레임": "storage-bed",
     "오토만침대": "storage-bed",
-    "침대프레임": "bed-frame",
+    "침대프레임": "bed-other",
     "침대": "bed-other",
     "기타": "bed-other",
 }
@@ -90,7 +90,7 @@ def normalize_bed_sub_category(row: dict) -> str:
     if "매트리스" in name and "침대프레임" not in name and "소파베드" not in name:
         return "매트리스"
     if "침대프레임" in raw or "침대프레임" in name or raw == "침대프레임":
-        return "침대프레임"
+        return "기타"
 
     return raw or "기타"
 

@@ -1,0 +1,46 @@
+Mood Code — 공간·무드 갤러리 (선영 팀)
+========================================
+
+출처: GitHub `선영` 브랜치 + `공간디자인-이미지-생성-및-csv파일-생성` 브랜치
+
+■ 접속 URL
+
+  무드 갤러리     http://127.0.0.1:5000/gallery
+  공간 갤러리     http://127.0.0.1:5000/spaces
+  공간+계절      http://127.0.0.1:5000/space/living/spring
+                 (living / bedroom / dining / balcony)
+                 (spring / summer / fall / winter)
+
+■ 적용된 파일
+
+  static/csv/moodcode_*_4seasons_16_final.csv   — 공간별 16장 메타 DB
+  static/originals/                             — 고해상도 원본 64장
+  static/moodcode_season_color_palette_package/ — 계절 컬러 팔레트
+  templates/gallery/                            — card_grid, gallery_detail
+  data/gallery_data.csv                         — 초기 Unsplash 샘플 (참고용)
+  routes/gallery.py                             — URL 라우트
+  services/gallery_service.py                   — CSV·이미지 로직
+
+■ 무드 카테고리
+
+  fresh     → BLOOM  (봄)
+  vibrant   → CLEAR  (여름)
+  cozy      → CALM   (가을)
+  chic_key  → CHIC   (겨울)
+
+■ 코드 위치 (통합 방식)
+
+  선영 팀 app.py는 단독 실행용이었음.
+  Mood Code 메인 앱(app.py)은 그대로 두고,
+  gallery blueprint로 기능만 통합함.
+  메인 홈(/)은 기존 Mood Code 메인 페이지 유지.
+
+■ 상품 위치 번호 (tagged 이미지 규칙)
+
+  1: 중심 상품 (소파/식탁/침대/발코니 메인)
+  2: 보조 테이블
+  3: 조명
+  4: 디퓨저/향기
+
+  tagged 이미지는 static/originals 와 별도 패키지에 있음.
+  현재 화면은 originals(원본) 이미지를 사용.

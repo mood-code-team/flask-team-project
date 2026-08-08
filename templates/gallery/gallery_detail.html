@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-gallery mood-{{ mood_key }}{% endblock %}
+{% block title %}{{ mood_detail.title if mood_detail else (meta.title if meta else 'Gallery') }} — Mood Gallery{% endblock %}
+{% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809e">
+{% endblock %}
+
+{% block content %}
+{% set detail = mood_detail %}
+
+<section class="mood-detail">
+  <div class="mood-detail__container">
+    {% include "components/gallery_mood_nav.html" %}
+
+    {% if detail %}
+    <header class="mood-detail__hero">
+      <h1 class="mood-detail__title">{{ detail.title }}</h1>
+      <p class="mood-detail__subtitle">{{ detail.subtitle }}</p>
+
+      <div class="mood-detail__info">
+        <div class="mood-detail__panel mood-detail__panel--highlights">
+          <h2 class="mood-detail__panel-title">MOOD HIGHLIGHTS</h2>
+          <ul class="mood-detail__list">
+            {% for title, desc in detail.highlights %}
+            <li><strong>· {{ title }}</strong> {{ desc }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="mood-detail__panel mood-detail__panel--palette">
+          <h2 class="mood-detail__panel-title">COLOR PALETTE</h2>
+          <div class="mood-detail__palette">
+            {% for color in detail.palettes %}
+            <div class="mood-detail__swatch">
+              <span class="mood-detail__swatch-color" style="background-color: {{ color.hex }};" title="{{ color.hex }}"></span>
+              <span class="mood-detail__swatch-label">{{ color.name }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </header>
+    {% endif %}
+
+    {% if gallery_items %}
+    <div class="mood-detail__grid">
+      {% for item in gallery_items %}
+      <article class="mood-detail__card{% if item.product_url %} mood-detail__card--linked{% endif %}">
+        {% if item.product_url %}
+        <a href="{{ item.product_url }}" class="mood-detail__card-link" title="{{ item.product_name }}">
+          <div class="mood-detail__card-img">
+            <img src="{{ item.image_url }}" alt="{{ item.product_name or 'Interior image' }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+          </div>
+          {% if item.mood_code_number %}
+          <p class="mood-detail__card-caption">{{ item.mood_code_number }} · {{ item.product_name }}</p>
+          {% endif %}
+        </a>
+        {% else %}
+        <div class="mood-detail__card-img">
+          <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

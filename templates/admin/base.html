@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}관리자{% endblock %} — Mood Code Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260807b">
+</head>
+<body class="admin-page">
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <a href="{{ url_for('admin.dashboard') }}" class="admin-brand">
+        Mood Code
+        <small>Admin Console</small>
+      </a>
+
+      <nav class="admin-nav" aria-label="관리자 메뉴">
+        <div class="admin-nav-group">
+          <div class="admin-nav-group__label">운영</div>
+          <a href="{{ url_for('admin.dashboard') }}"{% if active_menu == 'dashboard' %} class="is-active"{% endif %}>대시보드</a>
+          <a href="{{ url_for('admin.orders') }}"{% if active_menu == 'orders' %} class="is-active"{% endif %}>
+            주문 관리
+            {% if admin_sidebar.pending_orders %}<span class="admin-nav__badge">{{ admin_sidebar.pending_orders }}</span>{% endif %}
+          </a>
+          <a href="{{ url_for('admin.inquiries') }}"{% if active_menu == 'inquiries' %} class="is-active"{% endif %}>
+            1:1 문의
+            {% if admin_sidebar.pending_inquiries %}<span class="admin-nav__badge">{{ admin_sidebar.pending_inquiries }}</span>{% endif %}
+          </a>
+        </div>
+
+        <div class="admin-nav-group">
+          <div class="admin-nav-group__label">상품</div>
+          <a href="{{ url_for('admin.products') }}"{% if active_menu == 'products' %} class="is-active"{% endif %}>상품 관리</a>
+          <a href="{{ url_for('admin.categories') }}"{% if active_menu == 'categories' %} class="is-active"{% endif %}>카테고리</a>
+        </div>
+
+        <div class="admin-nav-group">
+          <div class="admin-nav-group__label">콘텐츠</div>
+          <a href="{{ url_for('admin.notices') }}"{% if active_menu == 'notices' %} class="is-active"{% endif %}>공지사항</a>
+          <a href="{{ url_for('admin.faqs') }}"{% if active_menu == 'faqs' %} class="is-active"{% endif %}>FAQ</a>
+        </div>
+
+        <div class="admin-nav-group">
+          <div class="admin-nav-group__label">회원</div>
+          <a href="{{ url_for('admin.users') }}"{% if active_menu == 'users' %} class="is-active"{% endif %}>회원 관리</a>
+        </div>
+      </nav>
+
+      <div class="admin-sidebar__foot">
+        <strong>{{ current_user.full_name or current_user.username }}</strong>
+        <p><a href="{{ url_for('main.index') }}">쇼핑몰 보기</a> · <a href="{{ url_for('auth.logout') }}">로그아웃</a></p>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <p class="admin-alert admin-alert--{{ category }}">{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {% block admin_content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

@@ -57,6 +57,10 @@ def create_app(config_name: str | None = None) -> Flask:
     if upload_dir:
         upload_dir.mkdir(parents=True, exist_ok=True)
 
+    @app.errorhandler(403)
+    def forbidden(error):
+        return render_template("errors/403.html"), 403
+
     @app.errorhandler(404)
     def not_found(error):
         return render_template("errors/404.html"), 404

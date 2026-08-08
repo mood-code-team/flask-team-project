@@ -2,21 +2,7 @@
 
 from __future__ import annotations
 
-# Unsplash 4K 이미지 파라미터
-_IMG_4K = "w=3840&q=92&auto=format&fit=crop"
-_IMG_2K = "w=1920&q=90&auto=format&fit=crop"
-
-
-def _unsplash(photo_id: str) -> dict[str, str]:
-    """Unsplash 4K / 2K URL 생성."""
-    base = f"https://images.unsplash.com/{photo_id}"
-    return {
-        "image": f"{base}?{_IMG_4K}",
-        "image_2k": f"{base}?{_IMG_2K}",
-    }
-
-
-# 히어로 — 카테고리 광고 (3·4번 톤: 따뜻한 중성 베드룸 / 1·2번도 같은 계열)
+# 히어로 — 카테고리 광고 (메인 전용 로컬 이미지)
 HERO_SLIDES = [
     {
         "image": "images/hero/lighting.jpg",

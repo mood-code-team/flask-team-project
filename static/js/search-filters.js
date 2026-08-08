@@ -68,7 +68,7 @@
 
   document.getElementById("search-filter-reset")?.addEventListener("click", () => {
     setFilterValue("sort", "newest");
-    ["space", "style", "color", "brand"].forEach((key) => {
+    ["space", "style", "color", "subcategory"].forEach((key) => {
       setFilterValue(key, "");
     });
     submitForm();

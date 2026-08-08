@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% set active_menu = 'notices' %}
+{% block title %}{% if notice %}공지 수정{% else %}공지 작성{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="admin-topbar">
+  <div>
+    <h1>{% if notice %}공지 수정{% else %}공지 작성{% endif %}</h1>
+  </div>
+  <a href="{{ url_for('admin.notices') }}" class="admin-btn admin-btn--ghost">목록으로</a>
+</div>
+
+<section class="admin-panel">
+  <form class="admin-form admin-form--wide" method="post">
+    <div class="admin-field">
+      <label for="title">제목</label>
+      <input id="title" name="title" type="text" value="{{ notice.title if notice else '' }}" required>
+    </div>
+    <div class="admin-field">
+      <label for="content">내용</label>
+      <textarea id="content" name="content" required>{{ notice.content if notice else '' }}</textarea>
+    </div>
+    <div class="admin-checks">
+      <label><input type="checkbox" name="is_pinned"{% if notice and notice.is_pinned %} checked{% endif %}> 상단 고정</label>
+      <label><input type="checkbox" name="is_active"{% if not notice or notice.is_active %} checked{% endif %}> 노출</label>
+    </div>
+    <div><button type="submit" class="admin-btn">저장</button></div>
+  </form>
+</section>
+{% endblock %}
