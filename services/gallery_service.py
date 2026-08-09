@@ -321,14 +321,17 @@ def get_season_palette(season: str) -> list[dict[str, str]]:
     return palette
 
 
-def get_mood_products(category: str, *, limit: int = 8, space: str = "living") -> list[dict]:
-    """무드 상세 페이지 — 거실 대표 이미지 최대 8장 (2×4 그리드)."""
+def get_mood_products(category: str, *, limit: int = 16) -> list[dict]:
+    """무드 상세 — 4공간(living/bedroom/dining/balcony) × 계절 4장 = 16장 그리드."""
     matched = [
         item
-        for item in get_all_products(space=space)
+        for item in get_all_products()
         if item["category"] == category
     ]
-    matched.sort(key=lambda item: item.get("scene_code", ""))
+    space_order = {"living": 0, "bedroom": 1, "dining": 2, "balcony": 3}
+    matched.sort(
+        key=lambda item: (space_order.get(item["space"], 9), item.get("scene_code", ""))
+    )
     return matched[:limit]
 
 

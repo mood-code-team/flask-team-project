@@ -5,7 +5,7 @@
 {% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809e">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809f">
 {% endblock %}
 
 {% block content %}
@@ -48,21 +48,10 @@
     {% if gallery_items %}
     <div class="mood-detail__grid">
       {% for item in gallery_items %}
-      <article class="mood-detail__card{% if item.product_url %} mood-detail__card--linked{% endif %}">
-        {% if item.product_url %}
-        <a href="{{ item.product_url }}" class="mood-detail__card-link" title="{{ item.product_name }}">
-          <div class="mood-detail__card-img">
-            <img src="{{ item.image_url }}" alt="{{ item.product_name or 'Interior image' }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
-          </div>
-          {% if item.mood_code_number %}
-          <p class="mood-detail__card-caption">{{ item.mood_code_number }} · {{ item.product_name }}</p>
-          {% endif %}
-        </a>
-        {% else %}
+      <article class="mood-detail__card">
         <div class="mood-detail__card-img">
           <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
         </div>
-        {% endif %}
       </article>
       {% endfor %}
     </div>
