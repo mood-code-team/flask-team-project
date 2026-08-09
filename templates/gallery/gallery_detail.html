@@ -5,7 +5,7 @@
 {% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809f">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809g">
 {% endblock %}
 
 {% block content %}
@@ -45,7 +45,23 @@
     </header>
     {% endif %}
 
-    {% if gallery_items %}
+    {% if gallery_sections %}
+    <div class="mood-detail__spaces">
+      {% for section in gallery_sections %}
+      <section class="mood-detail__space">
+        <header class="mood-detail__space-head">
+          <h2 class="mood-detail__space-title">{{ section.label }} 공간</h2>
+          <p class="mood-detail__space-subtitle">{{ section.label_en }} SPACE</p>
+        </header>
+        <article class="mood-detail__card">
+          <div class="mood-detail__card-img mood-detail__card-img--wide">
+            <img src="{{ section.item.image_url }}" alt="{{ section.label }} interior" loading="lazy" onerror="this.closest('.mood-detail__space').style.display='none';">
+          </div>
+        </article>
+      </section>
+      {% endfor %}
+    </div>
+    {% elif gallery_items %}
     <div class="mood-detail__grid">
       {% for item in gallery_items %}
       <article class="mood-detail__card">

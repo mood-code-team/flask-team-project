@@ -15,7 +15,7 @@ from services.gallery_service import (
     build_space_detail_meta,
     build_space_main_items,
     get_mood_detail,
-    get_mood_products,
+    get_mood_gallery_sections,
     get_space_products,
 )
 
@@ -30,11 +30,11 @@ def _gallery_context(**kwargs):
 
 def _render_mood_detail(category: str, *, mood_key: str | None = None):
     key = mood_key or CATEGORY_TO_MOOD_KEY.get(category, "bloom")
-    items = get_mood_products(category)
+    sections = get_mood_gallery_sections(category)
     return render_template(
         "gallery/gallery_detail.html",
         **_gallery_context(
-            gallery_items=items,
+            gallery_sections=sections,
             meta=build_mood_detail_meta(category),
             mood_key=key,
             active_mood=key,

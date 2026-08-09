@@ -17,6 +17,15 @@ SPACE_META: dict[str, str] = {
     "balcony": "발코니",
 }
 
+SPACE_ORDER: tuple[str, ...] = ("living", "bedroom", "dining", "balcony")
+
+SPACE_META_EN: dict[str, str] = {
+    "living": "LIVING",
+    "bedroom": "BEDROOM",
+    "dining": "DINING",
+    "balcony": "BALCONY",
+}
+
 SEASON_META: dict[str, dict[str, str]] = {
     "spring": {"title_ko": "봄", "subtitle": "따스한 햇살과 생기 넘치는 봄의 공간"},
     "summer": {"title_ko": "여름", "subtitle": "청량하고 시원한 여름의 공간"},
@@ -321,18 +330,35 @@ def get_season_palette(season: str) -> list[dict[str, str]]:
     return palette
 
 
-def get_mood_products(category: str, *, limit: int = 16) -> list[dict]:
-    """무드 상세 — 4공간(living/bedroom/dining/balcony) × 계절 4장 = 16장 그리드."""
+def get_mood_gallery_sections(category: str) -> list[dict]:
+    """무드 상세 — 거실→침실→다이닝→발코니 공간별 1장씩 세로 배치."""
     matched = [
         item
         for item in get_all_products()
         if item["category"] == category
     ]
-    space_order = {"living": 0, "bedroom": 1, "dining": 2, "balcony": 3}
-    matched.sort(
-        key=lambda item: (space_order.get(item["space"], 9), item.get("scene_code", ""))
-    )
-    return matched[:limit]
+    sections: list[dict] = []
+    for space in SPACE_ORDER:
+        space_items = sorted(
+            [item for item in matched if item["space"] == space],
+            key=lambda item: item.get("scene_code", ""),
+        )
+        if not space_items:
+            continue
+        sections.append(
+            {
+                "space": space,
+                "label": SPACE_META[space],
+                "label_en": SPACE_META_EN[space],
+                "item": space_items[0],
+            }
+        )
+    return sections
+
+
+def get_mood_products(category: str, *, limit: int = 4) -> list[dict]:
+    """무드 상세 — 공간별 대표 이미지(기본 4장)."""
+    return [section["item"] for section in get_mood_gallery_sections(category)][:limit]
 
 
 def build_space_main_items() -> list[dict]:
