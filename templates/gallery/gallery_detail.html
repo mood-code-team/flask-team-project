@@ -5,7 +5,7 @@
 {% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260810b">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260810c">
 {% endblock %}
 
 {% block content %}
@@ -17,55 +17,39 @@
 
     {% if detail %}
     <header class="mood-detail__hero">
-      <h1 class="mood-detail__title">{{ detail.title }}</h1>
-      <p class="mood-detail__subtitle">{{ detail.subtitle }}</p>
+      <div class="mood-detail__hero-text">
+        <h1 class="mood-detail__title">{{ detail.title }}</h1>
+        <p class="mood-detail__subtitle">{{ detail.subtitle }}</p>
+      </div>
 
-      <div class="mood-detail__info">
-        <div class="mood-detail__panel mood-detail__panel--highlights">
-          <h2 class="mood-detail__panel-title">MOOD HIGHLIGHTS</h2>
-          <ul class="mood-detail__list">
-            {% for title, desc in detail.highlights %}
-            <li><strong>· {{ title }}</strong> {{ desc }}</li>
-            {% endfor %}
-          </ul>
-        </div>
-
-        <div class="mood-detail__panel mood-detail__panel--palette">
-          <h2 class="mood-detail__panel-title">COLOR PALETTE</h2>
-          <div class="mood-detail__palette">
-            {% for color in detail.palettes %}
-            <div class="mood-detail__swatch">
-              <span class="mood-detail__swatch-color" style="background-color: {{ color.hex }};" title="{{ color.hex }}"></span>
-              <span class="mood-detail__swatch-label">{{ color.name }}</span>
-            </div>
-            {% endfor %}
+      <div class="mood-detail__panel mood-detail__panel--palette">
+        <h2 class="mood-detail__panel-title">COLOR PALETTE</h2>
+        <div class="mood-detail__palette">
+          {% for color in detail.palettes %}
+          <div class="mood-detail__swatch">
+            <span class="mood-detail__swatch-color" style="background-color: {{ color.hex }};" title="{{ color.hex }}"></span>
+            <span class="mood-detail__swatch-label">{{ color.name }}</span>
           </div>
+          {% endfor %}
         </div>
       </div>
     </header>
     {% endif %}
 
-    {% if gallery_sections %}
-    <div class="mood-detail__matrix">
+{% if gallery_sections %}
+    <div class="mood-detail__masonry">
       {% for section in gallery_sections %}
-      <div class="mood-detail__matrix-col">
-        <header class="mood-detail__matrix-head">
-          <h2 class="mood-detail__matrix-title">{{ section.label }}</h2>
-        </header>
-        <div class="mood-detail__matrix-stack">
-          {% for item in section.scenes %}
-          <article class="mood-detail__card">
-            <div class="mood-detail__card-img mood-detail__card-img--wide">
-              <img src="{{ item.image_url }}" alt="{{ section.label }} {{ loop.index }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
-            </div>
-          </article>
-          {% endfor %}
-        </div>
-      </div>
+        {% for item in section.scenes %}
+        <article class="mood-detail__card">
+          <div class="mood-detail__card-img">
+            <img src="{{ item.image_url }}" alt="Interior scene" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+          </div>
+        </article>
+        {% endfor %}
       {% endfor %}
     </div>
     {% elif gallery_items %}
-    <div class="mood-detail__grid">
+    <div class="mood-detail__masonry">
       {% for item in gallery_items %}
       <article class="mood-detail__card">
         <div class="mood-detail__card-img">

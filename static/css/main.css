@@ -1069,3 +1069,20 @@ body.season-winter .site-footer {
     aspect-ratio: 16 / 10;
   }
 }
+/* ============================================================
+   상품 카드 하트(좋아요) 버튼 위치 수정
+   ============================================================ */
+
+/* 다른 모든 스타일을 무시하고 오른쪽 아래에 강제 고정 */
+.product-item .wish-btn { 
+  position: absolute !important;
+  right: 12px !important;  /* 오른쪽 여백 */
+  
+  /* 🔴 위쪽 고정을 강제로 해제 */
+  top: auto !important; 
+  
+  /* 🟢 아래쪽 고정을 강제 적용 */
+  bottom: 12px !important; 
+  
+  z-index: 10 !important; /* 이미지 위에 오도록 */
+}
