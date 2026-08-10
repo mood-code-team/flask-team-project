@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scene_detail.css') }}">
+{% endblock %}
+
+
+{% block content %}
+
+<main class="scene-detail">
+
+    <div class="scene-detail__container">
+
+        <div class="scene-detail__top">
+
+            <!-- 왼쪽 큰 장면 이미지 -->
+            <div class="scene-detail__image-wrap">
+
+                <img src="{{ scene.image_url }}" alt="Interior scene" class="scene-detail__image">
+
+                {% if scene.products %}
+                {% for product in scene.products %}
+
+                {% if product.hotspot_x is defined and product.hotspot_y is defined %}
+                <a href="{{ product.url }}" class="scene-hotspot" data-product-code="{{ product.code }}"
+                    style="left: {{ product.hotspot_x }}%; top: {{ product.hotspot_y }}%;"
+                    aria-label="{{ product.name }} 상품 상세보기">
+                    +
+                </a>
+                {% endif %}
+
+                {% endfor %}
+                {% endif %}
+
+            </div>
+
+
+            <!-- 오른쪽 상품 썸네일 -->
+            <aside class="scene-detail__side">
+
+                {% if scene.products %}
+                <div class="scene-products">
+
+                    {% for product in scene.products %}
+
+                    <a href="{{ product.url }}" class="scene-product-card" data-product-code="{{ product.code }}"
+                        aria-label="{{ product.name }} 상품 상세보기">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+                    </a>
+
+                    {% endfor %}
+
+                </div>
+                {% endif %}
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const productCards = document.querySelectorAll(".scene-product-card");
+        const imageWrap = document.querySelector(".scene-detail__image-wrap");
+
+        if (!imageWrap) {
+            console.log("imageWrap을 찾지 못했습니다.");
+            return;
+        }
+
+        let selectedProductCode = null;
+
+        // 오른쪽 썸네일 선택
+        productCards.forEach(function (card) {
+
+            card.addEventListener("click", function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                productCards.forEach(function (item) {
+                    item.classList.remove("is-selected");
+                });
+
+                card.classList.add("is-selected");
+
+                selectedProductCode = card.dataset.productCode;
+
+                imageWrap.classList.add("is-editing-hotspot");
+
+                console.log(
+                    "선택된 상품:",
+                    selectedProductCode
+                );
+            });
+        });
+
+        // 큰 사진 클릭
+        imageWrap.addEventListener("click", function (event) {
+
+            if (!selectedProductCode) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const rect = imageWrap.getBoundingClientRect();
+
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+
+            const xPercent =
+                (clickX / rect.width) * 100;
+
+            const yPercent =
+                (clickY / rect.height) * 100;
+
+            console.log(
+                "새 좌표:",
+                selectedProductCode,
+                "x=" + xPercent.toFixed(1),
+                "y=" + yPercent.toFixed(1)
+            );
+
+            // 기존 + 찾기
+            let hotspot = imageWrap.querySelector(
+                '.scene-hotspot[data-product-code="' +
+                selectedProductCode +
+                '"]'
+            );
+
+            // FAILED 상품이면 + 새로 생성
+            if (!hotspot) {
+
+                hotspot = document.createElement("a");
+                hotspot.className = "scene-hotspot";
+                hotspot.dataset.productCode =
+                    selectedProductCode;
+                hotspot.textContent = "+";
+
+                const selectedCard =
+                    document.querySelector(
+                        '.scene-product-card[data-product-code="' +
+                        selectedProductCode +
+                        '"]'
+                    );
+
+                if (selectedCard) {
+                    hotspot.href = selectedCard.href;
+                }
+
+                imageWrap.appendChild(hotspot);
+
+                console.log(
+                    "새 + 버튼 생성:",
+                    selectedProductCode
+                );
+            }
+
+            // + 위치 이동
+            hotspot.style.left =
+                xPercent.toFixed(1) + "%";
+
+            hotspot.style.top =
+                yPercent.toFixed(1) + "%";
+
+            fetch(
+                "{{ url_for('gallery.save_scene_hotspot', scene_code=scene.scene_code) }}",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        product_code: selectedProductCode,
+                        x: Number(xPercent.toFixed(1)),
+                        y: Number(yPercent.toFixed(1)),
+                    }),
+                }
+            )
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("저장 요청 실패");
+                    }
+
+                    return response.json();
+                })
+                .then(function (data) {
+                    console.log("CSV 저장 완료:", data);
+
+                    // 저장 성공 후 선택 해제
+                    productCards.forEach(function (item) {
+                        item.classList.remove("is-selected");
+                    });
+
+                    imageWrap.classList.remove(
+                        "is-editing-hotspot"
+                    );
+
+                    selectedProductCode = null;
+                })
+                .catch(function (error) {
+                    console.error("CSV 저장 실패:", error
+                    );
+                });
+             });
+    });
+</script>
+
+{% endblock %}

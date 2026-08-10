@@ -54,12 +54,6 @@ CATEGORY_TO_MOOD_KEY: dict[str, str] = {
     "chic_key": "chic",
 }
 
-SEASON_TO_MOOD_KEY: dict[str, str] = {
-    "spring": "bloom",
-    "summer": "clear",
-    "fall": "calm",
-    "winter": "chic",
-}
 
 SEASON_TO_MOOD: dict[str, str] = {
     "spring": "BLOOM",
@@ -306,6 +300,31 @@ def get_space_products(space: str, season: str) -> list[dict]:
             products.append(_build_gallery_item(row, space=space, season=target_season))
     return products
 
+def get_scene_by_code(scene_code: str) -> dict | None:
+    """scene_code로 갤러리 장면 하나를 찾아 핫스팟 좌표까지 붙여 반환."""
+    target_code = scene_code.strip().upper()
+
+    for item in get_all_products():
+        if (item.get("scene_code") or "").strip().upper() != target_code:
+            continue
+
+        hotspots = get_hotspots(target_code)
+
+        for product in item.get("products", []):
+            product_code = (product.get("code") or "").strip()
+
+            hotspot = hotspots.get(product_code)
+
+            if hotspot:
+                product["hotspot_x"] = hotspot["x"]
+                product["hotspot_y"] = hotspot["y"]
+                product["hotspot_confidence"] = hotspot["confidence"]
+                product["hotspot_status"] = hotspot["status"]
+
+        return item
+
+    return None
+
 
 def get_season_palette(season: str) -> list[dict[str, str]]:
     palette: list[dict[str, str]] = []
@@ -364,22 +383,6 @@ def get_mood_products(category: str, *, limit: int = 16) -> list[dict]:
     return items[:limit]
 
 
-def build_space_main_items() -> list[dict]:
-    items: list[dict] = []
-    for space, label in SPACE_META.items():
-        products = get_space_products(space, "spring")
-        if not products:
-            continue
-        product = random.choice(products)
-        items.append(
-            {
-                "name": label,
-                "image_url": product["image_url"],
-                "link": f"/space/{space}/spring",
-            }
-        )
-    return items
-
 
 def build_mood_main_items() -> list[dict]:
     products = get_all_products()
@@ -411,11 +414,121 @@ def build_mood_detail_meta(category: str) -> dict:
     }
 
 
-def build_space_detail_meta(season: str) -> dict:
-    palette = get_season_palette(season)
-    return {
-        "title": SEASON_TO_MOOD.get(season, "STYLE"),
-        "subtitle": SEASON_META.get(season, {}).get("subtitle", ""),
-        "colors": [color["hex"] for color in palette],
-        "color_desc": ", ".join(color["name_en"] for color in palette),
-    }
+def get_hotspots(scene_code: str) -> dict[str, dict]:
+    """scene_code에 해당하는 상품별 핫스팟 좌표를 반환."""
+    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
+
+    if not hotspot_file.is_file():
+        return {}
+
+    hotspots = {}
+
+    with hotspot_file.open(
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+        reader = csv.DictReader(handle)
+
+        for row in reader:
+            if (row.get("scene_code") or "").strip() != scene_code:
+                continue
+
+            product_code = (row.get("product_code") or "").strip()
+
+            if not product_code:
+                continue
+
+            x_value = (row.get("x") or "").strip()
+            y_value = (row.get("y") or "").strip()
+            confidence_value = (row.get("confidence") or "").strip()
+
+            # YOLO 탐지 실패로 좌표가 없는 상품은 건너뜀
+            if not x_value or not y_value:
+                continue
+
+            hotspots[product_code] = {
+                "x": float(x_value),
+                "y": float(y_value),
+                "confidence": (
+                    float(confidence_value)
+                    if confidence_value
+                    else 0.0
+                ),
+                "status": (row.get("status") or "").strip(),
+            }
+
+    return hotspots
+
+def save_hotspot_position(
+    scene_code: str,
+    product_code: str,
+    x: float,
+    y: float,
+) -> bool:
+    """gallery_hotspots.csv에서 해당 상품 좌표를 수정해서 저장."""
+    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
+
+    if not hotspot_file.is_file():
+        return False
+
+    with hotspot_file.open(
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+        rows = list(csv.DictReader(handle))
+
+    if not rows:
+        return False
+
+    fieldnames = [
+        "scene_code",
+        "product_code",
+        "product_type",
+        "x",
+        "y",
+        "confidence",
+        "status",
+    ]
+
+    found = False
+
+    for row in rows:
+        if (
+            (row.get("scene_code") or "").strip() == scene_code
+            and
+            (row.get("product_code") or "").strip() == product_code
+        ):
+            row["x"] = f"{x:.1f}"
+            row["y"] = f"{y:.1f}"
+            row["confidence"] = "1.00"
+            row["status"] = "manual"
+
+            found = True
+            break
+
+    # 기존 failed 행조차 없는 경우 새 행 추가
+    if not found:
+        rows.append({
+            "scene_code": scene_code,
+            "product_code": product_code,
+            "product_type": "",
+            "x": f"{x:.1f}",
+            "y": f"{y:.1f}",
+            "confidence": "1.00",
+            "status": "manual",
+        })
+
+    with hotspot_file.open(
+        "w",
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+        )
+
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return True

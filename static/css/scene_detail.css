@@ -1,0 +1,157 @@
+.scene-detail {
+  min-height: 100vh;
+  background: #fff;
+}
+
+
+.scene-detail__container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+
+/* 큰 이미지 + 썸네일 */
+.scene-detail__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 70px;
+  align-items: stretch;
+}
+
+
+/* 왼쪽 큰 사진 */
+.scene-detail__image-wrap {
+  position: relative;
+
+  width: 100%;
+  overflow: hidden;
+
+  background: #f4f4f4;
+}
+
+
+.scene-detail__image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+/* 오른쪽 제품 썸네일 */
+.scene-detail__side {
+  height: 100%;
+}
+
+.scene-products {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.scene-product-card {
+  display: block;
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f3f3;
+  border: 1px solid #ededed;
+}
+
+
+.scene-product-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+}
+
+
+.scene-product-card:hover {
+  transform: scale(1.04);
+}
+
+
+@media (max-width: 900px) {
+
+  .scene-detail__top {
+    grid-template-columns: 1fr;
+  }
+
+  .scene-products {
+    height: auto;
+    flex-direction: row;
+  }
+
+  .scene-product-card {
+    width: 90px;
+  }
+}
+
+.scene-hotspot {
+  position: absolute;
+
+  width: 24px;
+  height: 24px;
+
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+
+  background: #168bd2;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  line-height: 1;
+
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  z-index: 10;
+}
+
+.scene-hotspot:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.scene-product-card.is-selected {
+  outline: 2px solid #168bd2;
+  outline-offset: 3px;
+}
+
+.scene-detail__image-wrap.is-editing-hotspot {
+  cursor: crosshair;
+}
+
+.scene-detail__image-wrap.is-editing-hotspot::after {
+  content: "상품 위치를 클릭하세요";
+
+  position: absolute;
+  left: 16px;
+  top: 16px;
+
+  padding: 7px 11px;
+
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+
+  border-radius: 4px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  pointer-events: none;
+
+  z-index: 30;
+}
