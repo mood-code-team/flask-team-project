@@ -119,6 +119,40 @@
   white-space: nowrap;
 }
 
+.mood-detail__matrix {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 1.5vw, 16px);
+  align-items: start;
+}
+
+.mood-detail__matrix-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.mood-detail__matrix-head {
+  padding: 12px 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.mood-detail__matrix-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: -0.01em;
+}
+
+.mood-detail__matrix-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.5vw, 14px);
+}
+
 .mood-detail__spaces {
   display: flex;
   flex-direction: column;
@@ -142,6 +176,16 @@
   font-weight: 700;
   letter-spacing: 0.16em;
   color: #888;
+}
+
+.mood-detail__space-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mood-detail__space-grid .mood-detail__card-img {
+  aspect-ratio: 3 / 2;
 }
 
 .mood-detail__grid {
@@ -307,6 +351,10 @@
 }
 
 @media (max-width: 1024px) {
+  .mood-detail__matrix {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .mood-detail__grid,
   .gallery-picker__grid {
     grid-template-columns: repeat(2, 1fr);
@@ -318,6 +366,10 @@
 }
 
 @media (max-width: 540px) {
+  .mood-detail__matrix {
+    grid-template-columns: 1fr;
+  }
+
   .mood-detail__grid,
   .gallery-picker__grid {
     grid-template-columns: 1fr;

@@ -17,7 +17,7 @@ SPACE_META: dict[str, str] = {
     "balcony": "발코니",
 }
 
-SPACE_ORDER: tuple[str, ...] = ("living", "bedroom", "dining", "balcony")
+SPACE_ORDER: tuple[str, ...] = ("living", "dining", "bedroom", "balcony")
 
 SPACE_META_EN: dict[str, str] = {
     "living": "LIVING",
@@ -331,7 +331,7 @@ def get_season_palette(season: str) -> list[dict[str, str]]:
 
 
 def get_mood_gallery_sections(category: str) -> list[dict]:
-    """무드 상세 — 거실→침실→다이닝→발코니 공간별 1장씩 세로 배치."""
+    """무드 상세 — 거실·침실·다이닝·발코니 공간별 4장(계절 16장 세트)."""
     matched = [
         item
         for item in get_all_products()
@@ -350,15 +350,18 @@ def get_mood_gallery_sections(category: str) -> list[dict]:
                 "space": space,
                 "label": SPACE_META[space],
                 "label_en": SPACE_META_EN[space],
-                "item": space_items[0],
+                "scenes": space_items[:4],
             }
         )
     return sections
 
 
-def get_mood_products(category: str, *, limit: int = 4) -> list[dict]:
-    """무드 상세 — 공간별 대표 이미지(기본 4장)."""
-    return [section["item"] for section in get_mood_gallery_sections(category)][:limit]
+def get_mood_products(category: str, *, limit: int = 16) -> list[dict]:
+    """무드 상세 — 공간별 4장 × 4공간 (기본 16장)."""
+    items: list[dict] = []
+    for section in get_mood_gallery_sections(category):
+        items.extend(section["scenes"])
+    return items[:limit]
 
 
 def build_space_main_items() -> list[dict]:

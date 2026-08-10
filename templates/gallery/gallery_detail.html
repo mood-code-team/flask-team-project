@@ -5,7 +5,7 @@
 {% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809g">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260810b">
 {% endblock %}
 
 {% block content %}
@@ -46,19 +46,22 @@
     {% endif %}
 
     {% if gallery_sections %}
-    <div class="mood-detail__spaces">
+    <div class="mood-detail__matrix">
       {% for section in gallery_sections %}
-      <section class="mood-detail__space">
-        <header class="mood-detail__space-head">
-          <h2 class="mood-detail__space-title">{{ section.label }} 공간</h2>
-          <p class="mood-detail__space-subtitle">{{ section.label_en }} SPACE</p>
+      <div class="mood-detail__matrix-col">
+        <header class="mood-detail__matrix-head">
+          <h2 class="mood-detail__matrix-title">{{ section.label }}</h2>
         </header>
-        <article class="mood-detail__card">
-          <div class="mood-detail__card-img mood-detail__card-img--wide">
-            <img src="{{ section.item.image_url }}" alt="{{ section.label }} interior" loading="lazy" onerror="this.closest('.mood-detail__space').style.display='none';">
-          </div>
-        </article>
-      </section>
+        <div class="mood-detail__matrix-stack">
+          {% for item in section.scenes %}
+          <article class="mood-detail__card">
+            <div class="mood-detail__card-img mood-detail__card-img--wide">
+              <img src="{{ item.image_url }}" alt="{{ section.label }} {{ loop.index }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
       {% endfor %}
     </div>
     {% elif gallery_items %}
