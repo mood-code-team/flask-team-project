@@ -43,10 +43,37 @@
 
                     {% for product in scene.products %}
 
-                    <a href="{{ product.url }}" class="scene-product-card" data-product-code="{{ product.code }}"
-                        aria-label="{{ product.name }} 상품 상세보기">
-                        <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
-                    </a>
+                    <div class="scene-product-item">
+
+                        <a href="{{ product.url }}" class="scene-product-card" data-product-code="{{ product.code }}"
+                            aria-label="{{ product.name }} 상품 상세보기">
+
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+                        </a>
+
+                        <div class="scene-product-status">
+
+                            {% if product.hotspot_status %}
+                            <span class="scene-product-status__badge
+                scene-product-status__badge--{{ product.hotspot_status }}">
+                                {{ product.hotspot_status|upper }}
+                            </span>
+                            {% else %}
+                            <span class="scene-product-status__badge
+                scene-product-status__badge--failed">
+                                FAILED
+                            </span>
+                            {% endif %}
+
+                            {% if product.hotspot_status == "review" %}
+                            <button type="button" class="scene-product-verify" data-product-code="{{ product.code }}">
+                                확인 완료
+                            </button>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
 
                     {% endfor %}
 
@@ -56,6 +83,34 @@
             </aside>
 
         </div>
+
+        {% if scene_navigation.previous or scene_navigation.next %}
+        <div class="scene-review-nav">
+
+            <div class="scene-review-nav__previous">
+                {% if scene_navigation.previous %}
+                <a href="{{ url_for('gallery.scene_detail', scene_code=scene_navigation.previous) }}"
+                    class="scene-review-nav__button">
+                    ← 이전 사진
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="scene-review-nav__count">
+                {{ scene_navigation.current }} / {{ scene_navigation.total }}
+            </div>
+
+            <div class="scene-review-nav__next">
+                {% if scene_navigation.next %}
+                <a href="{{ url_for('gallery.scene_detail', scene_code=scene_navigation.next) }}"
+                    class="scene-review-nav__button">
+                    다음 사진 →
+                </a>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endif %}
 
     </div>
 
@@ -212,7 +267,8 @@
                     console.error("CSV 저장 실패:", error
                     );
                 });
-             });
+        });
+
     });
 </script>
 
