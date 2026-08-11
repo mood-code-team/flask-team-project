@@ -508,6 +508,7 @@ def get_mood_gallery_sections(category: str) -> list[dict]:
                 "label": SPACE_META[space],
                 "label_en": SPACE_META_EN[space],
                 "item": space_items[0],
+                "scenes": space_items,
             }
         )
     return sections
