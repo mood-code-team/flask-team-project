@@ -7,6 +7,9 @@ venv/
 .flaskenv
 instance/
 
+weights/
+*.pt
+
 # DB (shop.db는 frontend 브랜치에 포함 — 팀 공유용)
 database/*.db
 !database/shop.db

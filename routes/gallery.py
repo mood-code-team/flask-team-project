@@ -15,14 +15,7 @@ from services.gallery_service import (
     get_mood_detail,
     get_mood_gallery_sections,
     get_scene_by_code,
-    save_hotspot_position,
-    get_review_scene_navigation,
-    verify_hotspot,
-    get_next_review_scene,
     get_space_products,
-    get_next_review_scene,
-    get_scene_navigation,
-    verify_hotspot,
 )
 
 gallery_bp = Blueprint("gallery", __name__)
@@ -82,90 +75,9 @@ def scene_detail(scene_code: str):
     if scene is None:
         abort(404)
 
-    scene_navigation = get_scene_navigation(scene_code)
-
     return render_template(
         "gallery/scene_detail.html",
         scene=scene,
-        scene_navigation=scene_navigation,
     )
 
 
-@gallery_bp.route("/scene/<scene_code>/hotspot", methods=["POST"])
-def save_scene_hotspot(scene_code: str):
-    """수동으로 수정한 상품 핫스팟 좌표 저장."""
-
-    data = request.get_json(silent=True) or {}
-
-    product_code = (data.get("product_code") or "").strip()
-
-    try:
-        x = float(data.get("x"))
-        y = float(data.get("y"))
-    except (TypeError, ValueError):
-        return {"ok": False, "message": "잘못된 좌표입니다."}, 400
-
-    if not product_code:
-        return {"ok": False, "message": "상품 코드가 없습니다."}, 400
-
-    saved = save_hotspot_position(
-        scene_code=scene_code,
-        product_code=product_code,
-        x=x,
-        y=y,
-    )
-
-    if not saved:
-        return {
-            "ok": False,
-            "message": "핫스팟 CSV 저장에 실패했습니다.",
-        }, 500
-
-    return {
-        "ok": True,
-        "scene_code": scene_code,
-        "product_code": product_code,
-        "x": x,
-        "y": y,
-    }
-
-@gallery_bp.route(
-    "/scene/<scene_code>/hotspot/verify",
-    methods=["POST"],
-)
-def verify_scene_hotspot(scene_code: str):
-    """현재 핫스팟 위치를 검수 완료 처리."""
-
-    data = request.get_json(silent=True) or {}
-
-    product_code = (
-        data.get("product_code") or ""
-    ).strip()
-
-    if not product_code:
-        return {
-            "ok": False,
-            "message": "상품 코드가 없습니다.",
-        }, 400
-
-    verified = verify_hotspot(
-        scene_code=scene_code,
-        product_code=product_code,
-    )
-
-    if not verified:
-        return {
-            "ok": False,
-            "message": "검수 완료 처리에 실패했습니다.",
-        }, 404
-
-    # 현재 장면의 검수 대상이 모두 끝났다면
-    # 다음 review/failed 장면을 찾음
-    next_scene = get_next_review_scene(scene_code)
-
-    return {
-        "ok": True,
-        "scene_code": scene_code,
-        "product_code": product_code,
-        "status": "verified",
-    }
