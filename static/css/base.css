@@ -947,6 +947,54 @@ body.side-menu-open {
   margin-top: 4px;
 }
 
+.side-menu__category {
+  margin-bottom: 4px;
+}
+
+.side-menu__category-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  padding: 8px 0 4px;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.side-menu__category-btn:hover,
+.side-menu__category.is-open .side-menu__category-btn {
+  color: var(--color-text);
+}
+
+.side-menu__sublist {
+  list-style: none;
+  padding: 2px 0 10px 14px;
+  margin: 0;
+}
+
+.side-menu__sublist[hidden] {
+  display: none;
+}
+
+.side-menu__sublist li {
+  margin-bottom: 8px;
+}
+
+.side-menu__sublist a {
+  font-size: 13px;
+  font-weight: 400;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.side-menu__sublist a:hover {
+  color: var(--color-text);
+}
+
 .side-menu__category-link {
   display: block;
   font-size: 14px;

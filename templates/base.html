@@ -150,12 +150,21 @@
 
     <nav class="side-menu__nav">
       <div class="side-menu__group side-menu__group--products">
-        {% if side_menu_categories %}
-        <a href="{{ url_for('category.listing', slug=side_menu_categories[0].slug) }}" class="side-menu__title side-menu__title-link">상품목록</a>
-        {% else %}
-        <a href="{{ url_for('category.listing', slug='light') }}" class="side-menu__title side-menu__title-link">상품목록</a>
-        {% endif %}
-        {% include "components/side_menu_categories.html" %}
+        <button
+          type="button"
+          class="side-menu__title-btn"
+          id="side-menu-products-toggle"
+          aria-expanded="false"
+          aria-controls="side-menu-products"
+        >
+          <span>상품목록</span>
+          <svg class="side-menu__title-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div id="side-menu-products" class="side-menu__products" hidden>
+          {% include "components/side_menu_categories.html" %}
+        </div>
       </div>
 
       <div class="side-menu__group side-menu__group--single">

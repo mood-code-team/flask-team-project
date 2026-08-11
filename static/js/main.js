@@ -123,6 +123,7 @@ function initSideMenu() {
     overlay.classList.remove("is-visible");
     menuToggle.setAttribute("aria-expanded", "false");
     document.body.classList.remove("side-menu-open");
+    resetSideMenuProductList(sideMenu);
     setTimeout(() => { overlay.hidden = true; }, 300);
   }
 
@@ -130,10 +131,79 @@ function initSideMenu() {
   menuClose?.addEventListener("click", closeMenu);
   overlay.addEventListener("click", closeMenu);
 
+  initSideMenuAccordion(sideMenu);
+  initSideMenuProductList(sideMenu);
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && sideMenu.classList.contains("is-open")) {
       closeMenu();
     }
+  });
+}
+
+/** 상품목록 패널·카테고리 아코디언 초기화 */
+function resetSideMenuProductList(sideMenu) {
+  const toggle = sideMenu?.querySelector("#side-menu-products-toggle");
+  const panel = sideMenu?.querySelector("#side-menu-products");
+  const group = sideMenu?.querySelector(".side-menu__group--products");
+  if (!toggle || !panel) return;
+
+  panel.setAttribute("hidden", "");
+  toggle.setAttribute("aria-expanded", "false");
+  group?.classList.remove("is-open");
+
+  sideMenu.querySelectorAll(".side-menu__category").forEach((category) => {
+    category.classList.remove("is-open");
+    category.querySelector(".side-menu__category-btn")?.setAttribute("aria-expanded", "false");
+    category.querySelector(".side-menu__sublist")?.setAttribute("hidden", "");
+  });
+}
+
+function initSideMenuProductList(sideMenu) {
+  const toggle = sideMenu?.querySelector("#side-menu-products-toggle");
+  const panel = sideMenu?.querySelector("#side-menu-products");
+  const group = sideMenu?.querySelector(".side-menu__group--products");
+  if (!toggle || !panel) return;
+
+  toggle.addEventListener("click", () => {
+    const willOpen = panel.hasAttribute("hidden");
+
+    if (willOpen) {
+      panel.removeAttribute("hidden");
+      toggle.setAttribute("aria-expanded", "true");
+      group?.classList.add("is-open");
+    } else {
+      resetSideMenuProductList(sideMenu);
+    }
+  });
+}
+
+function initSideMenuAccordion(sideMenu) {
+  const categories = sideMenu?.querySelectorAll(".side-menu__category");
+  if (!categories?.length) return;
+
+  categories.forEach((category) => {
+    const btn = category.querySelector(".side-menu__category-btn");
+    const sublist = category.querySelector(".side-menu__sublist");
+    if (!btn || !sublist) return;
+
+    btn.addEventListener("click", () => {
+      const willOpen = !category.classList.contains("is-open");
+
+      categories.forEach((other) => {
+        other.classList.remove("is-open");
+        const otherBtn = other.querySelector(".side-menu__category-btn");
+        const otherList = other.querySelector(".side-menu__sublist");
+        otherBtn?.setAttribute("aria-expanded", "false");
+        otherList?.setAttribute("hidden", "");
+      });
+
+      if (willOpen) {
+        category.classList.add("is-open");
+        btn.setAttribute("aria-expanded", "true");
+        sublist.removeAttribute("hidden");
+      }
+    });
   });
 }
 

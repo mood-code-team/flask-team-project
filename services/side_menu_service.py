@@ -17,6 +17,7 @@ class SideMenuSubItem:
 @dataclass(frozen=True)
 class SideMenuCategory:
     name: str
+    slug: str
     subitems: tuple[SideMenuSubItem, ...]
 
 
@@ -70,6 +71,20 @@ def get_side_menu_categories() -> tuple[SideMenuCategory, ...]:
         for child in children:
             subitems.append(SideMenuSubItem(child.name, category_slug=child.slug))
 
-        menu.append(SideMenuCategory(name=label, subitems=tuple(subitems)))
+        menu.append(
+            SideMenuCategory(name=label, slug=root.slug, subitems=tuple(subitems))
+        )
+
+    if not menu:
+        from services.side_menu_content import SIDE_MENU_CATEGORIES
+
+        return tuple(
+            SideMenuCategory(
+                name=category.name,
+                slug=category.subitems[0].category_slug if category.subitems else "",
+                subitems=category.subitems,
+            )
+            for category in SIDE_MENU_CATEGORIES
+        )
 
     return tuple(menu)

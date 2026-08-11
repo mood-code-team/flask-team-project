@@ -1,10 +1,26 @@
-{# 사이드 메뉴 — 대분류 바로 링크 #}
+{# 사이드 메뉴 — 대분류 + 소분류 아코디언 #}
 <ul class="side-menu__categories">
   {% for category in side_menu_categories %}
-  <li>
-    <a href="{{ url_for('category.listing', slug=category.slug) }}" class="side-menu__category-link">
+  <li class="side-menu__category">
+    <button
+      type="button"
+      class="side-menu__category-btn"
+      aria-expanded="false"
+      aria-controls="side-sub-{{ loop.index }}"
+    >
       {{ category.name }}
-    </a>
+    </button>
+    <ul class="side-menu__sublist" id="side-sub-{{ loop.index }}" hidden>
+      {% for item in category.subitems %}
+      <li>
+        {% if item.category_slug %}
+        <a href="{{ url_for('category.listing', slug=item.category_slug) }}">{{ item.name }}</a>
+        {% elif item.query %}
+        <a href="{{ url_for('search.results', q=item.query) }}">{{ item.name }}</a>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
   </li>
   {% else %}
   {% set fallback = [
@@ -12,8 +28,8 @@
     ('Dining Table', 'table'), ('Bed', 'bed'), ('Balcony', 'balcony')
   ] %}
   {% for name, slug in fallback %}
-  <li>
-    <a href="{{ url_for('category.listing', slug=slug) }}" class="side-menu__category-link">{{ name }}</a>
+  <li class="side-menu__category">
+    <a href="{{ url_for('category.listing', slug=slug) }}" class="side-menu__category-btn">{{ name }}</a>
   </li>
   {% endfor %}
   {% endfor %}
