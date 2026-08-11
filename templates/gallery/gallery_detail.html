@@ -16,9 +16,32 @@
     {% include "components/gallery_mood_nav.html" %}
 
     {% if detail %}
-    <header class="mood-detail__hero mood-detail__hero--compact">
+    <header class="mood-detail__hero">
       <h1 class="mood-detail__title">{{ detail.title }}</h1>
       <p class="mood-detail__subtitle">{{ detail.subtitle }}</p>
+
+      <div class="mood-detail__info">
+        <div class="mood-detail__panel mood-detail__panel--highlights">
+          <h2 class="mood-detail__panel-title">MOOD HIGHLIGHTS</h2>
+          <ul class="mood-detail__list">
+            {% for title, desc in detail.highlights %}
+            <li><strong>· {{ title }}</strong> {{ desc }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="mood-detail__panel mood-detail__panel--palette">
+          <h2 class="mood-detail__panel-title">COLOR PALETTE</h2>
+          <div class="mood-detail__palette">
+            {% for color in detail.palettes %}
+            <div class="mood-detail__swatch">
+              <span class="mood-detail__swatch-color" style="background-color: {{ color.hex }};" title="{{ color.hex }}"></span>
+              <span class="mood-detail__swatch-label">{{ color.name }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
     </header>
     {% endif %}
 

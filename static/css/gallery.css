@@ -12,34 +12,30 @@
 }
 
 .mood-detail__container {
-  max-width: 1080px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 28px clamp(16px, 3vw, 24px) 56px;
+  padding: 32px clamp(16px, 3vw, 24px) 72px;
 }
 
 .mood-detail__hero {
   margin-bottom: 30px;
 }
 
-.mood-detail__hero--compact {
-  margin-bottom: 20px;
-}
-
 .mood-detail__title {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 800;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   color: #111;
   text-transform: uppercase;
   letter-spacing: -0.02em;
 }
 
 .mood-detail__subtitle {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 0;
-  line-height: 1.5;
-  max-width: 560px;
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 25px;
+  line-height: 1.55;
+  max-width: 720px;
 }
 
 .mood-detail__info {
@@ -126,10 +122,8 @@
 .mood-detail__matrix {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(6px, 1vw, 10px);
+  gap: clamp(10px, 1.5vw, 16px);
   align-items: start;
-  max-width: 920px;
-  margin: 0 auto;
 }
 
 .mood-detail__matrix-col {
@@ -140,14 +134,14 @@
 }
 
 .mood-detail__matrix-head {
-  padding: 8px 6px;
+  padding: 12px 8px;
   text-align: center;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #ddd;
   background: #fafafa;
 }
 
 .mood-detail__matrix-title {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   color: #111;
   letter-spacing: -0.01em;
@@ -156,7 +150,7 @@
 .mood-detail__matrix-stack {
   display: flex;
   flex-direction: column;
-  gap: clamp(6px, 1vw, 8px);
+  gap: clamp(10px, 1.5vw, 14px);
 }
 
 .mood-detail__spaces {
@@ -211,11 +205,11 @@
   aspect-ratio: 1 / 1;
   overflow: hidden;
   background: #eee;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .mood-detail__card-img--wide {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
 }
 
 .mood-detail__card-img img {

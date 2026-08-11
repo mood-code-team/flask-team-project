@@ -17,7 +17,7 @@ SPACE_META: dict[str, str] = {
     "balcony": "발코니",
 }
 
-SPACE_ORDER: tuple[str, ...] = ("living", "bedroom", "dining", "balcony")
+SPACE_ORDER: tuple[str, ...] = ("living", "dining", "bedroom", "balcony")
 
 SPACE_META_EN: dict[str, str] = {
     "living": "LIVING",
@@ -27,10 +27,10 @@ SPACE_META_EN: dict[str, str] = {
 }
 
 SEASON_META: dict[str, dict[str, str]] = {
-    "spring": {"title_ko": "봄", "subtitle": "화사한 햇살, 가벼운 리듬"},
-    "summer": {"title_ko": "여름", "subtitle": "청량한 여백, 시원한 공기"},
-    "fall": {"title_ko": "가을", "subtitle": "따뜻한 톤, 아늑한 온기"},
-    "winter": {"title_ko": "겨울", "subtitle": "모던 모노톤, 세련된 무드"},
+    "spring": {"title_ko": "봄", "subtitle": "따스한 햇살과 생기 넘치는 봄의 공간"},
+    "summer": {"title_ko": "여름", "subtitle": "청량하고 시원한 여름의 공간"},
+    "fall": {"title_ko": "가을", "subtitle": "깊이감 있고 아늑한 가을의 공간"},
+    "winter": {"title_ko": "겨울", "subtitle": "모던하고 포근한 겨울의 공간"},
 }
 
 CATEGORY_TO_SEASON: dict[str, str] = {
@@ -69,10 +69,10 @@ SEASON_TO_MOOD: dict[str, str] = {
 }
 
 MOOD_SUBTITLES: dict[str, str] = {
-    "fresh": "화사한 햇살, 가벼운 리듬",
-    "vibrant": "청량한 여백, 시원한 공기",
-    "cozy": "따뜻한 톤, 아늑한 온기",
-    "chic_key": "모던 모노톤, 세련된 무드",
+    "fresh": "화사한 햇살과 가벼운 소재로 공간에 리듬을 더합니다.",
+    "vibrant": "군더더기 없는 투명함과 정돈된 레이아웃을 선사합니다.",
+    "cozy": "깊은 안정감을 주는 차분한 톤과 자연의 온기를 담았습니다.",
+    "chic_key": "세련된 감각과 모던한 디테일이 돋보이는 스타일입니다.",
 }
 
 PRIMARY_PRODUCT_FIELDS: tuple[tuple[str, str], ...] = (
@@ -100,10 +100,10 @@ GALLERY_MOODS: list[tuple[str, str]] = [
 MOOD_DETAIL: dict[str, dict] = {
     "bloom": {
         "title": "BLOOM",
-        "subtitle": "화사한 햇살, 가벼운 리듬",
+        "subtitle": "화사한 햇살과 가벼운 소재로 공간에 리듬을 더합니다.",
         "highlights": [
-            ("파스텔 & 라이트 우드", "가벼운 톤으로 공간에 리듬을."),
-            ("자연광", "낮은 조도로 저녁 무드까지."),
+            ("파스텔 & 라이트 우드", "베이지·민트 패브릭 레이어드로 공간을 가볍게."),
+            ("자연광 커튼", "테이블·플로어 조명을 함께 쓰면 저녁 무드 유지."),
         ],
         "palettes": [
             {"name": "Fresh Ivory", "hex": "#F7F2E8"},
@@ -115,10 +115,10 @@ MOOD_DETAIL: dict[str, dict] = {
     },
     "clear": {
         "title": "CLEAR",
-        "subtitle": "청량한 여백, 시원한 공기",
+        "subtitle": "시원한 청량감과 투명한 유리 소재로 공간을 시원하게 채웁니다.",
         "highlights": [
-            ("쿨 화이트", "깨끗하고 시원한 무드."),
-            ("시트러스 포인트", "가벼운 활기."),
+            ("쿨 화이트 & 씨글라스", "블루와 아쿠아 톤으로 시원하고 깨끗한 무드 연출."),
+            ("시트러스 포인트", "싱그러운 노란색 소품으로 활기찬 여름 분위기 완성."),
         ],
         "palettes": [
             {"name": "Cool White", "hex": "#F4F8F7"},
@@ -130,10 +130,10 @@ MOOD_DETAIL: dict[str, dict] = {
     },
     "calm": {
         "title": "CALM",
-        "subtitle": "따뜻한 톤, 아늑한 온기",
+        "subtitle": "깊이 있는 우드와 따뜻한 오트밀 컬러로 아늑함을 선사합니다.",
         "highlights": [
-            ("오트밀 & 올리브", "편안한 공간 밸런스."),
-            ("러스틱 텍스처", "깊이 있는 감성."),
+            ("오트밀 & 올리브", "차분한 자연 톤으로 마음이 편안해지는 공간 밸런스."),
+            ("러스틱 텍스처", "월넛과 러스트 컬러 포인트로 깊이 있는 감성 유지."),
         ],
         "palettes": [
             {"name": "Oatmeal", "hex": "#D8C3A5"},
@@ -145,10 +145,10 @@ MOOD_DETAIL: dict[str, dict] = {
     },
     "chic": {
         "title": "CHIC",
-        "subtitle": "모던 모노톤, 세련된 무드",
+        "subtitle": "모던하고 시크한 모노톤에 은은한 플럼빛으로 도회적인 매력을 더합니다.",
         "highlights": [
-            ("스노 화이트 & 차콜", "도시적 세련함."),
-            ("아이스 블루 & 플럼", "고요한 포인트."),
+            ("스노 화이트 & 차콜", "대비가 선명한 모던 모노톤으로 세련된 도시적 감각."),
+            ("아이스 블루 & 플럼", "차가운 듯 고요한 포인트 컬러로 무드 극대화."),
         ],
         "palettes": [
             {"name": "Snow White", "hex": "#F3F4F2"},
@@ -488,7 +488,7 @@ def get_season_palette(season: str) -> list[dict[str, str]]:
 
 
 def get_mood_gallery_sections(category: str) -> list[dict]:
-    """무드 상세 — 거실→침실→다이닝→발코니 공간별 1장씩 세로 배치."""
+    """무드 상세 — 거실·침실·다이닝·발코니 공간별 4장(계절 16장 세트)."""
     matched = [
         item
         for item in get_all_products()
@@ -508,15 +508,18 @@ def get_mood_gallery_sections(category: str) -> list[dict]:
                 "label": SPACE_META[space],
                 "label_en": SPACE_META_EN[space],
                 "item": space_items[0],
-                "scenes": space_items,
+                "scenes": space_items[:4],
             }
         )
     return sections
 
 
-def get_mood_products(category: str, *, limit: int = 4) -> list[dict]:
-    """무드 상세 — 공간별 대표 이미지(기본 4장)."""
-    return [section["item"] for section in get_mood_gallery_sections(category)][:limit]
+def get_mood_products(category: str, *, limit: int = 16) -> list[dict]:
+    """무드 상세 — 공간별 4장 × 4공간 (기본 16장)."""
+    items: list[dict] = []
+    for section in get_mood_gallery_sections(category):
+        items.extend(section["scenes"])
+    return items[:limit]
 
 
 def build_space_main_items() -> list[dict]:

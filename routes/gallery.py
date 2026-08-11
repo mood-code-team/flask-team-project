@@ -10,6 +10,7 @@ from services.gallery_service import (
     MOOD_SLUG_TO_CATEGORY,
     SEASON_TO_MOOD_KEY,
     SPACE_META,
+    SPACE_META_EN,
     build_mood_detail_meta,
     build_mood_main_items,
     build_space_detail_meta,
@@ -67,11 +68,18 @@ def space_gallery(space_name: str, season: str):
         abort(404)
 
     mood_key = SEASON_TO_MOOD_KEY[season]
-    products = get_space_products(space_name, season)[:8]
+    products = get_space_products(space_name, season)[:4]
     return render_template(
         "gallery/gallery_detail.html",
         **_gallery_context(
-            gallery_items=products,
+            gallery_sections=[
+                {
+                    "space": space_name,
+                    "label": SPACE_META[space_name],
+                    "label_en": SPACE_META_EN[space_name],
+                    "scenes": products,
+                }
+            ],
             meta=build_space_detail_meta(season),
             mood_key=mood_key,
             active_mood=mood_key,
