@@ -4,6 +4,19 @@
 (function () {
   "use strict";
 
+  function isLoggedIn() {
+    return document.body.dataset.userLoggedIn === "true";
+  }
+
+  function currentPathQuery() {
+    return window.location.pathname + window.location.search;
+  }
+
+  function registerUrl() {
+    const base = document.body.dataset.registerUrl || "/register";
+    return `${base}?next=${encodeURIComponent(currentPathQuery())}`;
+  }
+
   function updateHeaderCount(count) {
     document.querySelectorAll(".util-wishlist__count").forEach((el) => {
       el.textContent = String(count);
@@ -21,10 +34,9 @@
     document.querySelectorAll(`[data-wishlist-toggle="${productId}"]`).forEach((btn) => {
       btn.classList.toggle("is-active", inWishlist);
       btn.setAttribute("aria-pressed", inWishlist ? "true" : "false");
-      const label = btn.dataset.labelToggle || btn.textContent.trim();
       if (btn.dataset.labelAdd && btn.dataset.labelRemove) {
         btn.textContent = inWishlist ? btn.dataset.labelRemove : btn.dataset.labelAdd;
-      } else if (label.includes("위시리스트")) {
+      } else if (btn.textContent.includes("위시리스트")) {
         btn.textContent = inWishlist ? "위시리스트 해제" : "위시리스트";
       }
     });
@@ -42,16 +54,15 @@
   }
 
   async function refreshWishlistUI() {
+    if (!isLoggedIn()) return;
     const data = await fetchWishlist();
     if (!data || !data.ok) return;
     updateHeaderCount(data.count || 0);
     (data.items || []).forEach((item) => updateToggleButtons(item.id, true));
   }
 
-  function initWishlistModal() {
-    const overlay = document.getElementById("wishlist-modal-overlay");
-    const closeBtn = document.getElementById("wishlist-modal-close");
-    if (!overlay) return;
+  function bindModal(overlay, closeBtn, onOpen) {
+    if (!overlay) return { open: () => {}, close: () => {} };
 
     function openModal() {
       overlay.hidden = false;
@@ -59,6 +70,7 @@
       requestAnimationFrame(() => overlay.classList.add("is-visible"));
       document.body.classList.add("wishlist-modal-open");
       closeBtn?.focus();
+      onOpen?.();
     }
 
     function closeModal() {
@@ -81,12 +93,55 @@
       }
     });
 
+    return { open: openModal, close: closeModal };
+  }
+
+  function initWishlistModal() {
+    const overlay = document.getElementById("wishlist-modal-overlay");
+    const closeBtn = document.getElementById("wishlist-modal-close");
+    const modal = bindModal(overlay, closeBtn);
     window.MoodCodeWishlist = window.MoodCodeWishlist || {};
-    window.MoodCodeWishlist.openAddedModal = openModal;
-    window.MoodCodeWishlist.closeAddedModal = closeModal;
+    window.MoodCodeWishlist.openAddedModal = modal.open;
+    window.MoodCodeWishlist.closeAddedModal = modal.close;
+  }
+
+  function initWishlistSignupModal() {
+    const overlay = document.getElementById("wishlist-signup-overlay");
+    const closeBtn = document.getElementById("wishlist-signup-close");
+    const registerLink = document.getElementById("wishlist-signup-register");
+    const loginLink = document.getElementById("wishlist-signup-login");
+    const modal = bindModal(overlay, closeBtn, () => {
+      const next = encodeURIComponent(currentPathQuery());
+      if (registerLink) registerLink.href = `${document.body.dataset.registerUrl || "/register"}?next=${next}`;
+      if (loginLink) loginLink.href = `${document.body.dataset.loginUrl || "/login"}?next=${next}`;
+    });
+
+    document.querySelectorAll("[data-wishlist-guest]").forEach((el) => {
+      el.addEventListener("click", (event) => {
+        event.preventDefault();
+        modal.open();
+      });
+    });
+
+    window.MoodCodeWishlist = window.MoodCodeWishlist || {};
+    window.MoodCodeWishlist.openSignupModal = modal.open;
+  }
+
+  function promptSignupForWishlist() {
+    if (window.MoodCodeWishlist?.openSignupModal) {
+      window.MoodCodeWishlist.openSignupModal();
+      return true;
+    }
+    window.location.href = registerUrl();
+    return true;
   }
 
   async function toggleWishlist(productId) {
+    if (!isLoggedIn()) {
+      promptSignupForWishlist();
+      return null;
+    }
+
     const res = await fetch("/api/wishlist/toggle", {
       method: "POST",
       credentials: "same-origin",
@@ -96,7 +151,7 @@
     const data = await res.json();
 
     if (res.status === 401) {
-      window.location.href = "/login?next=" + encodeURIComponent(window.location.pathname);
+      promptSignupForWishlist();
       return null;
     }
     if (!res.ok || !data.ok) {
@@ -110,6 +165,11 @@
   }
 
   async function addToWishlist(productId) {
+    if (!isLoggedIn()) {
+      promptSignupForWishlist();
+      return null;
+    }
+
     const res = await fetch("/api/wishlist/add", {
       method: "POST",
       credentials: "same-origin",
@@ -119,7 +179,7 @@
     const data = await res.json();
 
     if (res.status === 401) {
-      window.location.href = "/login?next=" + encodeURIComponent(window.location.pathname);
+      promptSignupForWishlist();
       return null;
     }
     if (!res.ok || !data.ok) {
@@ -156,6 +216,11 @@
         const productId = btn.dataset.wishlistAdd;
         if (!productId || btn.disabled) return;
 
+        if (!isLoggedIn()) {
+          promptSignupForWishlist();
+          return;
+        }
+
         if (btn.classList.contains("is-active")) {
           const data = await toggleWishlist(productId);
           if (data && !data.in_wishlist) return;
@@ -175,6 +240,7 @@
 
   function init() {
     initWishlistModal();
+    initWishlistSignupModal();
     initWishlistButtons();
     refreshWishlistUI();
   }
@@ -186,6 +252,7 @@
     updateHeaderCount,
     openAddedModal: null,
     closeAddedModal: null,
+    openSignupModal: null,
   };
 
   if (document.readyState === "loading") {

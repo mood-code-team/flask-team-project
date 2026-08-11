@@ -17,7 +17,7 @@ SPACE_META: dict[str, str] = {
     "balcony": "발코니",
 }
 
-SPACE_ORDER: tuple[str, ...] = ("living", "dining", "bedroom", "balcony")
+SPACE_ORDER: tuple[str, ...] = ("living", "bedroom", "dining", "balcony")
 
 SPACE_META_EN: dict[str, str] = {
     "living": "LIVING",
@@ -287,6 +287,163 @@ def get_all_products(*, space: str | None = None) -> list[dict]:
                 )
     return products
 
+def get_hotspots(scene_code: str) -> dict[str, dict]:
+    """scene_code에 해당하는 상품별 핫스팟 좌표를 반환."""
+    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
+
+    if not hotspot_file.is_file():
+        return {}
+
+    hotspots = {}
+
+    with hotspot_file.open(
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+
+        reader = csv.DictReader(handle)
+
+        for row in reader:
+
+            if row.get("scene_code") != scene_code:
+                continue
+
+            product_code = (row.get("product_code") or "").strip()
+
+            if not product_code:
+                continue
+
+            # 탐지 상태
+            status = (row.get("status") or "").strip()
+
+            # FAILED는 좌표가 없으므로 건너뛰기
+            if status == "failed":
+                continue
+
+            x_value = (row.get("x") or "").strip()
+            y_value = (row.get("y") or "").strip()
+
+            # 혹시 좌표가 비어 있으면 안전하게 건너뛰기
+            if not x_value or not y_value:
+                continue
+
+            confidence_value = (
+                row.get("confidence") or "0"
+            ).strip()
+
+            hotspots[product_code] = {
+                "x": float(x_value),
+                "y": float(y_value),
+                "confidence": float(confidence_value),
+                "status": status,
+            }
+
+    return hotspots
+
+def save_manual_hotspot(
+    scene_code: str,
+    product_code: str,
+    x: float,
+    y: float,
+) -> bool:
+    """수동으로 수정한 핫스팟 좌표를 CSV에 저장."""
+    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
+
+    if not hotspot_file.is_file():
+        return False
+
+    rows = []
+
+    with hotspot_file.open(
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+        reader = csv.DictReader(handle)
+        fieldnames = reader.fieldnames or []
+
+        for row in reader:
+            rows.append(row)
+
+    required_fields = [
+        "scene_code",
+        "product_code",
+        "product_type",
+        "x",
+        "y",
+        "confidence",
+        "status",
+    ]
+
+    for field in required_fields:
+        if field not in fieldnames:
+            fieldnames.append(field)
+
+    found = False
+
+    for row in rows:
+        if (
+            (row.get("scene_code") or "").strip() == scene_code
+            and
+            (row.get("product_code") or "").strip() == product_code
+        ):
+            row["x"] = f"{x:.1f}"
+            row["y"] = f"{y:.1f}"
+            row["confidence"] = "1.0"
+            row["status"] = "manual"
+            found = True
+            break
+
+    # 기존 failed 행이 없거나 아예 행 자체가 없는 경우
+    if not found:
+        rows.append({
+            "scene_code": scene_code,
+            "product_code": product_code,
+            "product_type": "",
+            "x": f"{x:.1f}",
+            "y": f"{y:.1f}",
+            "confidence": "1.0",
+            "status": "manual",
+        })
+
+    with hotspot_file.open(
+        "w",
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+        )
+
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return True
+
+
+def get_scene_detail(scene_code: str) -> dict | None:
+    items = get_all_products()
+
+    for item in items:
+        if item.get("scene_code") != scene_code:
+            continue
+
+        hotspots = get_hotspots(scene_code)
+
+        for product in item.get("products", []):
+            product_code = product.get("code")
+            hotspot = hotspots.get(product_code)
+
+            if hotspot:
+                product["hotspot_x"] = hotspot["x"]
+                product["hotspot_y"] = hotspot["y"]
+                product["hotspot_confidence"] = hotspot["confidence"]
+
+        return item
+
+    return None
+
 
 def get_space_products(space: str, season: str) -> list[dict]:
     products: list[dict] = []
@@ -331,7 +488,7 @@ def get_season_palette(season: str) -> list[dict[str, str]]:
 
 
 def get_mood_gallery_sections(category: str) -> list[dict]:
-    """무드 상세 — 거실·침실·다이닝·발코니 공간별 4장(계절 16장 세트)."""
+    """무드 상세 — 거실→침실→다이닝→발코니 공간별 1장씩 세로 배치."""
     matched = [
         item
         for item in get_all_products()
@@ -350,18 +507,15 @@ def get_mood_gallery_sections(category: str) -> list[dict]:
                 "space": space,
                 "label": SPACE_META[space],
                 "label_en": SPACE_META_EN[space],
-                "scenes": space_items[:4],
+                "item": space_items[0],
             }
         )
     return sections
 
 
-def get_mood_products(category: str, *, limit: int = 16) -> list[dict]:
-    """무드 상세 — 공간별 4장 × 4공간 (기본 16장)."""
-    items: list[dict] = []
-    for section in get_mood_gallery_sections(category):
-        items.extend(section["scenes"])
-    return items[:limit]
+def get_mood_products(category: str, *, limit: int = 4) -> list[dict]:
+    """무드 상세 — 공간별 대표 이미지(기본 4장)."""
+    return [section["item"] for section in get_mood_gallery_sections(category)][:limit]
 
 
 def build_space_main_items() -> list[dict]:

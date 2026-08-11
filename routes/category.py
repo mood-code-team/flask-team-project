@@ -38,6 +38,13 @@ def shop():
     return redirect(url_for("category.listing", slug=DEFAULT_SHOP_CATEGORY))
 
 
+@category_bp.route("/category")
+@category_bp.route("/category/")
+def category_index():
+    """카테고리 slug 없이 접근 시 기본 상품목록으로."""
+    return redirect(url_for("category.listing", slug=DEFAULT_SHOP_CATEGORY))
+
+
 @category_bp.route("/category/<slug>")
 def listing(slug: str):
     """Lighting·Sofa·Side Table·Diffuser 등 카테고리 상품 목록."""

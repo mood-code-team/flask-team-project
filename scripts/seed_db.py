@@ -69,18 +69,10 @@ def seed_catalog() -> None:
             slug_map[child["slug"]] = sub
 
         expected_child_slugs = {child["slug"] for child in group.get("children", [])}
-        fallback_other_slug = {
-            "sofa": "sofa-other",
-            "bed": "bed-other",
-        }.get(parent.slug)
-
         for orphan in Category.query.filter_by(parent_id=parent.id).all():
             if orphan.slug not in expected_child_slugs:
-                target = parent
-                if fallback_other_slug and fallback_other_slug in slug_map:
-                    target = slug_map[fallback_other_slug]
                 Product.query.filter_by(category_id=orphan.id).update(
-                    {"category_id": target.id},
+                    {"category_id": parent.id},
                     synchronize_session=False,
                 )
                 orphan.is_active = False
@@ -123,35 +115,32 @@ def seed_catalog() -> None:
 ADMIN_USERNAME = "gygs1010"
 ADMIN_EMAIL = "gygs1010@gmail.com"
 ADMIN_PASSWORD = "dnjsdlf@102360"
+ADMIN_FULL_NAME = "Mood Code 관리자"
 
 
 def seed_admin() -> None:
-    """관리자 계정 시드."""
+    """관리자 계정 시드 — gygs1010 (문서·실행_관리자.bat 기준)."""
     admin = User.query.filter(
-        (User.is_admin.is_(True))
-        | (User.username == ADMIN_USERNAME)
-        | (User.username == "gygs10190")
-        | (User.email == "admin@shop.local")
+        (User.username == ADMIN_USERNAME) | (User.email == ADMIN_EMAIL)
     ).first()
+
     if admin:
         admin.username = ADMIN_USERNAME
         admin.email = ADMIN_EMAIL
-        admin.full_name = admin.full_name or "관리자"
+        admin.full_name = admin.full_name or ADMIN_FULL_NAME
         admin.is_admin = True
         admin.is_active = True
-        admin.set_password(ADMIN_PASSWORD)
-        db.session.commit()
-        return
+    else:
+        admin = User(
+            email=ADMIN_EMAIL,
+            username=ADMIN_USERNAME,
+            full_name=ADMIN_FULL_NAME,
+            phone="010-0000-0000",
+            is_admin=True,
+        )
+        db.session.add(admin)
 
-    admin = User(
-        email=ADMIN_EMAIL,
-        username=ADMIN_USERNAME,
-        full_name="관리자",
-        phone="010-0000-0000",
-        is_admin=True,
-    )
     admin.set_password(ADMIN_PASSWORD)
-    db.session.add(admin)
     db.session.commit()
 
 
@@ -197,7 +186,7 @@ def main() -> None:
         print("[OK] Mood Code DB 초기화 및 카탈로그 시드 완료")
         print(f"     카테고리: {Category.query.count()}개")
         print(f"     상품: {Product.query.count()}개")
-        print(f"     관리자: {ADMIN_USERNAME} / (시드 비밀번호 설정됨)")
+        print(f"     관리자: {ADMIN_USERNAME} / {ADMIN_PASSWORD}")
 
 
 if __name__ == "__main__":

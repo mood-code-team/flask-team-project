@@ -4,189 +4,293 @@ import csv
 from ultralytics import YOLOWorld
 
 
-ROOT = Path(__file__).resolve().parents[1]
+# =========================================================
+# 기본 경로
+# =========================================================
 
-OUTPUT_CSV = ROOT / "static" / "csv" / "gallery_hotspots.csv"
+ROOT = Path(__file__).resolve().parent.parent
+
+CSV_DIR = ROOT / "static" / "csv"
+ORIGINALS_DIR = ROOT / "static" / "originals"
+
+OUTPUT_CSV = CSV_DIR / "gallery_hotspots.csv"
+
+SPACES = [
+    "living",
+    "bedroom",
+    "dining",
+    "balcony",
+]
 
 
-GALLERY_CSVS = {
-    "living": ROOT / "static" / "csv" / "moodcode_living_4seasons_16_final.csv",
-    "bedroom": ROOT / "static" / "csv" / "moodcode_bedroom_4seasons_16_final.csv",
-    "dining": ROOT / "static" / "csv" / "moodcode_dining_4seasons_16_final.csv",
-    "balcony": ROOT / "static" / "csv" / "moodcode_balcony_4seasons_16_final.csv",
-}
+# =========================================================
+# 공간별 상품 컬럼
+# =========================================================
 
-
-PRODUCT_DETECTION_MAP = {
-    "sofa_code": [
-        "armchair",
-        "chair",
-        "lounge chair",
-        "sofa",
+PRODUCT_FIELDS = {
+    "living": [
+        ("sofa_code", "sofa_name"),
+        ("table_code", "table_name"),
+        ("light_code", "light_name"),
+        ("scent_code", "scent_name"),
     ],
 
-    "table_code": [
-        "coffee table",
-        "side table",
-        "table",
+    "bedroom": [
+        ("bed_code", "bed_name"),
+        ("side_table_code", "side_table_name"),
+        ("light_code", "light_name"),
+        ("scent_code", "scent_name"),
     ],
 
-    "bed_code": [
-        "bed",
-        "bed frame",
+    "dining": [
+        ("dining_code", "dining_name"),
+        ("side_table_code", "side_table_name"),
+        ("light_code", "light_name"),
+        ("scent_code", "scent_name"),
     ],
 
-    "dining_code": [
-        "dining table",
-        "table",
-    ],
-
-    "balcony_code": [
-        "plant pot",
-        "planter",
-        "flower pot",
-    ],
-
-    "side_table_code": [
-        "side table",
-        "coffee table",
-        "table",
-    ],
-
-    "light_code": [
-        "floor lamp",
-        "table lamp",
-        "lamp",
-    ],
-
-    "scent_code": [
-        "candle",
-        "scented candle",
-        "glass candle",
-        "candle jar",
+    "balcony": [
+        ("balcony_code", "balcony_name"),
+        ("side_table_code", "side_table_name"),
+        ("light_code", "light_name"),
+        ("scent_code", "scent_name"),
     ],
 }
 
 
-def get_scene_products(row: dict) -> list[dict]:
-    products = []
+# =========================================================
+# 경로 함수
+# =========================================================
 
-    for code_field, search_terms in PRODUCT_DETECTION_MAP.items():
-
-        product_code = (row.get(code_field) or "").strip()
-
-        if not product_code:
-            continue
-
-        name_field = code_field.replace("_code", "_name")
-
-        products.append({
-            "code_field": code_field,
-            "product_code": product_code,
-            "product_name": (row.get(name_field) or "").strip(),
-            "search_terms": search_terms,
-        })
-
-    return products
+def get_csv_path(space: str) -> Path:
+    return CSV_DIR / f"moodcode_{space}_4seasons_16_final.csv"
 
 
-def get_image_path(
+def get_scene_image_path(
     space: str,
     season: str,
     image_name: str,
 ) -> Path:
-
-    return (
-        ROOT
-        / "static"
-        / "originals"
-        / space
-        / season
-        / image_name
-    )
+    return ORIGINALS_DIR / space / season / image_name
 
 
-def detect_product(
-    model,
-    image_path: Path,
-    search_terms: list[str],
-):
-    model.set_classes(search_terms)
+# =========================================================
+# 장면에서 상품 추출
+# =========================================================
 
-    results = model.predict(
-        source=str(image_path),
-        conf=0.12,
-        verbose=False,
-    )
+def get_scene_products(row: dict, space: str) -> list[dict]:
+    products = []
 
-    result = results[0]
+    for code_field, name_field in PRODUCT_FIELDS[space]:
 
-    if result.boxes is None or len(result.boxes) == 0:
-        return None
+        code = (row.get(code_field) or "").strip()
+        name = (row.get(name_field) or "").strip()
 
-    # 가장 신뢰도가 높은 탐지 결과
-    best_box = max(
-        result.boxes,
-        key=lambda box: float(box.conf[0]),
-    )
+        if not code:
+            continue
 
-    confidence = float(best_box.conf[0])
+        products.append(
+            {
+                "code": code,
+                "name": name,
+                "field": code_field,
+            }
+        )
 
-    x1, y1, x2, y2 = best_box.xyxy[0].tolist()
+    return products
 
-    image_height, image_width = result.orig_shape
 
-    center_x = (x1 + x2) / 2
-    center_y = (y1 + y2) / 2
+# =========================================================
+# 상품 → YOLO 검색어 생성
+# =========================================================
 
-    x_percent = center_x / image_width * 100
-    y_percent = center_y / image_height * 100
+def get_detection_classes(product: dict) -> list[str]:
 
-    class_id = int(best_box.cls[0])
+    field = product["field"]
+    name = product["name"].lower()
 
-    product_type = search_terms[class_id]
+    # 소파 / 암체어
+    if field == "sofa_code":
 
-    return {
-        "product_type": product_type,
-        "x": round(x_percent, 1),
-        "y": round(y_percent, 1),
-        "confidence": round(confidence, 2),
-    }
+        if "암체어" in name:
+            return [
+                "armchair",
+                "lounge chair",
+                "chair",
+            ]
 
+        return [
+            "sofa",
+            "couch",
+        ]
+
+    # 침대
+    if field == "bed_code":
+        return [
+            "bed",
+            "bed frame",
+        ]
+
+    # 다이닝 테이블
+    if field == "dining_code":
+        return [
+            "dining table",
+            "table",
+        ]
+
+    # 테이블
+    if field in ("table_code", "side_table_code"):
+
+        if "커피테이블" in name:
+            return [
+                "coffee table",
+                "side table",
+                "table",
+            ]
+
+        if "트레이테이블" in name:
+            return [
+                "side table",
+                "tray table",
+                "small table",
+            ]
+
+        if "보조테이블" in name:
+            return [
+                "side table",
+                "small table",
+                "table",
+            ]
+
+        return [
+            "side table",
+            "small table",
+            "table",
+        ]
+
+    # 조명
+    if field == "light_code":
+
+        if "플로어스탠드" in name:
+            return [
+                "floor lamp",
+                "lamp",
+            ]
+
+        if "탁상스탠드" in name:
+            return [
+                "table lamp",
+                "lamp",
+            ]
+
+        if "펜던트" in name:
+            return [
+                "pendant lamp",
+                "hanging lamp",
+                "ceiling lamp",
+            ]
+
+        return [
+            "lamp",
+            "light",
+        ]
+
+    # 향 제품
+    if field == "scent_code":
+
+        if "향초" in name:
+            return [
+                "candle",
+                "scented candle",
+                "glass candle",
+                "candle jar",
+            ]
+
+        if "라벤더주머니" in name:
+            return [
+                "lavender sachet",
+                "sachet",
+                "small pouch",
+                "fabric pouch",
+            ]
+
+        if "디퓨저" in name:
+            return [
+                "reed diffuser",
+                "diffuser bottle",
+                "bottle",
+            ]
+
+        return [
+            "home fragrance",
+            "small container",
+        ]
+
+    # 발코니 메인 상품
+    if field == "balcony_code":
+
+        if "화분" in name:
+            return [
+                "plant pot",
+                "planter",
+                "flower pot",
+            ]
+
+        return [
+            "outdoor furniture",
+            "patio furniture",
+        ]
+
+    return []
+
+
+# =========================================================
+# YOLO 모델
+# =========================================================
+
+print("YOLO-World 모델 불러오는 중...")
 
 model = YOLOWorld("yolov8s-worldv2.pt")
 
-output_rows = []
+print("모델 준비 완료")
+
+
+# =========================================================
+# 전체 탐지 결과
+# =========================================================
+
+all_rows = []
 
 total_scenes = 0
 processed_scenes = 0
 
-auto_count = 0
-review_count = 0
-failed_count = 0
 
+# =========================================================
+# 4개 공간 처리
+# =========================================================
 
-for space, csv_path in GALLERY_CSVS.items():
+for space in SPACES:
 
-    print("\n" + "=" * 60)
-    print("공간:", space)
-    print("CSV:", csv_path)
+    csv_path = get_csv_path(space)
 
     if not csv_path.is_file():
-        print("❌ CSV 없음")
+        print(f"CSV 없음: {csv_path}")
         continue
 
     with csv_path.open(
         encoding="utf-8-sig",
         newline="",
-    ) as handle:
+    ) as file:
 
-        rows = list(csv.DictReader(handle))
+        reader = csv.DictReader(file)
+        rows = list(reader)
 
     total_scenes += len(rows)
 
-    print("장면 개수:", len(rows))
-
+    print()
+    print("=" * 60)
+    print(f"{space.upper()} 처리 시작")
+    print("=" * 60)
 
     for row in rows:
 
@@ -197,113 +301,229 @@ for space, csv_path in GALLERY_CSVS.items():
         if not scene_code or not season or not image_name:
             continue
 
-        image_path = get_image_path(
+        image_path = get_scene_image_path(
             space,
             season,
             image_name,
         )
 
-        print(f"\n[{scene_code}]")
-
         if not image_path.is_file():
-            print("  ❌ 이미지 없음:", image_path)
+            print(f"[이미지 없음] {scene_code}: {image_path}")
             continue
 
-        products = get_scene_products(row)
+        products = get_scene_products(
+            row,
+            space,
+        )
+
+        print()
+        print(f"[{scene_code}]")
+
+        processed_scenes += 1
+
+        # =================================================
+        # 상품 하나씩 탐지
+        # =================================================
 
         for product in products:
 
-            detection = detect_product(
-                model,
-                image_path,
-                product["search_terms"],
-            )
+            product_code = product["code"]
 
-            if detection is None:
+            search_classes = get_detection_classes(product)
 
-                status = "failed"
-                failed_count += 1
-
-                output_rows.append({
-                    "scene_code": scene_code,
-                    "product_code": product["product_code"],
-                    "product_type": "",
-                    "x": "",
-                    "y": "",
-                    "confidence": "",
-                    "status": status,
-                })
+            if not search_classes:
 
                 print(
-                    "  FAILED:",
-                    product["product_code"],
-                    product["search_terms"],
+                    f"  탐지 검색어 없음: "
+                    f"{product_code}"
+                )
+
+                all_rows.append(
+                    {
+                        "scene_code": scene_code,
+                        "product_code": product_code,
+                        "product_type": "",
+                        "x": "",
+                        "y": "",
+                        "confidence": 0,
+                        "status": "failed",
+                    }
                 )
 
                 continue
 
+            # 이 상품 후보 검색어만 설정
+            model.set_classes(search_classes)
 
-            confidence = detection["confidence"]
+            results = model.predict(
+                source=str(image_path),
+                conf=0.10,
+                verbose=False,
+            )
+
+            result = results[0]
+
+            image_height, image_width = result.orig_shape
+
+            best_detection = None
+
+            # =================================================
+            # 가장 신뢰도 높은 탐지 하나 선택
+            # =================================================
+
+            for box in result.boxes:
+
+                class_id = int(box.cls[0])
+
+                class_name = model.names[class_id]
+
+                confidence = float(box.conf[0])
+
+                x1, y1, x2, y2 = box.xyxy[0].tolist()
+
+                center_x = (x1 + x2) / 2
+                center_y = (y1 + y2) / 2
+
+                x_percent = (
+                    center_x
+                    / image_width
+                    * 100
+                )
+
+                y_percent = (
+                    center_y
+                    / image_height
+                    * 100
+                )
+
+                if (
+                    best_detection is None
+                    or confidence
+                    > best_detection["confidence"]
+                ):
+
+                    best_detection = {
+                        "class_name": class_name,
+                        "x": round(x_percent, 1),
+                        "y": round(y_percent, 1),
+                        "confidence": round(confidence, 2),
+                    }
+
+            # =================================================
+            # 탐지 실패
+            # =================================================
+
+            if best_detection is None:
+
+                print(
+                    f"  ❌ {product_code} "
+                    f"탐지 실패"
+                )
+
+                all_rows.append(
+                    {
+                        "scene_code": scene_code,
+                        "product_code": product_code,
+                        "product_type": "",
+                        "x": "",
+                        "y": "",
+                        "confidence": 0,
+                        "status": "failed",
+                    }
+                )
+
+                continue
+
+            confidence = best_detection["confidence"]
+
+            # =================================================
+            # 상태 결정
+            # =================================================
 
             if confidence >= 0.50:
                 status = "auto"
-                auto_count += 1
             else:
                 status = "review"
-                review_count += 1
-
-
-            output_rows.append({
-                "scene_code": scene_code,
-                "product_code": product["product_code"],
-                "product_type": detection["product_type"],
-                "x": detection["x"],
-                "y": detection["y"],
-                "confidence": confidence,
-                "status": status,
-            })
-
 
             print(
-                f"  {status.upper():6}"
-                f" {product['product_code']}"
-                f" {detection['product_type']}"
-                f" x={detection['x']}%"
-                f" y={detection['y']}%"
-                f" conf={confidence}"
+                f"  {product_code} "
+                f"→ {best_detection['class_name']} "
+                f"x={best_detection['x']}% "
+                f"y={best_detection['y']}% "
+                f"conf={confidence} "
+                f"[{status}]"
+            )
+
+            all_rows.append(
+                {
+                    "scene_code": scene_code,
+                    "product_code": product_code,
+                    "product_type": best_detection["class_name"],
+                    "x": best_detection["x"],
+                    "y": best_detection["y"],
+                    "confidence": confidence,
+                    "status": status,
+                }
             )
 
 
-        processed_scenes += 1
+# =========================================================
+# CSV 저장
+# =========================================================
 
-
-fieldnames = [
-    "scene_code",
-    "product_code",
-    "product_type",
-    "x",
-    "y",
-    "confidence",
-    "status",
-]
-
+OUTPUT_CSV.parent.mkdir(
+    parents=True,
+    exist_ok=True,
+)
 
 with OUTPUT_CSV.open(
     "w",
     encoding="utf-8-sig",
     newline="",
-) as handle:
+) as file:
 
     writer = csv.DictWriter(
-        handle,
-        fieldnames=fieldnames,
+        file,
+        fieldnames=[
+            "scene_code",
+            "product_code",
+            "product_type",
+            "x",
+            "y",
+            "confidence",
+            "status",
+        ],
     )
 
     writer.writeheader()
-    writer.writerows(output_rows)
+    writer.writerows(all_rows)
 
 
-print("\n" + "=" * 60)
+# =========================================================
+# 결과 요약
+# =========================================================
+
+auto_count = sum(
+    1
+    for row in all_rows
+    if row["status"] == "auto"
+)
+
+review_count = sum(
+    1
+    for row in all_rows
+    if row["status"] == "review"
+)
+
+failed_count = sum(
+    1
+    for row in all_rows
+    if row["status"] == "failed"
+)
+
+
+print()
+print("=" * 60)
 print("전체 자동 탐지 완료")
 print("=" * 60)
 

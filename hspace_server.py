@@ -21,18 +21,14 @@ from app import create_app
 
 HOST = "127.0.0.1"
 PORT = 5000
-OPEN_PATH = os.environ.get("MOODCODE_OPEN_URL", "/").strip() or "/"
-if not OPEN_PATH.startswith("/"):
-    OPEN_PATH = f"/{OPEN_PATH}"
-URL = f"http://{HOST}:{PORT}{OPEN_PATH}"
+URL = f"http://{HOST}:{PORT}/"
 USE_RELOADER = os.environ.get("FLASK_USE_RELOADER", "0") == "1"
 _browser_opened = False
 
 
 def _server_ready() -> bool:
-    probe = f"http://{HOST}:{PORT}/"
     try:
-        with urllib.request.urlopen(probe, timeout=1) as response:
+        with urllib.request.urlopen(URL, timeout=1) as response:
             return response.status < 500
     except (urllib.error.URLError, TimeoutError, OSError):
         return False

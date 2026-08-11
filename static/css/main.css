@@ -10,7 +10,7 @@
 
 .hero-ad__bridge {
   position: absolute;
-  top: var(--header-height);
+  top: calc(var(--top-banner-height) + var(--header-height));
   left: calc(clamp(16px, 3vw, 32px) + 13px);
   z-index: 1;
   width: 1px;
@@ -27,7 +27,7 @@
   position: absolute;
   z-index: 12;
   left: clamp(24px, 5vw, 80px);
-  top: calc(var(--header-height) + clamp(40px, 7vw, 72px));
+  top: calc(var(--top-banner-height) + var(--header-height) + clamp(40px, 7vw, 72px));
   max-width: min(520px, 86vw);
   color: #fff;
   pointer-events: none;
@@ -1007,7 +1007,7 @@ body.season-winter .site-footer {
   }
 
   .hero-ad__copy {
-    top: calc(var(--header-height) + 24px);
+    top: calc(var(--top-banner-height) + var(--header-height) + 24px);
     left: 20px;
     max-width: calc(100% - 40px);
   }
@@ -1068,21 +1068,4 @@ body.season-winter .site-footer {
   .season-card__image {
     aspect-ratio: 16 / 10;
   }
-}
-/* ============================================================
-   상품 카드 하트(좋아요) 버튼 위치 수정
-   ============================================================ */
-
-/* 다른 모든 스타일을 무시하고 오른쪽 아래에 강제 고정 */
-.product-item .wish-btn { 
-  position: absolute !important;
-  right: 12px !important;  /* 오른쪽 여백 */
-  
-  /* 🔴 위쪽 고정을 강제로 해제 */
-  top: auto !important; 
-  
-  /* 🟢 아래쪽 고정을 강제 적용 */
-  bottom: 12px !important; 
-  
-  z-index: 10 !important; /* 이미지 위에 오도록 */
 }
