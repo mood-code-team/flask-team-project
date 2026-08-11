@@ -37,46 +37,6 @@
   object-fit: contain;
 }
 
-/* 이전 / 현재 / 다음 장면 네비게이션 */
-.scene-review-nav {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-
-  margin-top: 28px;
-  padding-top: 20px;
-
-  border-top: 1px solid #e5e5e5;
-}
-
-.scene-review-nav__previous {
-  text-align: left;
-}
-
-.scene-review-nav__count {
-  font-size: 13px;
-  color: #777;
-  text-align: center;
-}
-
-.scene-review-nav__next {
-  text-align: right;
-}
-
-.scene-review-nav__button {
-  display: inline-block;
-
-  font-size: 13px;
-  color: #222;
-  text-decoration: none;
-
-  transition: opacity 0.2s ease;
-}
-
-.scene-review-nav__button:hover {
-  opacity: 0.55;
-}
-
 
 
 /* + 버튼 */
@@ -177,33 +137,3 @@
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== 핫스팟 재검수용 ===== */
-
-.scene-product-card.is-selected {
-  outline: 3px solid #168bd2;
-  outline-offset: 3px;
-}
-
-.scene-detail__image-wrap.is-editing-hotspot {
-  cursor: crosshair;
-}
-
-.scene-detail__image-wrap.is-editing-hotspot::after {
-  content: "상품 위치를 클릭하세요";
-
-  position: absolute;
-  left: 16px;
-  top: 16px;
-
-  padding: 8px 12px;
-
-  background: rgba(0, 0, 0, 0.72);
-  color: #fff;
-  border-radius: 4px;
-
-  font-size: 12px;
-  font-weight: 600;
-
-  pointer-events: none;
-  z-index: 30;
-}
