@@ -7,7 +7,7 @@
   <title>{% block full_title %}{% block title %}무드·인테리어 셀렉션샵{% endblock %} — Mood Code{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}무드와 공간의 조화 — Mood Code{% endblock %}">
   <link rel="icon" href="{{ url_for('static', filename='images/mood-code-icon.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=20260811f">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=20260811g">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/inquiry-modal.css') }}?v=20260801a">
   {% block extra_css %}{% endblock %}
@@ -150,21 +150,12 @@
 
     <nav class="side-menu__nav">
       <div class="side-menu__group side-menu__group--products">
-        <button
-          type="button"
-          class="side-menu__title-btn"
-          id="side-menu-products-toggle"
-          aria-expanded="false"
-          aria-controls="side-menu-products"
-        >
-          <span>상품목록</span>
-          <svg class="side-menu__title-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-            <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div id="side-menu-products" class="side-menu__products" hidden>
-          {% include "components/side_menu_categories.html" %}
-        </div>
+        {% if side_menu_categories %}
+        <a href="{{ url_for('category.listing', slug=side_menu_categories[0].slug) }}" class="side-menu__title side-menu__title-link">상품목록</a>
+        {% else %}
+        <a href="{{ url_for('category.listing', slug='light') }}" class="side-menu__title side-menu__title-link">상품목록</a>
+        {% endif %}
+        {% include "components/side_menu_categories.html" %}
       </div>
 
       <div class="side-menu__group side-menu__group--single">
@@ -363,7 +354,7 @@
   <script src="{{ url_for('static', filename='js/scroll-top.js') }}?v=20260801f"></script>
   <script src="{{ url_for('static', filename='js/cart.js') }}?v=20260801c"></script>
   <script src="{{ url_for('static', filename='js/wishlist.js') }}?v=20260811a"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20260811c"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20260811g"></script>
   <script src="{{ url_for('static', filename='js/inquiry-modal.js') }}?v=20260801a"></script>
   {% block extra_js %}{% endblock %}
 </body>
