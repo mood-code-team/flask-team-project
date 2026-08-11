@@ -1,15 +1,16 @@
-{# 사이드 메뉴 — 대분류 + 소분류 항상 노출 (JS 없이도 동작) #}
+{# 사이드 메뉴 — 대분류 + 소분류 아코디언 #}
 <ul class="side-menu__categories">
   {% for category in side_menu_categories %}
   <li class="side-menu__category">
-    {% if category.slug %}
-    <a href="{{ url_for('category.listing', slug=category.slug) }}" class="side-menu__category-label">
+    <button
+      type="button"
+      class="side-menu__category-btn"
+      aria-expanded="false"
+      aria-controls="side-sub-{{ loop.index }}"
+    >
       {{ category.name }}
-    </a>
-    {% else %}
-    <p class="side-menu__category-label">{{ category.name }}</p>
-    {% endif %}
-    <ul class="side-menu__sublist">
+    </button>
+    <ul class="side-menu__sublist" id="side-sub-{{ loop.index }}" hidden>
       {% for item in category.subitems %}
       <li>
         {% if item.category_slug %}
@@ -28,7 +29,7 @@
   ] %}
   {% for name, slug in fallback %}
   <li class="side-menu__category">
-    <a href="{{ url_for('category.listing', slug=slug) }}" class="side-menu__category-label">{{ name }}</a>
+    <a href="{{ url_for('category.listing', slug=slug) }}" class="side-menu__category-btn">{{ name }}</a>
   </li>
   {% endfor %}
   {% endfor %}

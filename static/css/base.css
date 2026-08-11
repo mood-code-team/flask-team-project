@@ -948,20 +948,7 @@ body.side-menu-open {
 }
 
 .side-menu__category {
-  margin-bottom: 14px;
-}
-
-.side-menu__category-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text);
-  padding: 6px 0 4px;
-  text-decoration: none;
-}
-
-a.side-menu__category-label:hover {
-  color: var(--color-text);
+  margin-bottom: 4px;
 }
 
 .side-menu__category-btn {
@@ -985,7 +972,7 @@ a.side-menu__category-label:hover {
 
 .side-menu__sublist {
   list-style: none;
-  padding: 2px 0 4px 12px;
+  padding: 2px 0 10px 14px;
   margin: 0;
 }
 
