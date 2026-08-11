@@ -112,23 +112,35 @@ def seed_catalog() -> None:
     db.session.commit()
 
 
+ADMIN_USERNAME = "gygs1010"
+ADMIN_EMAIL = "gygs1010@gmail.com"
+ADMIN_PASSWORD = "dnjsdlf@102360"
+ADMIN_FULL_NAME = "Mood Code 관리자"
+
+
 def seed_admin() -> None:
-    """관리자 계정 시드."""
-    admin = User.query.filter_by(email="admin@shop.local").first()
+    """관리자 계정 시드 — gygs1010 (문서·실행_관리자.bat 기준)."""
+    admin = User.query.filter(
+        (User.username == ADMIN_USERNAME) | (User.email == ADMIN_EMAIL)
+    ).first()
+
     if admin:
-        if not admin.full_name:
-            admin.full_name = "관리자"
-            db.session.commit()
-        return
-    admin = User(
-        email="admin@shop.local",
-        username="admin",
-        full_name="관리자",
-        phone="010-0000-0000",
-        is_admin=True,
-    )
-    admin.set_password("admin1234")
-    db.session.add(admin)
+        admin.username = ADMIN_USERNAME
+        admin.email = ADMIN_EMAIL
+        admin.full_name = admin.full_name or ADMIN_FULL_NAME
+        admin.is_admin = True
+        admin.is_active = True
+    else:
+        admin = User(
+            email=ADMIN_EMAIL,
+            username=ADMIN_USERNAME,
+            full_name=ADMIN_FULL_NAME,
+            phone="010-0000-0000",
+            is_admin=True,
+        )
+        db.session.add(admin)
+
+    admin.set_password(ADMIN_PASSWORD)
     db.session.commit()
 
 
@@ -174,7 +186,7 @@ def main() -> None:
         print("[OK] Mood Code DB 초기화 및 카탈로그 시드 완료")
         print(f"     카테고리: {Category.query.count()}개")
         print(f"     상품: {Product.query.count()}개")
-        print("     관리자: admin@shop.local / admin1234")
+        print(f"     관리자: {ADMIN_USERNAME} / {ADMIN_PASSWORD}")
 
 
 if __name__ == "__main__":
