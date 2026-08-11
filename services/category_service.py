@@ -6,7 +6,6 @@ from dataclasses import dataclass
 
 from extensions import db
 from models import Category, Product
-from services.category_banners import get_category_banner_urls
 from services.search_filters import ActiveFilters, product_matches_filters
 from services.search_service import _apply_sort
 
@@ -42,31 +41,8 @@ def get_category_by_slug(slug: str) -> Category | None:
     return Category.query.filter_by(slug=slug, is_active=True).first()
 
 
-def get_category_root(category: Category) -> Category:
-    """대분류 카테고리 반환."""
-    current = category
-    while current.parent_id:
-        parent = db.session.get(Category, current.parent_id)
-        if not parent or not parent.is_active:
-            break
-        current = parent
-    return current
-
-
-def get_category_banner_image(category: Category) -> dict[str, str]:
-    """카테고리 목록 상단 고정 배너 (2K + 4K)."""
-    root = get_category_root(category)
-    return get_category_banner_urls(root.slug)
-
-
-def _category_ids_for_listing(category: Category, filters: ActiveFilters) -> list[int]:
-    """목록에 포함할 카테고리 ID."""
-    if filters.subcategory:
-        child = get_category_by_slug(filters.subcategory)
-        root = get_category_root(category)
-        if child and child.parent_id == root.id:
-            return [child.id]
-
+def _category_ids_for_listing(category: Category) -> list[int]:
+    """대분류 선택 시 하위 카테고리 상품까지 포함."""
     ids = [category.id]
     for child in category.children:
         if child.is_active:
@@ -92,7 +68,7 @@ def list_category_products(
     page = max(page, 1)
     per_page = max(min(per_page, 48), 1)
 
-    category_ids = _category_ids_for_listing(category, filters)
+    category_ids = _category_ids_for_listing(category)
 
     base = (
         db.session.query(Product)

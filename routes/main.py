@@ -2,7 +2,6 @@
 
 from flask import Blueprint, abort, render_template
 
-from services.gallery_service import GALLERY_MOODS, build_mood_main_items
 from services.home_content import HERO_SLIDES, SEASON_ROOMS, get_season
 from services.season_service import get_season_products
 
@@ -15,8 +14,7 @@ def index():
     return render_template(
         "index.html",
         hero_slides=HERO_SLIDES,
-        gallery_mood_items=build_mood_main_items(),
-        gallery_moods=GALLERY_MOODS,
+        season_rooms=SEASON_ROOMS,
     )
 
 
@@ -34,7 +32,6 @@ def season_detail(season_id: str):
         products=products,
         season_rooms=SEASON_ROOMS,
     )
-
 
 @main_bp.route("/space")
 def space():
