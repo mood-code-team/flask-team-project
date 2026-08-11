@@ -7,16 +7,25 @@
   <title>{% block full_title %}{% block title %}무드·인테리어 셀렉션샵{% endblock %} — Mood Code{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}무드와 공간의 조화 — Mood Code{% endblock %}">
   <link rel="icon" href="{{ url_for('static', filename='images/mood-code-icon.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=20260803f">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=20260811d">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/inquiry-modal.css') }}?v=20260801a">
   {% block extra_css %}{% endblock %}
 </head>
 <body
-  class="{% block body_class %}{% endblock %}"
+  class="{% if not current_user.is_authenticated %}has-header-promo {% endif %}{% block body_class %}{% endblock %}"
   data-user-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}"
   data-login-url="{{ url_for('auth.login') }}"
+  data-register-url="{{ url_for('auth.register') }}"
 >
+
+  {% if not current_user.is_authenticated %}
+  <div class="header-promo" id="header-promo">
+    <a href="{{ url_for('auth.register', next=request.path) }}" class="header-promo__link">
+      회원가입 시 <strong>10,000원</strong> 할인 쿠폰 증정
+    </a>
+  </div>
+  {% endif %}
 
   {# ---- 메인 헤더 ---- #}
   <header class="site-header" id="site-header">
@@ -52,8 +61,9 @@
           </svg>
         </button>
         <a
-          href="{% if current_user.is_authenticated %}{{ url_for('mypage.wishlist') }}{% else %}{{ url_for('auth.login', next=url_for('mypage.wishlist')) }}{% endif %}"
+          href="{% if current_user.is_authenticated %}{{ url_for('mypage.wishlist') }}{% else %}#{% endif %}"
           class="util-btn util-wishlist{% if wishlist_count %} has-items{% endif %}"
+          {% if not current_user.is_authenticated %}data-wishlist-guest="true"{% endif %}
           aria-label="위시리스트 {{ wishlist_count }}개"
         >
           <svg class="util-btn__icon util-wishlist__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -158,7 +168,7 @@
           {% else %}
           <li><a href="{{ url_for('auth.login') }}">로그인</a></li>
           <li><a href="{{ url_for('auth.register') }}">회원가입</a></li>
-          <li><a href="{{ url_for('auth.login', next=url_for('mypage.wishlist')) }}">위시리스트</a></li>
+          <li><a href="#" data-wishlist-guest="true">위시리스트</a></li>
           {% endif %}
         </ul>
       </div>
@@ -215,6 +225,24 @@
       </div>
       <div class="wishlist-modal__actions">
         <a href="{{ url_for('mypage.wishlist') }}" class="wishlist-modal__link">위시리스트 이동</a>
+      </div>
+    </div>
+  </div>
+
+  {# ---- 비회원 찜 → 회원가입 유도 ---- #}
+  <div class="wishlist-modal-overlay" id="wishlist-signup-overlay" hidden aria-hidden="true">
+    <div class="wishlist-modal" id="wishlist-signup-modal" role="dialog" aria-modal="true" aria-labelledby="wishlist-signup-title">
+      <header class="wishlist-modal__header">
+        <span class="wishlist-modal__title" id="wishlist-signup-title">WISHLIST</span>
+        <button type="button" class="wishlist-modal__close" id="wishlist-signup-close">CLOSE</button>
+      </header>
+      <div class="wishlist-modal__body">
+        <p>찜(위시리스트)은 회원 전용 기능입니다.</p>
+        <p>지금 가입하면 <strong>10,000원 할인 쿠폰</strong>을 드립니다.</p>
+      </div>
+      <div class="wishlist-modal__actions wishlist-modal__actions--stack">
+        <a href="{{ url_for('auth.register', next=request.path) }}" class="wishlist-modal__link wishlist-modal__link--primary" id="wishlist-signup-register">회원가입</a>
+        <a href="{{ url_for('auth.login', next=request.path) }}" class="wishlist-modal__link" id="wishlist-signup-login">로그인</a>
       </div>
     </div>
   </div>
@@ -322,9 +350,10 @@
   <script src="{{ url_for('static', filename='js/channel-talk.js') }}?v=20260801a"></script>
   {% endif %}
 
+  <script src="{{ url_for('static', filename='js/header-promo.js') }}?v=20260811a"></script>
   <script src="{{ url_for('static', filename='js/scroll-top.js') }}?v=20260801f"></script>
   <script src="{{ url_for('static', filename='js/cart.js') }}?v=20260801c"></script>
-  <script src="{{ url_for('static', filename='js/wishlist.js') }}?v=20260801b"></script>
+  <script src="{{ url_for('static', filename='js/wishlist.js') }}?v=20260811a"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}?v=20260801f"></script>
   <script src="{{ url_for('static', filename='js/inquiry-modal.js') }}?v=20260801a"></script>
   {% block extra_js %}{% endblock %}

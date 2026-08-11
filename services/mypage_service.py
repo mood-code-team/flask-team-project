@@ -94,9 +94,8 @@ def get_membership_info(user_id: int, label: str) -> MembershipInfo:
         "WELCOME": (
             "첫 방문을 환영합니다",
             [
-                "신규 가입 웰컴 적립금 1,000원",
-                "웰컴 10% 할인 쿠폰",
-                "무료 배송 쿠폰 1장",
+                "신규 가입 10,000원 할인 쿠폰",
+                "멤버 전용 찜(위시리스트)",
                 "멤버 전용 기획전 알림",
             ],
             "MEMBER",

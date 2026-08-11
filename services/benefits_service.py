@@ -9,13 +9,18 @@ from datetime import datetime
 from extensions import db
 from models import Coupon, UserCoupon
 from services.coupon_service import issue_coupon_to_user
-from services.point_service import add_points
-
-
 def ensure_default_coupons() -> None:
     """기본 쿠폰 템플릿 생성."""
     expires = datetime(2026, 12, 31, 23, 59, 59)
     templates = [
+        {
+            "code": "WELCOME10K",
+            "title": "신규 가입 10,000원 할인",
+            "description": "회원가입 축하 — 10,000원 할인 쿠폰",
+            "discount_type": "fixed",
+            "discount_value": 10_000,
+            "min_amount": 50_000,
+        },
         {
             "code": "WELCOME10",
             "title": "웰컴 10% 할인",
@@ -61,6 +66,12 @@ def ensure_default_coupons() -> None:
     for item in templates:
         coupon = Coupon.query.filter_by(code=item["code"]).first()
         if coupon:
+            coupon.title = item["title"]
+            coupon.description = item["description"]
+            coupon.discount_type = item["discount_type"]
+            coupon.discount_value = item["discount_value"]
+            coupon.min_amount = item["min_amount"]
+            coupon.is_active = True
             continue
         db.session.add(
             Coupon(
@@ -73,7 +84,5 @@ def ensure_default_coupons() -> None:
 
 
 def issue_welcome_benefits(user_id: int) -> None:
-    """신규 가입 웰컴 쿠폰·적립금."""
-    issue_coupon_to_user(user_id, "WELCOME10")
-    issue_coupon_to_user(user_id, "MOODSHIP")
-    add_points(user_id, 1000, "신규 가입 웰컴 적립")
+    """신규 가입 — 10,000원 할인 쿠폰."""
+    issue_coupon_to_user(user_id, "WELCOME10K")
