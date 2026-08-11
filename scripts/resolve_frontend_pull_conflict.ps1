@@ -1,28 +1,17 @@
 # =============================================================================
-#  frontend pull 충돌 자동 해결 스크립트
+#  frontend pull 충돌 자동 해결 — gallery.py / gallery_service.py
 # =============================================================================
 #
-#  [언제 쓰나요?]
-#  git pull team frontend (또는 origin frontend) 후 아래처럼 멈췄을 때:
-#    - CONFLICT in routes/gallery.py
-#    - CONFLICT in services/gallery_service.py
-#    - git stash pop 이 "충돌 때문에 불가" 라고 할 때
+#  VS Code에 이렇게 보이면 이 스크립트 또는 docs/GALLERY_충돌_해결.txt 참고:
 #
-#  [왜 이런 일이 생기나요?]
-#  1) 내 PC에 예전 gallery 코드가 있고
-#  2) GitHub frontend 브랜치에도 gallery 수정이 올라와서
-#  3) 같은 파일을 Git이 자동으로 합치지 못해 <<<<<<< 표시가 생깁니다.
+#    <<<<<<< HEAD
+#    (내 코드)
+#    =======
+#    (팀원/원격 코드)   ← 이쪽(origin/frontend)만 남기면 됨
+#    >>>>>>> origin/frontend
 #
-#  Git은 "충돌이 남아 있으면 stash pop(임시 저장 꺼내기)"을 막습니다.
-#  그래서 순서가 반드시: ① 충돌 해결 → ② commit → ③ stash pop 입니다.
-#
-#  [이 스크립트가 하는 일]
-#  - gallery.py, gallery_service.py → frontend(원격) 최신 버전으로 맞춤
-#    (피그마 UI + 백엔드 핫스팟 + C타입 카피가 이미 remote에 반영됨)
-#  - merge commit 생성
-#  - stash 가 있으면 pop
-#
-#  [실행 방법]  프로젝트 폴더에서:
+#  [실행]  프로젝트 폴더에서:
+#    git fetch team frontend
 #    powershell -File scripts/resolve_frontend_pull_conflict.ps1
 #
 # =============================================================================
@@ -30,82 +19,104 @@
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 
+$conflictFiles = @(
+    "routes/gallery.py",
+    "services/gallery_service.py"
+)
+
 Write-Host ""
 Write-Host "========================================"
-Write-Host " frontend pull 충돌 해결"
+Write-Host " gallery 충돌 해결 (2파일)"
 Write-Host "========================================"
 Write-Host ""
-Write-Host "※ gallery 2개 파일은 '팀 frontend(원격)' 버전을 씁니다."
-Write-Host "  내 로컬 gallery 수정은 이 파일들에서 덮어씌워질 수 있습니다."
-Write-Host "  (다른 파일 작업은 stash pop 후 그대로 남습니다)"
+Write-Host "[수동으로 할 때 — VS Code]"
+Write-Host "  <<<<<<< HEAD 와 ======= 사이 = 내 코드 → 삭제"
+Write-Host "  ======= 와 >>>>>>> origin/frontend 사이 = 팀 frontend → 유지"
+Write-Host "  <<<<<<< / ======= / >>>>>>> 줄도 전부 삭제"
+Write-Host ""
+Write-Host "[자동] GitHub team/frontend 최신본으로 2파일 덮어쓰기"
 Write-Host ""
 
-Write-Host "[1/4] 현재 Git 상태 확인"
-Write-Host "      (UU = 아직 충돌 중, M = 수정됨)"
+Write-Host "[1/5] git fetch"
+$remotes = @("team", "origin")
+$fetched = $false
+foreach ($remote in $remotes) {
+    git remote get-url $remote 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        git fetch $remote frontend 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "      → fetch $remote frontend OK"
+            $fetchRef = "$remote/frontend"
+            $fetched = $true
+            break
+        }
+    }
+}
+if (-not $fetched) {
+    Write-Host "      ⚠ team/origin remote 없음. fetch 생략."
+    $fetchRef = "frontend"
+}
+
+Write-Host ""
+Write-Host "[2/5] git status"
 git status --short
 
-$conflictFiles = @("routes/gallery.py", "services/gallery_service.py")
 $inMerge = Test-Path ".git/MERGE_HEAD"
 
-if (-not $inMerge) {
-    $hasMarkers = Select-String -Path $conflictFiles -Pattern "^<<<<<<< " -ErrorAction SilentlyContinue
-    if (-not $hasMarkers) {
-        Write-Host ""
-        Write-Host "  → 지금은 merge 충돌 상태가 아닙니다."
-        Write-Host "    먼저: git pull team frontend"
-        Write-Host "    충돌 나면 이 스크립트를 다시 실행하세요."
-        Write-Host ""
-    }
-}
-
 Write-Host ""
-Write-Host "[2/4] gallery 충돌 파일 → frontend(원격) 버전으로 선택"
-Write-Host "      routes/gallery.py"
-Write-Host "      services/gallery_service.py"
+Write-Host "[3/5] gallery 2파일 → $fetchRef 버전으로 교체"
 foreach ($file in $conflictFiles) {
-    if (-not (Test-Path $file)) { continue }
-    # pull 받을 때: --theirs = 방금 받은 remote(frontend) 쪽
-    git checkout --theirs $file 2>$null
+    if (-not (Test-Path $file)) {
+        Write-Host "      skip (없음): $file"
+        continue
+    }
+    git checkout $fetchRef -- $file 2>$null
     if ($LASTEXITCODE -ne 0) {
-        git checkout --ours $file 2>$null
+        Write-Host "      checkout $fetchRef 실패 → --theirs 시도: $file"
+        git checkout --theirs $file 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            git checkout --ours $file 2>$null
+        }
+    }
+    # 혹시 <<<<<<< 가 남아 있으면 경고
+    $markers = Select-String -Path $file -Pattern "^<<<<<<< " -ErrorAction SilentlyContinue
+    if ($markers) {
+        Write-Host "      ⚠ 아직 충돌 표시 남음! docs/GALLERY_충돌_해결.txt 보고 수동 정리: $file"
+        exit 1
     }
     git add $file
+    Write-Host "      OK: $file"
 }
-Write-Host "      → 충돌 표시(<<<<<<<) 제거 후 staging 완료"
 
 Write-Host ""
 if ($inMerge) {
-    Write-Host "[3/4] merge commit (충돌 해결 기록)"
-    git commit -m "merge: frontend pull 충돌 해결 (gallery 원격 기준)"
-    Write-Host "      → commit 완료. 이제 stash pop 가능합니다."
+    Write-Host "[4/5] merge commit"
+    git commit -m "merge: gallery 충돌 해결 (frontend 원격 기준)"
+    Write-Host "      → commit 완료"
 } else {
-    Write-Host "[3/4] merge commit 생략"
-    Write-Host "      → MERGE_HEAD 없음 (이미 commit 됐거나 pull 전 상태)"
+    $staged = git diff --cached --name-only
+    if ($staged) {
+        Write-Host "[4/5] commit (merge 상태 아님 — staged 변경만)"
+        git commit -m "fix: gallery 파일 frontend 기준으로 정리"
+    } else {
+        Write-Host "[4/5] commit 생략 (변경 없음)"
+    }
 }
 
 Write-Host ""
 $stash = git stash list 2>$null
 if ($stash) {
-    Write-Host "[4/4] git stash pop — 임시 저장해 둔 내 작업 꺼내기"
+    Write-Host "[5/5] git stash pop"
     git stash pop
     if ($LASTEXITCODE -ne 0) {
         Write-Host ""
-        Write-Host "  ⚠ stash pop에서 또 충돌 났습니다."
-        Write-Host "    VS Code에서 <<<<<<< 표시 찾아서 수동 정리 후:"
-        Write-Host "      git add ."
-        Write-Host "      git commit -m \"stash 적용\""
+        Write-Host "  ⚠ stash pop 추가 충돌 → VS Code에서 <<<<<<< 수동 정리 후 git add / commit"
         exit 1
     }
-    Write-Host "      → stash 적용 완료"
 } else {
-    Write-Host "[4/4] stash 없음 — 건너뜀"
+    Write-Host "[5/5] stash 없음"
 }
 
 Write-Host ""
-Write-Host "========================================"
-Write-Host " 완료"
-Write-Host "========================================"
-Write-Host "  다음 확인:"
-Write-Host "    1) 서버 재시작 (실행_서버.bat)"
-Write-Host "    2) 브라우저: /  /gallery  /category/light"
+Write-Host "완료. 서버 재시작 후 /gallery 확인하세요."
 Write-Host ""

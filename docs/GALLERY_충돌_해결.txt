@@ -1,0 +1,50 @@
+================================================================================
+  gallery.py / gallery_service.py  merge 충돌 해결 (팀원용)
+================================================================================
+
+■ 파일
+  routes/gallery.py
+  services/gallery_service.py
+
+■ VS Code에서 <<<<<<< 가 보일 때 (수동)
+
+  1) 두 파일을 엽니다.
+
+  2) 아래처럼 생긴 블록을 찾습니다:
+
+     <<<<<<< HEAD
+     (내 코드 — pull 전 내 PC 버전)
+     =======
+     (팀원/원격 코드 — origin/frontend 쪽)
+     >>>>>>> origin/frontend
+
+  3) **origin/frontend 아래 내용만 남깁니다.**
+     - <<<<<<< HEAD ~ ======= 사이(내 코드) → 삭제
+     - ======= 줄 → 삭제
+     - >>>>>>> origin/frontend 줄 → 삭제
+     - origin/frontend 쪽 코드만 유지
+
+  4) Ctrl+S 저장
+
+  5) 터미널:
+     git add routes/gallery.py services/gallery_service.py
+     git commit -m "merge: gallery 충돌 해결 (frontend 원격 기준)"
+     git stash pop
+
+■ 자동 (추천)
+
+  git fetch team frontend
+  powershell -File scripts/resolve_frontend_pull_conflict.ps1
+
+  → GitHub frontend 최신 gallery 2파일로 덮어쓰고 commit + stash pop 까지 시도
+
+■ 왜 frontend(원격) 버전?
+
+  frontend 브랜치에 이미 합쳐져 있음:
+  - 피그마 UI (프로모, 찜, 레이아웃)
+  - 백엔드 핫스팟 / scene_detail API
+  - C타입 갤러리 카피
+
+  gallery만 로컬·원격이 겹치기 쉬워서 이 두 파일은 원격 기준이 안전합니다.
+
+================================================================================
