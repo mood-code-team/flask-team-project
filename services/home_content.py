@@ -186,4 +186,7 @@ SEASON_BY_ID: dict[str, dict] = {room["id"]: room for room in SEASON_ROOMS}
 
 def get_season(season_id: str) -> dict | None:
     """시즌 ID로 상세 데이터 조회."""
-    return SEASON_BY_ID.get(season_id)
+    key = (season_id or "").strip().lower()
+    if key == "fall":
+        key = "autumn"
+    return SEASON_BY_ID.get(key)

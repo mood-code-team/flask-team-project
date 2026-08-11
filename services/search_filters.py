@@ -210,6 +210,7 @@ class ActiveFilters:
     space: str = ""
     style: str = ""
     color: str = ""
+    subcategory: str = ""
     brand: str = ""
 
     def as_query_params(self) -> dict[str, str]:
@@ -232,7 +233,11 @@ class ActiveFilters:
         return count
 
 
-def get_active_filter_tags(filters: ActiveFilters) -> list[dict]:
+def get_active_filter_tags(
+    filters: ActiveFilters,
+    *,
+    subcategory_options: dict[str, str] | None = None,
+) -> list[dict]:
     """선택된 필터 태그 목록."""
     tags: list[dict] = []
 
@@ -243,13 +248,17 @@ def get_active_filter_tags(filters: ActiveFilters) -> list[dict]:
             "swatch": None,
         })
 
-    for key in ("space", "style", "color", "brand"):
+    for key in ("subcategory", "space", "style", "color", "brand"):
         value = getattr(filters, key)
         if not value:
             continue
+        if key == "subcategory":
+            label = (subcategory_options or {}).get(value, value)
+        else:
+            label = get_option_label(key, value)
         tags.append({
             "key": key,
-            "label": get_option_label(key, value),
+            "label": label,
             "swatch": COLOR_SWATCHES.get(value) if key == "color" else None,
         })
 
@@ -286,7 +295,29 @@ def get_filter_groups() -> dict[str, dict]:
     return groups
 
 
-def parse_filters(args) -> ActiveFilters:
+def get_subcategory_options(category) -> dict[str, str]:
+    """대분류 페이지 — 하위 세분류 필터 옵션."""
+    children = [child for child in category.children if child.is_active]
+    children.sort(key=lambda item: (item.sort_order, item.id))
+    return {child.slug: child.name for child in children}
+
+
+def get_category_filter_groups(category) -> dict[str, dict]:
+    """카테고리 목록 페이지 필터 — 세분류 포함, 브랜드 제외."""
+    groups = get_filter_groups()
+    subcategories = get_subcategory_options(category)
+    if subcategories:
+        groups = {
+            "sort": groups["sort"],
+            "subcategory": {"label": "세분류", "options": subcategories},
+            **{key: groups[key] for key in ("space", "style", "color")},
+        }
+    else:
+        groups.pop("brand", None)
+    return groups
+
+
+def parse_filters(args, *, subcategory_options: dict[str, str] | None = None) -> ActiveFilters:
     """요청 쿼리에서 필터 파싱."""
     sort = args.get("sort", "newest")
     if sort == "relevance":
@@ -303,11 +334,18 @@ def parse_filters(args) -> ActiveFilters:
             options = brand_options
         return value if value in options else ""
 
+    subcategory = args.get("subcategory", "").strip()
+    if subcategory_options is None:
+        subcategory = ""
+    elif subcategory not in subcategory_options:
+        subcategory = ""
+
     return ActiveFilters(
         sort=sort,
         space=pick("space"),
         style=pick("style"),
         color=pick("color"),
+        subcategory=subcategory,
         brand=pick("brand"),
     )
 
