@@ -419,3 +419,185 @@ def build_space_detail_meta(season: str) -> dict:
         "colors": [color["hex"] for color in palette],
         "color_desc": ", ".join(color["name_en"] for color in palette),
     }
+
+def get_hotspots(scene_code: str) -> dict[str, dict]:
+    """scene_code에 해당하는 상품별 핫스팟 좌표를 반환."""
+    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
+
+    if not hotspot_file.is_file():
+        return {}
+
+    hotspots = {}
+
+    with hotspot_file.open(
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+        reader = csv.DictReader(handle)
+
+        for row in reader:
+            if row.get("scene_code") != scene_code:
+                continue
+
+            product_code = (row.get("product_code") or "").strip()
+
+            if not product_code:
+                continue
+
+            status = (row.get("status") or "").strip()
+
+            if status == "failed":
+                continue
+
+            x_value = (row.get("x") or "").strip()
+            y_value = (row.get("y") or "").strip()
+
+            if not x_value or not y_value:
+                continue
+
+            confidence_value = (
+                row.get("confidence") or "0"
+            ).strip()
+
+            hotspots[product_code] = {
+                "x": float(x_value),
+                "y": float(y_value),
+                "confidence": float(confidence_value),
+                "status": status,
+            }
+
+    return hotspots
+
+
+def get_scene_detail(scene_code: str) -> dict | None:
+    items = get_all_products()
+
+    for item in items:
+        if item.get("scene_code") != scene_code:
+            continue
+
+        hotspots = get_hotspots(scene_code)
+
+        for product in item.get("products", []):
+            product_code = product.get("code")
+            hotspot = hotspots.get(product_code)
+
+            if hotspot:
+                product["hotspot_x"] = hotspot["x"]
+                product["hotspot_y"] = hotspot["y"]
+                product["hotspot_confidence"] = hotspot["confidence"]
+
+        return item
+
+    return None
+
+
+def get_scene_navigation(scene_code: str) -> dict:
+    """전체 갤러리 장면 기준 이전/다음 장면 정보 반환."""
+    scene_codes = []
+
+    for item in get_all_products():
+        code = (item.get("scene_code") or "").strip()
+
+        if not code:
+            continue
+
+        if code not in scene_codes:
+            scene_codes.append(code)
+
+    scene_codes.sort()
+
+    if scene_code not in scene_codes:
+        return {
+            "previous": None,
+            "next": None,
+            "current": None,
+            "total": len(scene_codes),
+        }
+
+    index = scene_codes.index(scene_code)
+
+    previous_scene = (
+        scene_codes[index - 1]
+        if index > 0
+        else None
+    )
+
+    next_scene = (
+        scene_codes[index + 1]
+        if index < len(scene_codes) - 1
+        else None
+    )
+
+    return {
+        "previous": previous_scene,
+        "next": next_scene,
+        "current": index + 1,
+        "total": len(scene_codes),
+    }
+
+
+def save_hotspot_position(
+    scene_code: str,
+    product_code: str,
+    x: float,
+    y: float,
+) -> bool:
+    """gallery_hotspots.csv에서 해당 상품 좌표를 수정해서 저장."""
+    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
+
+    if not hotspot_file.is_file():
+        return False
+
+    with hotspot_file.open(
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+        reader = csv.DictReader(handle)
+        fieldnames = reader.fieldnames
+        rows = list(reader)
+
+    if not fieldnames:
+        return False
+
+    found = False
+
+    for row in rows:
+        if (
+            (row.get("scene_code") or "").strip() == scene_code
+            and
+            (row.get("product_code") or "").strip() == product_code
+        ):
+            row["x"] = f"{x:.1f}"
+            row["y"] = f"{y:.1f}"
+            row["confidence"] = "1.00"
+            row["status"] = "manual"
+
+            found = True
+            break
+
+    if not found:
+        rows.append({
+            "scene_code": scene_code,
+            "product_code": product_code,
+            "product_type": "",
+            "x": f"{x:.1f}",
+            "y": f"{y:.1f}",
+            "confidence": "1.00",
+            "status": "manual",
+        })
+
+    with hotspot_file.open(
+        "w",
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+        )
+
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return True

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
 {% block body_class %}page-gallery mood-{{ mood_key }}{% endblock %}
-{% block title %}{{ mood_detail.title if mood_detail else (meta.title if meta else 'Gallery') }} — Mood Gallery{% endblock %}
+{% block title %}{{ mood_detail.title if mood_detail else (meta.title if meta else 'Gallery') }} — Mood Gallery{%
+endblock %}
 {% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
 
 {% block extra_css %}
@@ -27,7 +28,8 @@
         <div class="mood-detail__palette">
           {% for color in detail.palettes %}
           <div class="mood-detail__swatch">
-            <span class="mood-detail__swatch-color" style="background-color: {{ color.hex }};" title="{{ color.hex }}"></span>
+            <span class="mood-detail__swatch-color" style="background-color: {{ color.hex }};"
+              title="{{ color.hex }}"></span>
             <span class="mood-detail__swatch-label">{{ color.name }}</span>
           </div>
           {% endfor %}
@@ -36,16 +38,25 @@
     </header>
     {% endif %}
 
-{% if gallery_sections %}
+    {% if gallery_sections %}
     <div class="mood-detail__masonry">
       {% for section in gallery_sections %}
-        {% for item in section.scenes %}
-        <article class="mood-detail__card">
-          <div class="mood-detail__card-img">
-            <img src="{{ item.image_url }}" alt="Interior scene" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
-          </div>
-        </article>
-        {% endfor %}
+      {% for item in section.scenes %}
+
+      <article class="mood-detail__card">
+        <div class="mood-detail__card-img">
+
+          <a href="{{ url_for('gallery.scene_detail', scene_code=item.scene_code) }}" class="mood-detail__card-link">
+
+            <img src="{{ item.image_url }}" alt="Interior scene" loading="lazy"
+              onerror="this.closest('.mood-detail__card').style.display='none';">
+
+          </a>
+
+        </div>
+      </article>
+
+      {% endfor %}
       {% endfor %}
     </div>
     {% elif gallery_items %}
@@ -53,7 +64,8 @@
       {% for item in gallery_items %}
       <article class="mood-detail__card">
         <div class="mood-detail__card-img">
-          <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+          <img src="{{ item.image_url }}" alt="Interior image" loading="lazy"
+            onerror="this.closest('.mood-detail__card').style.display='none';">
         </div>
       </article>
       {% endfor %}

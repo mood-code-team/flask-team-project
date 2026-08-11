@@ -39,11 +39,21 @@ def find_product_by_image_name(image_name: str | None) -> Product | None:
     )
 
 
-def resolve_product_link(mood_code: str | None = None, image_name: str | None = None) -> dict | None:
+def resolve_product_link(
+    mood_code: str | None = None,
+    image_name: str | None = None,
+) -> dict | None:
     """Return product summary for gallery links."""
-    product = find_product_by_mood_code(mood_code)
-    if not product and image_name:
+
+    product = None
+
+    # 이미지명이 있으면 이미지명으로 먼저 정확하게 찾기
+    if image_name:
         product = find_product_by_image_name(image_name)
+
+    # 이미지명으로 찾지 못한 경우에만 mood code 사용
+    if not product:
+        product = find_product_by_mood_code(mood_code)
 
     if not product:
         return None

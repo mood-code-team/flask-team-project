@@ -17,6 +17,9 @@ from services.gallery_service import (
     build_space_main_items,
     get_mood_detail,
     get_mood_gallery_sections,
+    get_scene_detail,
+    get_scene_navigation,
+    save_hotspot_position,
     get_space_products,
 )
 
@@ -113,3 +116,63 @@ def mood_gallery():
             gallery_mode="mood",
         ),
     )
+
+@gallery_bp.route("/gallery/scene/<scene_code>")
+def scene_detail(scene_code: str):
+    """인테리어 장면 상세페이지."""
+    scene = get_scene_detail(scene_code)
+
+    if scene is None:
+        abort(404)
+
+    scene_navigation = get_scene_navigation(scene_code)
+
+    return render_template(
+        "gallery/scene_detail.html",
+        scene=scene,
+        scene_navigation=scene_navigation,
+    )
+
+
+@gallery_bp.route("/gallery/scene/<scene_code>/hotspot", methods=["POST"])
+def save_scene_hotspot(scene_code: str):
+    """재검수로 수정한 상품 핫스팟 좌표 저장."""
+    data = request.get_json(silent=True) or {}
+
+    product_code = (data.get("product_code") or "").strip()
+
+    try:
+        x = float(data.get("x"))
+        y = float(data.get("y"))
+    except (TypeError, ValueError):
+        return {
+            "ok": False,
+            "message": "잘못된 좌표입니다.",
+        }, 400
+
+    if not product_code:
+        return {
+            "ok": False,
+            "message": "상품 코드가 없습니다.",
+        }, 400
+
+    saved = save_hotspot_position(
+        scene_code=scene_code,
+        product_code=product_code,
+        x=x,
+        y=y,
+    )
+
+    if not saved:
+        return {
+            "ok": False,
+            "message": "핫스팟 CSV 저장에 실패했습니다.",
+        }, 500
+
+    return {
+        "ok": True,
+        "scene_code": scene_code,
+        "product_code": product_code,
+        "x": x,
+        "y": y,
+    }

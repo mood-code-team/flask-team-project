@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scene_detail.css') }}">
+{% endblock %}
+
+
+{% block content %}
+
+<main class="scene-detail">
+
+    <div class="scene-detail__container">
+
+        <div class="scene-detail__top">
+
+            <!-- 왼쪽 큰 장면 이미지 -->
+            <div class="scene-detail__image-wrap">
+
+                <img src="{{ scene.image_url }}" alt="Interior scene" class="scene-detail__image">
+
+                {% if scene.products %}
+                {% for product in scene.products %}
+
+                {% if product.hotspot_x is defined and product.hotspot_y is defined %}
+                <a href="{{ product.url }}" class="scene-hotspot" data-product-code="{{ product.code }}"
+                    style="left: {{ product.hotspot_x }}%; top: {{ product.hotspot_y }}%;"
+                    aria-label="{{ product.name }} 상품 상세보기">
+                    +
+                </a>
+                {% endif %}
+
+                {% endfor %}
+                {% endif %}
+
+            </div>
+
+
+            <!-- 오른쪽 상품 썸네일 -->
+            <aside class="scene-detail__side">
+
+                {% if scene.products %}
+                <div class="scene-products">
+
+                    {% for product in scene.products %}
+
+                    <div class="scene-product-item">
+
+                        <a href="{{ product.url }}" class="scene-product-card" data-product-code="{{ product.code }}"
+                            aria-label="{{ product.name }} 상품 상세보기">
+
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+                        </a>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+                {% endif %}
+
+            </aside>
+
+        </div>
+
+        <!-- 이전 / 다음 사진 -->
+        {% if scene_navigation.previous or scene_navigation.next %}
+        <div class="scene-review-nav">
+
+            <div class="scene-review-nav__previous">
+                {% if scene_navigation.previous %}
+                <a href="{{ url_for('gallery.scene_detail', scene_code=scene_navigation.previous) }}"
+                   class="scene-review-nav__button">
+                    ← 이전 사진
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="scene-review-nav__count">
+                {{ scene_navigation.current }} / {{ scene_navigation.total }}
+            </div>
+
+            <div class="scene-review-nav__next">
+                {% if scene_navigation.next %}
+                <a href="{{ url_for('gallery.scene_detail', scene_code=scene_navigation.next) }}"
+                   class="scene-review-nav__button">
+                    다음 사진 →
+                </a>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endif %}
+
+    </div>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const productCards = document.querySelectorAll(".scene-product-card");
+    const imageWrap = document.querySelector(".scene-detail__image-wrap");
+
+    if (!imageWrap) return;
+
+    let selectedProductCode = null;
+
+    // 오른쪽 썸네일 선택
+    productCards.forEach(function (card) {
+        card.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            productCards.forEach(function (item) {
+                item.classList.remove("is-selected");
+            });
+
+            card.classList.add("is-selected");
+            selectedProductCode = card.dataset.productCode;
+
+            imageWrap.classList.add("is-editing-hotspot");
+        });
+    });
+
+    // 왼쪽 큰 사진 클릭 → + 위치 이동
+    imageWrap.addEventListener("click", function (event) {
+        if (!selectedProductCode) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const rect = imageWrap.getBoundingClientRect();
+
+        const xPercent =
+            ((event.clientX - rect.left) / rect.width) * 100;
+
+        const yPercent =
+            ((event.clientY - rect.top) / rect.height) * 100;
+
+        let hotspot = imageWrap.querySelector(
+            '.scene-hotspot[data-product-code="' +
+            selectedProductCode +
+            '"]'
+        );
+
+        // +가 없는 상품이면 새로 생성
+        if (!hotspot) {
+            hotspot = document.createElement("a");
+            hotspot.className = "scene-hotspot";
+            hotspot.dataset.productCode = selectedProductCode;
+            hotspot.textContent = "+";
+
+            const selectedCard = document.querySelector(
+                '.scene-product-card[data-product-code="' +
+                selectedProductCode +
+                '"]'
+            );
+
+            if (selectedCard) {
+                hotspot.href = selectedCard.href;
+            }
+
+            imageWrap.appendChild(hotspot);
+        }
+
+        hotspot.style.left = xPercent.toFixed(1) + "%";
+        hotspot.style.top = yPercent.toFixed(1) + "%";
+
+        fetch(
+            "{{ url_for('gallery.save_scene_hotspot', scene_code=scene.scene_code) }}",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    product_code: selectedProductCode,
+                    x: Number(xPercent.toFixed(1)),
+                    y: Number(yPercent.toFixed(1)),
+                }),
+            }
+        )
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error("저장 요청 실패");
+            }
+            return response.json();
+        })
+        .then(function () {
+            productCards.forEach(function (item) {
+                item.classList.remove("is-selected");
+            });
+
+            imageWrap.classList.remove("is-editing-hotspot");
+            selectedProductCode = null;
+        })
+        .catch(function (error) {
+            console.error("CSV 저장 실패:", error);
+        });
+    });
+});
+</script>
+{% endblock %}
