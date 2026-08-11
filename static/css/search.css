@@ -1203,3 +1203,21 @@
   right: 1px !important; /* 🟢 수치가 작아질수록 오른쪽 벽으로 바짝 붙습니다 (기존 12px -> 4px) */
   top: 3px !important;        /* 🟢 수치가 작아질수록 위쪽 끝에 바짝 붙습니다 (예: 8px -> 4px -> 0px) */
 }
+/* 1. 썸네일 상자 배경을 흰색으로 고정하고 안쪽 여백(padding)으로 이미지 크기 축소 */
+.product-thumb {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  padding: 24px !important;            /* 🟢 여백 크기 (12px ~ 24px 사이로 조정) */
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 2. 이미지 비율 및 크기 맞춤 */
+.product-thumb img {
+  width: 90% !important;
+  height: 90% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
