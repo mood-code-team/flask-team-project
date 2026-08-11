@@ -2,10 +2,7 @@
 # 사용: powershell -File scripts/resolve_frontend_pull_conflict.ps1
 
 $ErrorActionPreference = "Stop"
-Set-Location (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
-if (-not (Test-Path "routes/gallery.py")) {
-    Set-Location (Split-Path $PSScriptRoot -Parent)
-}
+Set-Location (Split-Path $PSScriptRoot -Parent)
 
 Write-Host "[1/4] git status"
 git status --short
