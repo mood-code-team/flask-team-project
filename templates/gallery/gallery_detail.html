@@ -5,7 +5,7 @@
 {% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260810b">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260811h">
 {% endblock %}
 
 {% block content %}
@@ -56,7 +56,13 @@
           {% for item in section.scenes %}
           <article class="mood-detail__card">
             <div class="mood-detail__card-img mood-detail__card-img--wide">
+              {% if item.scene_code %}
+              <a href="{{ url_for('gallery.scene_detail', scene_code=item.scene_code) }}" class="mood-detail__card-link" aria-label="{{ section.label }} 장면 상세">
+                <img src="{{ item.image_url }}" alt="{{ section.label }} {{ loop.index }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+              </a>
+              {% else %}
               <img src="{{ item.image_url }}" alt="{{ section.label }} {{ loop.index }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+              {% endif %}
             </div>
           </article>
           {% endfor %}
@@ -69,7 +75,13 @@
       {% for item in gallery_items %}
       <article class="mood-detail__card">
         <div class="mood-detail__card-img">
+          {% if item.scene_code %}
+          <a href="{{ url_for('gallery.scene_detail', scene_code=item.scene_code) }}" class="mood-detail__card-link" aria-label="장면 상세">
+            <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+          </a>
+          {% else %}
           <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+          {% endif %}
         </div>
       </article>
       {% endfor %}
