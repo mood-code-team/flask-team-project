@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=20260811b">
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809d">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260812a">
 
 {% for slide in hero_slides %}
 
@@ -168,6 +168,11 @@
 
     <p class="gallery-entry__section-desc">BLOOM · CLEAR · CALM · CHIC — 네 가지 무드를 간결하게 만나보세요.</p>
 
+  </div>
+
+  <div class="gallery-entry__nav-wrap">
+    {% set active_mood = none %}
+    {% include "components/gallery_mood_nav.html" %}
   </div>
 
 

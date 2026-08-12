@@ -104,9 +104,15 @@ def scene_detail(scene_code: str):
     if scene is None:
         abort(404)
 
+    active_mood = CATEGORY_TO_MOOD_KEY.get(scene.get("category", ""), "bloom")
+
     return render_template(
         "gallery/scene_detail.html",
-        scene=scene,
+        **_gallery_context(
+            scene=scene,
+            active_mood=active_mood,
+            mood_key=active_mood,
+        ),
     )
 
 

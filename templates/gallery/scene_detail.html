@@ -1,44 +1,53 @@
 {% extends "base.html" %}
 
+{% block body_class %}page-gallery mood-{{ mood_key }}{% endblock %}
+
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260812a">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/scene_detail.css') }}">
 {% endblock %}
 
 {% block content %}
-<main class="scene-detail">
-    <div class="scene-detail__container">
+<section class="mood-detail">
+  <div class="mood-detail__container">
+    {% include "components/gallery_mood_nav.html" %}
+
+    <main class="scene-detail">
+      <div class="scene-detail__container">
         <div class="scene-detail__top">
-            <div class="scene-detail__image-wrap">
-                <img src="{{ scene.image_url }}" alt="Interior scene" class="scene-detail__image">
+          <div class="scene-detail__image-wrap">
+            <img src="{{ scene.image_url }}" alt="Interior scene" class="scene-detail__image">
 
-                {% if scene.products %}
-                {% for product in scene.products %}
-                {% if product.hotspot_x is defined and product.hotspot_y is defined %}
-                <a href="{{ product.url }}" class="scene-hotspot" data-product-code="{{ product.code }}"
-                    style="left: {{ product.hotspot_x }}%; top: {{ product.hotspot_y }}%;"
-                    aria-label="{{ product.name }} 상품 상세보기">
-                    +
+            {% if scene.products %}
+            {% for product in scene.products %}
+            {% if product.hotspot_x is defined and product.hotspot_y is defined %}
+            <a href="{{ product.url }}" class="scene-hotspot" data-product-code="{{ product.code }}"
+              style="left: {{ product.hotspot_x }}%; top: {{ product.hotspot_y }}%;"
+              aria-label="{{ product.name }} 상품 상세보기">
+              +
+            </a>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <aside class="scene-detail__side">
+            {% if scene.products %}
+            <div class="scene-products">
+              {% for product in scene.products %}
+              <div class="scene-product-item">
+                <a href="{{ product.url }}" class="scene-product-card" data-product-code="{{ product.code }}"
+                  aria-label="{{ product.name }} 상품 상세보기">
+                  <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
                 </a>
-                {% endif %}
-                {% endfor %}
-                {% endif %}
+              </div>
+              {% endfor %}
             </div>
-
-            <aside class="scene-detail__side">
-                {% if scene.products %}
-                <div class="scene-products">
-                    {% for product in scene.products %}
-                    <div class="scene-product-item">
-                        <a href="{{ product.url }}" class="scene-product-card" data-product-code="{{ product.code }}"
-                            aria-label="{{ product.name }} 상품 상세보기">
-                            <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
-                        </a>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </aside>
+            {% endif %}
+          </aside>
         </div>
-    </div>
-</main>
+      </div>
+    </main>
+  </div>
+</section>
 {% endblock %}
