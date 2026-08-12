@@ -128,10 +128,10 @@ def season_id_to_style(season_id: str) -> str:
 
 
 SEASON_STYLE_NAV: tuple[dict[str, str], ...] = (
-    {"style": "spring", "label": "Spring", "scroll_id": "gallery-bloom"},
-    {"style": "summer", "label": "Summer", "scroll_id": "gallery-clear"},
-    {"style": "fall", "label": "Fall", "scroll_id": "gallery-calm"},
-    {"style": "winter", "label": "Winter", "scroll_id": "gallery-chic"},
+    {"style": "spring", "label": "BLOOM", "scroll_id": "gallery-bloom"},
+    {"style": "summer", "label": "CLEAR", "scroll_id": "gallery-clear"},
+    {"style": "fall", "label": "CALM", "scroll_id": "gallery-calm"},
+    {"style": "winter", "label": "CHIC", "scroll_id": "gallery-chic"},
 )
 
 
