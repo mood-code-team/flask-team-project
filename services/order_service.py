@@ -192,8 +192,10 @@ def complete_order_payment(
 ) -> Order:
     if order.status == OrderStatus.PAID:
         return order
+
     if order.status != OrderStatus.PENDING:
         raise OrderValidationError("결제할 수 없는 주문 상태입니다.")
+
     if amount != order.total_amount:
         raise OrderValidationError("결제 금액이 주문 금액과 일치하지 않습니다.")
 
@@ -211,6 +213,7 @@ def complete_order_payment(
             mark_coupon_used(user_coupon=user_coupon, order=order)
 
     guest = User.query.filter_by(email="guest@shop.local").first()
+
     if guest is None or order.user_id != guest.id:
         if order.point_used > 0 and not has_point_usage_for_order(order.id):
             use_points(
@@ -219,10 +222,16 @@ def complete_order_payment(
                 f"주문 사용 ({order.order_number})",
                 order_id=order.id,
             )
+
         earn_purchase_points(
             user_id=order.user_id,
             order_id=order.id,
-            product_total=max(order.product_total - order.coupon_discount, 0),
+            product_total=max(
+                order.product_total
+                - order.coupon_discount
+                - order.point_used,
+                0,
+            ),
         )
 
     from flask import session

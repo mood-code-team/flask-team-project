@@ -73,7 +73,6 @@ def ensure_default_coupons() -> None:
 
 
 def issue_welcome_benefits(user_id: int) -> None:
-    """신규 가입 웰컴 쿠폰·적립금."""
-    issue_coupon_to_user(user_id, "WELCOME10")
+    """신규 가입 웰컴 쿠폰 지급."""
+    issue_coupon_to_user(user_id, "WELCOME10K")
     issue_coupon_to_user(user_id, "MOODSHIP")
-    add_points(user_id, 1000, "신규 가입 웰컴 적립")
