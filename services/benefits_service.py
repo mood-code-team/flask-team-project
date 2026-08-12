@@ -40,14 +40,6 @@ def ensure_default_coupons() -> None:
             "min_amount": 50_000,
         },
         {
-            "code": "MEMBER5",
-            "title": "멤버 5% 추가 할인",
-            "description": "누적 구매 회원 전용 할인",
-            "discount_type": "percent",
-            "discount_value": 5,
-            "min_amount": 200_000,
-        },
-        {
             "code": "VIP15",
             "title": "VIP 15% 프리미엄 할인",
             "description": "MOOD VIP 전용 시즌 쿠폰",
@@ -82,6 +74,9 @@ def ensure_default_coupons() -> None:
                 is_active=True,
             )
         )
+    retired = Coupon.query.filter_by(code="MEMBER5").first()
+    if retired:
+        retired.is_active = False
     db.session.commit()
 
 

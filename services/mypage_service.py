@@ -104,8 +104,7 @@ def get_membership_info(user_id: int, label: str) -> MembershipInfo:
         "MEMBER": (
             "Mood Code 멤버",
             [
-                "구매 금액 1% 적립",
-                "멤버 5% 추가 할인 쿠폰",
+                "구매 금액 10% 적립",
                 "생일 월 특별 쿠폰",
                 "신상품 사전 알림",
             ],

@@ -66,10 +66,7 @@ def issue_coupon_to_user(user_id: int, coupon_code: str) -> UserCoupon | None:
 def ensure_tier_coupons(user_id: int) -> None:
     """등급별 쿠폰 자동 발급."""
     label = membership_label(user_id)
-    if label == "MEMBER":
-        issue_coupon_to_user(user_id, "MEMBER5")
-    elif label == "MOOD VIP":
-        issue_coupon_to_user(user_id, "MEMBER5")
+    if label == "MOOD VIP":
         issue_coupon_to_user(user_id, "VIP15")
         issue_coupon_to_user(user_id, "VIPSHIP")
 
