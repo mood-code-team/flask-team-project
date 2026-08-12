@@ -17,6 +17,10 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 os.chdir(PROJECT_DIR)
 
+from scripts.preflight_server import ensure_server_ready
+
+ensure_server_ready(PROJECT_DIR)
+
 from app import create_app
 
 HOST = "127.0.0.1"

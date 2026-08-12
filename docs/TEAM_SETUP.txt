@@ -31,10 +31,14 @@ Mood Code — 팀원 설치 · 실행 가이드
     chmod +x run.sh
     ./run.sh
 
-  [터미널 직접]
+  [터미널 직접 — 반드시 ① 패키지 설치 후 ② 서버 실행]
+
+    cd flask-team-project
     pip install -r requirements.txt
-    python scripts/seed_db.py
     python hspace_server.py
+
+  ※ python hspace_server.py 만 실행하면 ModuleNotFoundError 가 날 수 있음
+  ※ Windows 에서는 실행_서버.bat 사용을 권장 (자동 설치)
 
 
 ■ 3. 브라우저
