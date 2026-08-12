@@ -24,7 +24,7 @@ HERO_SLIDES = [
         "title": "Bed",
         "headline": "오늘을 내려놓는 자리",
         "tagline": "하루의 마지막을 위한 가장 편안한 공간.",
-        "concept": "REST",
+        "concept": "bed",
         "category_slug": "bed",
     },
     {
@@ -33,7 +33,7 @@ HERO_SLIDES = [
         "title": "Sofa",
         "headline": "앉는 곳보다, 머무는 곳.",
         "tagline": "생활의 중심이 되는 소파 컬렉션.",
-        "concept": "SOLO LOUNGE",
+        "concept": "sofa",
         "category_slug": "sofa",
     },
     {
@@ -42,7 +42,7 @@ HERO_SLIDES = [
         "title": "Side Table",
         "headline": "손 닿는 곳의 작은 취향.",
         "tagline": "일상 가까이에 머무는 나만의 작은 공간.",
-        "concept": "JUST FIT",
+        "concept": "side-table",
         "category_slug": "side-table",
     },
     {
@@ -51,7 +51,7 @@ HERO_SLIDES = [
         "title": "Diffuser",
         "headline": "공기에 무드를 더하다",
         "tagline": "보이지 않는 분위기로 공간을 완성해보세요.",
-        "concept": "SMALL MOOD",
+        "concept": "diffuser",
         "category_slug": "diffuser",
     },
 ]
