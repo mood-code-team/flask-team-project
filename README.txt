@@ -46,11 +46,12 @@ Flask 풀스택 | SQLite
   마이페이지    http://127.0.0.1:5000/mypage/
 
 
-■ 테스트 계정 (일반)
+■ 테스트 계정 (관리자)
 
-  python scripts\seed_db.py
-  admin / admin1234  (이메일: admin@shop.local)
-  ※ 최신 seed는 관리자 계정 gygs1010 으로 통일됨
+  아이디   : gygs1010
+  이메일   : gygs1010@gmail.com
+  비밀번호 : dnjsdlf@102360
+  ※ seed_db.py 실행 시 위 계정으로 생성·갱신됨
 
 
 ■ 관리자 페이지
