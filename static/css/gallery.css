@@ -234,6 +234,8 @@
 /* ===== 무드 탭 네비 ===== */
 .gallery-mood-nav {
   margin-bottom: 28px;
+  width: 100%;
+  padding-top: 24px;
 }
 
 .gallery-mood-nav__inner {
@@ -271,19 +273,6 @@
   color: var(--color-text);
   border-bottom-color: var(--color-text);
   pointer-events: none;
-}
-
-.gallery-mood-nav__secondary {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-text-light);
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  transition: color 0.2s;
-}
-
-.gallery-mood-nav__secondary:hover {
-  color: var(--color-text);
 }
 
 /* ===== 갤러리 선택 (카드 그리드) ===== */

@@ -8,17 +8,11 @@ from services.gallery_service import (
     CATEGORY_TO_MOOD_KEY,
     GALLERY_MOODS,
     MOOD_SLUG_TO_CATEGORY,
-    SEASON_TO_MOOD_KEY,
-    SPACE_META,
-    SPACE_META_EN,
     build_mood_detail_meta,
     build_mood_main_items,
-    build_space_detail_meta,
-    build_space_main_items,
     get_mood_detail,
     get_mood_gallery_sections,
     get_scene_detail,
-    get_space_products,
 )
 
 gallery_bp = Blueprint("gallery", __name__)
@@ -44,48 +38,6 @@ def _render_mood_detail(category: str, *, mood_key: str | None = None):
         ),
     )
 
-
-@gallery_bp.route("/spaces")
-def space_main():
-    """공간별 갤러리 — 거실·침실·다이닝·발코니."""
-    return render_template(
-        "gallery/card_grid.html",
-        **_gallery_context(
-            gallery_items=build_space_main_items(),
-            page_title="공간별 갤러리",
-            page_subtitle="원하시는 공간을 선택해 보세요",
-            gallery_mode="space",
-        ),
-    )
-
-
-@gallery_bp.route("/space/<space_name>/<season>")
-def space_gallery(space_name: str, season: str):
-    """공간 + 계절 조합 상세 갤러리."""
-    if space_name not in SPACE_META:
-        abort(404)
-    if season not in SEASON_TO_MOOD_KEY:
-        abort(404)
-
-    mood_key = SEASON_TO_MOOD_KEY[season]
-    products = get_space_products(space_name, season)[:4]
-    return render_template(
-        "gallery/gallery_detail.html",
-        **_gallery_context(
-            gallery_sections=[
-                {
-                    "space": space_name,
-                    "label": SPACE_META[space_name],
-                    "label_en": SPACE_META_EN[space_name],
-                    "scenes": products,
-                }
-            ],
-            meta=build_space_detail_meta(season),
-            mood_key=mood_key,
-            active_mood=mood_key,
-            mood_detail=get_mood_detail(mood_key),
-        ),
-    )
 
 
 @gallery_bp.route("/gallery/<mood_slug>")
