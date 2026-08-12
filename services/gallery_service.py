@@ -364,23 +364,6 @@ def get_mood_products(category: str, *, limit: int = 16) -> list[dict]:
     return items[:limit]
 
 
-def build_space_main_items() -> list[dict]:
-    items: list[dict] = []
-    for space, label in SPACE_META.items():
-        products = get_space_products(space, "spring")
-        if not products:
-            continue
-        product = random.choice(products)
-        items.append(
-            {
-                "name": label,
-                "image_url": product["image_url"],
-                "link": f"/space/{space}/spring",
-            }
-        )
-    return items
-
-
 def build_mood_main_items() -> list[dict]:
     products = get_all_products()
     items: list[dict] = []

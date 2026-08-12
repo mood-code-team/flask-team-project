@@ -135,6 +135,7 @@
 .gallery-mood-nav {
   margin-bottom: 28px;
   width: 100%;
+  padding-top: 24px;
 }
 
 .gallery-mood-nav__inner {
@@ -173,19 +174,6 @@
   border-bottom-color: #111;
 }
 
-.gallery-mood-nav__secondary {
-  font-size: 12px;
-  font-weight: 500;
-  color: #666;
-  text-decoration: none;
-  text-underline-offset: 4px;
-  padding-bottom: 12px;
-  transition: color 0.2s;
-}
-
-.gallery-mood-nav__secondary:hover {
-  color: #111;
-}
 
 /* ===== 갤러리 선택 (카드 그리드) ===== */
 .gallery-picker {
