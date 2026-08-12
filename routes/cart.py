@@ -172,7 +172,9 @@ def order():
             flash(str(exc), "error")
             return render_template("cart/order.html", **_order_context(lines, form, selected_raw))
 
-        return redirect(url_for("payment.checkout", order_number=pending.order_number))
+        return redirect(
+            url_for("payment.checkout", order_number=pending.order_number)
+        )
 
     return render_template(
         "cart/order.html",

@@ -9,6 +9,8 @@ from datetime import datetime
 from extensions import db
 from models import Coupon, UserCoupon
 from services.coupon_service import issue_coupon_to_user
+
+
 def ensure_default_coupons() -> None:
     """기본 쿠폰 템플릿 생성."""
     expires = datetime(2026, 12, 31, 23, 59, 59)
@@ -84,5 +86,6 @@ def ensure_default_coupons() -> None:
 
 
 def issue_welcome_benefits(user_id: int) -> None:
-    """신규 가입 — 10,000원 할인 쿠폰."""
+    """신규 가입 — 10,000원 할인 + 무료배송 쿠폰."""
     issue_coupon_to_user(user_id, "WELCOME10K")
+    issue_coupon_to_user(user_id, "MOODSHIP")

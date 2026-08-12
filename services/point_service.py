@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from extensions import db
-from models import PointLedger
+from models import Order, PointLedger
 
 
 class PointError(ValueError):
@@ -149,9 +149,17 @@ def reverse_order_points(*, user_id: int, order: Order) -> None:
 
 
 def earn_purchase_points(*, user_id: int, order_id: int, product_total: int) -> int:
-    """구매 적립 (상품금액 1%)."""
-    amount = max(product_total // 100, 0)
+    """구매 적립 (실제 결제금액의 10%)."""
+    amount = max(product_total // 10, 0)
+
     if amount <= 0:
         return 0
-    add_points(user_id, amount, f"구매 적립 (주문 #{order_id})", order_id=order_id)
+
+    add_points(
+        user_id,
+        amount,
+        f"구매 적립 10% (주문 #{order_id})",
+        order_id=order_id,
+    )
+
     return amount
