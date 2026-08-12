@@ -43,6 +43,7 @@
   opacity: 0.86;
   margin-bottom: 22px;
   max-width: 32ch;
+  white-space: nowrap;
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.38);
   transition: opacity 0.45s var(--ease-out-soft), transform 0.45s var(--ease-out-soft);
 }
@@ -65,11 +66,12 @@
 }
 
 .hero-ad__headline {
-  font-size: clamp(36px, 6.8vw, 68px);
+  font-size: clamp(34px, 5.5vw, 58px);
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1.06;
   margin: 0 0 14px;
+  white-space: nowrap;
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.42);
   transition: opacity 0.45s var(--ease-out-soft), transform 0.45s var(--ease-out-soft);
 }
@@ -190,7 +192,7 @@
   bottom: clamp(72px, 12vw, 140px);
   z-index: 2;
   margin: 0;
-  max-width: min(340px, 42vw);
+  max-width: min(500px, 60vw);
   font-size: clamp(28px, 5.5vw, 64px);
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -201,6 +203,7 @@
   pointer-events: none;
   user-select: none;
   word-break: keep-all;
+  white-space: nowrap;
 }
 
 /* 슬라이더 컨트롤 */
