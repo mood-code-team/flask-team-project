@@ -1,93 +1,92 @@
-{% extends "base.html" %}
-
-{% block body_class %}page-gallery mood-{{ mood_key }}{% endblock %}
-{% block title %}{{ mood_detail.title if mood_detail else (meta.title if meta else 'Gallery') }} — Mood Gallery{%
-endblock %}
-{% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260811h">
-{% endblock %}
-
-{% block content %}
-{% set detail = mood_detail %}
-
-<section class="mood-detail">
-  <div class="mood-detail__container">
-    {% include "components/gallery_mood_nav.html" %}
-
-    {% if detail %}
-    <header class="mood-detail__hero">
-      <h1 class="mood-detail__title">{{ detail.title }}</h1>
-      <p class="mood-detail__subtitle">{{ detail.subtitle }}</p>
-
-      <div class="mood-detail__info">
-        <div class="mood-detail__panel mood-detail__panel--highlights">
-          <h2 class="mood-detail__panel-title">MOOD HIGHLIGHTS</h2>
-          <ul class="mood-detail__list">
-            {% for title, desc in detail.highlights %}
-            <li><strong>· {{ title }}</strong> {{ desc }}</li>
-            {% endfor %}
-          </ul>
-        </div>
-
-        <div class="mood-detail__panel mood-detail__panel--palette">
-          <h2 class="mood-detail__panel-title">COLOR PALETTE</h2>
-          <div class="mood-detail__palette">
-            {% for color in detail.palettes %}
-            <div class="mood-detail__swatch">
-              <span class="mood-detail__swatch-color" style="background-color: {{ color.hex }};" title="{{ color.hex }}"></span>
-              <span class="mood-detail__swatch-label">{{ color.name }}</span>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-    </header>
-    {% endif %}
-
-    {% if gallery_sections %}
-    <div class="mood-detail__matrix">
-      {% for section in gallery_sections %}
-      <div class="mood-detail__matrix-col">
-        <header class="mood-detail__matrix-head">
-          <h2 class="mood-detail__matrix-title">{{ section.label }}</h2>
-        </header>
-        <div class="mood-detail__matrix-stack">
-          {% for item in section.scenes %}
-          <article class="mood-detail__card">
-            <div class="mood-detail__card-img mood-detail__card-img--wide">
-              {% if item.scene_code %}
-              <a href="{{ url_for('gallery.scene_detail', scene_code=item.scene_code) }}" class="mood-detail__card-link" aria-label="{{ section.label }} 장면 상세">
-                <img src="{{ item.image_url }}" alt="{{ section.label }} {{ loop.index }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
-              </a>
-              {% else %}
-              <img src="{{ item.image_url }}" alt="{{ section.label }} {{ loop.index }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
-              {% endif %}
-            </div>
-          </article>
-          {% endfor %}
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% elif gallery_items %}
-    <div class="mood-detail__grid">
-      {% for item in gallery_items %}
-      <article class="mood-detail__card">
-        <div class="mood-detail__card-img">
-          {% if item.scene_code %}
-          <a href="{{ url_for('gallery.scene_detail', scene_code=item.scene_code) }}" class="mood-detail__card-link" aria-label="장면 상세">
-            <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
-          </a>
-          {% else %}
-          <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
-          {% endif %}
-        </div>
-      </article>
-      {% endfor %}
-    </div>
-    {% endif %}
-  </div>
-</section>
-{% endblock %}
+{% extends "base.html" %}
+
+{% block body_class %}page-gallery mood-{{ mood_key }}{% endblock %}
+{% block title %}{{ mood_detail.title if mood_detail else (meta.title if meta else 'Gallery') }} — Mood Gallery{% endblock %}
+{% block meta_description %}{{ mood_detail.subtitle if mood_detail else '' }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260812a">
+{% endblock %}
+
+{% block content %}
+{% set detail = mood_detail %}
+
+<section class="mood-detail">
+  <div class="mood-detail__container">
+    {% include "components/gallery_mood_nav.html" %}
+
+    {% if detail %}
+    <header class="mood-detail__hero">
+      <h1 class="mood-detail__title">{{ detail.title }}</h1>
+      <p class="mood-detail__subtitle">{{ detail.subtitle }}</p>
+
+      <div class="mood-detail__info">
+        <div class="mood-detail__panel mood-detail__panel--highlights">
+          <h2 class="mood-detail__panel-title">MOOD HIGHLIGHTS</h2>
+          <ul class="mood-detail__list">
+            {% for title, desc in detail.highlights %}
+            <li><strong>· {{ title }}</strong> {{ desc }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="mood-detail__panel mood-detail__panel--palette">
+          <h2 class="mood-detail__panel-title">COLOR PALETTE</h2>
+          <div class="mood-detail__palette">
+            {% for color in detail.palettes %}
+            <div class="mood-detail__swatch">
+              <span class="mood-detail__swatch-color" style="background-color: {{ color.hex }};" title="{{ color.hex }}"></span>
+              <span class="mood-detail__swatch-label">{{ color.name }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </header>
+    {% endif %}
+
+    {% if gallery_sections %}
+    <div class="mood-detail__matrix">
+      {% for section in gallery_sections %}
+      <div class="mood-detail__matrix-col">
+        <header class="mood-detail__matrix-head">
+          <h2 class="mood-detail__matrix-title">{{ section.label }}</h2>
+        </header>
+        <div class="mood-detail__matrix-stack">
+          {% for item in section.scenes %}
+          <article class="mood-detail__card">
+            <div class="mood-detail__card-img mood-detail__card-img--wide">
+              {% if item.scene_code %}
+              <a href="{{ url_for('gallery.scene_detail', scene_code=item.scene_code) }}" class="mood-detail__card-link" aria-label="{{ section.label }} 장면 상세">
+                <img src="{{ item.image_url }}" alt="{{ section.label }} {{ loop.index }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+              </a>
+              {% else %}
+              <img src="{{ item.image_url }}" alt="{{ section.label }} {{ loop.index }}" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+              {% endif %}
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% elif gallery_items %}
+    <div class="mood-detail__grid">
+      {% for item in gallery_items %}
+      <article class="mood-detail__card">
+        <div class="mood-detail__card-img">
+          {% if item.scene_code %}
+          <a href="{{ url_for('gallery.scene_detail', scene_code=item.scene_code) }}" class="mood-detail__card-link" aria-label="장면 상세">
+            <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+          </a>
+          {% else %}
+          <img src="{{ item.image_url }}" alt="Interior image" loading="lazy" onerror="this.closest('.mood-detail__card').style.display='none';">
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

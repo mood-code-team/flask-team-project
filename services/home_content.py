@@ -19,12 +19,12 @@ def _unsplash(photo_id: str) -> dict[str, str]:
 # 히어로 — 카테고리 광고 (3·4번 톤: 따뜻한 중성 베드룸 / 1·2번도 같은 계열)
 HERO_SLIDES = [
     {
-        "image": "images/hero/lighting.jpg",
-        "image_2k": "images/hero/lighting.jpg",
-        "title": "Lighting",
+        "image": "images/hero/bed.jpg",
+        "image_2k": "images/hero/bed.jpg",
+        "title": "Bed",
         "headline": "오늘을 내려놓는 자리",
         "tagline": "하루의 마지막을 위한 가장 편안한 공간.",
-        "concept": "SOFT LIGHT",
+        "concept": "REST",
         "category_slug": "bed",
     },
     {
