@@ -164,7 +164,7 @@ def seed_notices() -> None:
     if Notice.query.first():
         return
     notices = [
-        ("Grand Open — 신규 회원 10% 할인", "오픈 기념 신규 회원 할인 이벤트 진행 중!", True),
+        ("Grand Open — 신규 회원 10,000원 할인", "오픈 기념 신규 회원 할인 이벤트 진행 중!", True),
         ("배송 안내", "명절 연휴 배송 일정 변경 안내드립니다.", False),
     ]
     for title, content, pinned in notices:

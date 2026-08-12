@@ -23,11 +23,11 @@ def ensure_default_coupons() -> None:
         },
         {
             "code": "WELCOME10",
-            "title": "웰컴 10% 할인",
+            "title": "웰컴 10,000원 할인",
             "description": "Mood Code 첫 구매를 위한 웰컴 쿠폰",
-            "discount_type": "percent",
-            "discount_value": 10,
-            "min_amount": 100_000,
+            "discount_type": "fixed",
+            "discount_value": 10_000,
+            "min_amount": 50_000,
         },
         {
             "code": "MOODSHIP",
