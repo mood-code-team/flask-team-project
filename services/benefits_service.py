@@ -21,7 +21,7 @@ def ensure_default_coupons() -> None:
             "description": "회원가입 축하 — 10,000원 할인 쿠폰",
             "discount_type": "fixed",
             "discount_value": 10_000,
-            "min_amount": 50_000,
+            "min_amount": 30_000,
         },
         {
             "code": "WELCOME10",
@@ -29,7 +29,7 @@ def ensure_default_coupons() -> None:
             "description": "Mood Code 첫 구매를 위한 웰컴 쿠폰",
             "discount_type": "fixed",
             "discount_value": 10_000,
-            "min_amount": 50_000,
+            "min_amount": 30_000,
         },
         {
             "code": "MOODSHIP",

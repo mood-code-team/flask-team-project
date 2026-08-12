@@ -443,6 +443,10 @@ body.page-home.mood-hover-chic .site-footer {
 }
 
 /* ===== Gallery entry (메인 MOOD GALLERY) ===== */
+.gallery-entry__item {
+  scroll-margin-top: calc(var(--top-banner-height) + var(--header-height) + 16px);
+}
+
 .gallery-entry {
   padding: 48px clamp(16px, 3vw, 40px) 72px;
 }

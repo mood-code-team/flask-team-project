@@ -19,7 +19,7 @@
       {% endif %}
     {% endwith %}
 
-    {% if next_url == '/admin' %}
+    {% if next_url.startswith('/admin') %}
     <p class="auth-promo auth-promo--admin">관리자 로그인 — 아이디 <strong>gygs1010</strong></p>
     {% elif next_url and ('/payment' in next_url or '/order' in next_url) %}
     {# 결제·주문 흐름 — 가입 유도 문구 생략 #}

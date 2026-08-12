@@ -69,7 +69,10 @@ def calculate_order_totals(
     """주문 금액 미리 계산."""
     cart_totals = compute_cart_totals(lines)
     product_total = cart_totals["product_total"]
-    shipping_fee = cart_totals["shipping_fee"]
+    original_total = cart_totals["original_total"]
+    discount_total = cart_totals["discount_total"]
+    base_shipping_fee = cart_totals["shipping_fee"]
+    shipping_fee = base_shipping_fee
     coupon_discount = 0
     shipping_discount = 0
     coupon_app: CouponApplication | None = None
@@ -79,11 +82,11 @@ def calculate_order_totals(
             user_id=user_id,
             user_coupon_id=user_coupon_id,
             product_total=product_total,
-            shipping_fee=shipping_fee,
+            shipping_fee=base_shipping_fee,
         )
         coupon_discount = coupon_app.product_discount
         shipping_discount = coupon_app.shipping_discount
-        shipping_fee = max(shipping_fee - shipping_discount, 0)
+        shipping_fee = max(base_shipping_fee - shipping_discount, 0)
 
     payable_product = max(product_total - coupon_discount, 0)
     if user_id and point_used > 0:
@@ -95,9 +98,13 @@ def calculate_order_totals(
 
     total_amount = max(payable_product - point_used, 0) + shipping_fee
     return {
+        "original_total": original_total,
         "product_total": product_total,
+        "discount_total": discount_total,
+        "base_shipping_fee": base_shipping_fee,
         "shipping_fee": shipping_fee,
         "coupon_discount": coupon_discount,
+        "shipping_discount": shipping_discount,
         "point_used": point_used,
         "total_amount": total_amount,
         "coupon_app": coupon_app,

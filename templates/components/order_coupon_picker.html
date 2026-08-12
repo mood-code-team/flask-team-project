@@ -1,0 +1,88 @@
+{# Mood Code 주문 쿠폰 선택 #}
+<div class="order-coupon">
+  <input type="hidden" name="user_coupon_id" id="user-coupon" value="{{ form.user_coupon_id }}">
+
+  <button type="button" class="order-coupon__trigger" id="order-coupon-open" aria-haspopup="dialog" aria-controls="order-coupon-modal">
+    <span class="order-coupon__trigger-label">쿠폰</span>
+    <span class="order-coupon__trigger-value" id="order-coupon-summary">
+      {% if selected_coupon %}
+        {{ selected_coupon.title }}
+        {% if selected_coupon.estimated_discount > 0 %}
+          (−{{ selected_coupon.estimated_discount | currency }}원)
+        {% endif %}
+      {% else %}
+        사용 가능 {{ coupon_options | selectattr('is_usable') | list | length }}장 · 쿠폰 선택
+      {% endif %}
+    </span>
+    <span class="order-coupon__trigger-arrow" aria-hidden="true">›</span>
+  </button>
+
+  <div class="order-coupon-modal" id="order-coupon-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="order-coupon-modal-title">
+    <div class="order-coupon-modal__overlay" data-coupon-close></div>
+    <div class="order-coupon-modal__panel">
+      <header class="order-coupon-modal__head">
+        <h3 id="order-coupon-modal-title">쿠폰 선택</h3>
+        <button type="button" class="order-coupon-modal__close" data-coupon-close aria-label="닫기">×</button>
+      </header>
+
+      <div class="order-coupon-modal__body">
+        <p class="order-coupon-modal__hint">사용 가능 <strong>{{ coupon_options | selectattr('is_usable') | list | length }}</strong>장 / 보유 {{ coupon_options | length }}장</p>
+
+        <ul class="order-coupon-list" role="radiogroup" aria-label="보유 쿠폰">
+          <li class="order-coupon-card{% if not form.user_coupon_id %} is-selected{% endif %}">
+            <label class="order-coupon-card__label">
+              <input type="radio" name="order_coupon_choice" value="" class="order-coupon-card__radio"{% if not form.user_coupon_id %} checked{% endif %}>
+              <span class="order-coupon-card__main">
+                <span class="order-coupon-card__amount">사용 안 함</span>
+                <span class="order-coupon-card__title">쿠폰을 적용하지 않습니다</span>
+              </span>
+            </label>
+          </li>
+
+          {% for coupon in coupon_options %}
+          <li class="order-coupon-card{% if not coupon.is_usable %} is-disabled{% endif %}{% if form.user_coupon_id == coupon.user_coupon_id|string %} is-selected{% endif %}">
+            <label class="order-coupon-card__label">
+              <input
+                type="radio"
+                name="order_coupon_choice"
+                value="{{ coupon.user_coupon_id }}"
+                class="order-coupon-card__radio"
+                data-title="{{ coupon.title }}"
+                data-estimated="{{ coupon.estimated_discount }}"
+                {% if form.user_coupon_id == coupon.user_coupon_id|string %}checked{% endif %}
+                {% if not coupon.is_usable %}disabled{% endif %}
+              >
+              <span class="order-coupon-card__main">
+                <span class="order-coupon-card__amount">
+                  {% if coupon.discount_type == 'shipping' %}
+                    배송비 {% if coupon.estimated_discount > 0 %}−{{ coupon.estimated_discount | currency }}원{% else %}무료{% endif %}
+                  {% elif coupon.discount_type == 'percent' %}
+                    {{ coupon.discount_label }} 할인
+                  {% else %}
+                    {{ coupon.discount_label }}
+                  {% endif %}
+                </span>
+                <span class="order-coupon-card__title">{{ coupon.title }}</span>
+                <span class="order-coupon-card__desc">{{ coupon.description }}</span>
+                <span class="order-coupon-card__meta">
+                  {% if coupon.min_amount > 0 %}{{ coupon.min_amount | currency }}원 이상{% else %}금액 제한 없음{% endif %}
+                  · {{ coupon.expires_at }}까지
+                </span>
+                {% if not coupon.is_usable and coupon.unusable_reason %}
+                <span class="order-coupon-card__warn">{{ coupon.unusable_reason }}</span>
+                {% elif coupon.is_usable and coupon.estimated_discount > 0 %}
+                <span class="order-coupon-card__save">적용 시 −{{ coupon.estimated_discount | currency }}원</span>
+                {% endif %}
+              </span>
+            </label>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <footer class="order-coupon-modal__foot">
+        <button type="button" class="cart-page__btn cart-page__btn--primary cart-page__btn--full" id="order-coupon-apply">적용하기</button>
+      </footer>
+    </div>
+  </div>
+</div>

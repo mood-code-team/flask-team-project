@@ -13,7 +13,8 @@
     if (!input || !checkbox || !form) return;
 
     const saved = localStorage.getItem(STORAGE_KEY);
-    const isAdminLogin = new URLSearchParams(window.location.search).get("next") === "/admin";
+    const nextParam = new URLSearchParams(window.location.search).get("next") || "";
+    const isAdminLogin = nextParam.startsWith("/admin");
     if (saved && !isAdminLogin) {
       input.value = saved;
       checkbox.checked = true;
