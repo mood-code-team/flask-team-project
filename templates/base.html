@@ -1,6 +1,7 @@
 {# Mood Code 공통 레이아웃 #}
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,13 +32,8 @@
   <header class="site-header" id="site-header">
     <div class="header-inner">
       <a href="{{ url_for('main.index') }}" class="logo" aria-label="Mood Code 홈">
-        <img
-          class="logo__icon"
-          src="{{ url_for('static', filename='images/mood-code-icon.svg') }}"
-          width="28"
-          height="28"
-          alt=""
-        >
+        <img class="logo__icon" src="{{ url_for('static', filename='images/mood-code-icon.svg') }}" width="28"
+          height="28" alt="">
         <span class="logo__stack">
           <span class="logo__text">Mood Code</span>
         </span>
@@ -45,19 +41,23 @@
 
       <nav class="main-nav" aria-label="Season menu">
         {% for item in season_nav %}
-          {% if item.mode == 'filter' %}
-            <a href="{{ item.href }}"{% if item.is_active %} class="is-active" aria-current="true"{% endif %}>{{ item.label }}</a>
-          {% else %}
-            <a href="{{ item.href }}" data-scroll-target="{{ item.scroll_target }}"{% if item.is_active %} class="is-active" aria-current="true"{% endif %}>{{ item.label }}</a>
-          {% endif %}
+        {% if item.mode == 'filter' %}
+        <a href="{{ item.href }}" {% if item.is_active %} class="is-active" aria-current="true" {% endif %}>{{
+          item.label }}</a>
+        {% else %}
+        <a href="{{ item.href }}" data-scroll-target="{{ item.scroll_target }}" {% if item.is_active %}
+          class="is-active" aria-current="true" {% endif %}>{{ item.label }}</a>
+        {% endif %}
         {% endfor %}
       </nav>
 
       <div class="header-utils">
-        <button type="button" class="util-btn search-toggle" id="search-toggle" aria-label="검색" aria-expanded="false" aria-controls="search-panel">
-          <svg class="util-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6.5"/>
-            <path d="M16 16l5.5 5.5"/>
+        <button type="button" class="util-btn search-toggle" id="search-toggle" aria-label="검색" aria-expanded="false"
+          aria-controls="search-panel">
+          <svg class="util-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"
+            aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5" />
+            <path d="M16 16l5.5 5.5" />
           </svg>
         </button>
         <a
@@ -72,27 +72,34 @@
           </svg>
           <span class="util-wishlist__count" aria-hidden="true">{{ wishlist_count }}</span>
         </a>
-        <button type="button" class="util-btn util-cart" id="cart-toggle" aria-label="장바구니 {{ cart_count }}개" aria-expanded="false" aria-controls="cart-drawer">
-          <svg class="util-btn__icon util-cart__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 3h2"/>
-            <path d="M5 3l1.2 3"/>
-            <path d="M6.2 6h11.6l-1.4 9.2a1.2 1.2 0 01-1.18 1H8.78a1.2 1.2 0 01-1.18-1L6.2 6z"/>
-            <circle cx="9.5" cy="19" r="1"/>
-            <circle cx="17" cy="19" r="1"/>
+        <button type="button" class="util-btn util-cart" id="cart-toggle" aria-label="장바구니 {{ cart_count }}개"
+          aria-expanded="false" aria-controls="cart-drawer">
+          <svg class="util-btn__icon util-cart__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 3h2" />
+            <path d="M5 3l1.2 3" />
+            <path d="M6.2 6h11.6l-1.4 9.2a1.2 1.2 0 01-1.18 1H8.78a1.2 1.2 0 01-1.18-1L6.2 6z" />
+            <circle cx="9.5" cy="19" r="1" />
+            <circle cx="17" cy="19" r="1" />
           </svg>
           <span class="util-cart__count" aria-hidden="true">{{ cart_count }}</span>
         </button>
-        <a href="{% if current_user.is_authenticated %}{{ url_for('mypage.index') }}{% else %}{{ url_for('auth.login') }}{% endif %}" class="util-btn" aria-label="{% if current_user.is_authenticated %}{{ current_user.full_name or current_user.username }}님 마이페이지{% else %}로그인{% endif %}">
-          <svg class="util-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
-            <circle cx="12" cy="8" r="3.5"/>
-            <path d="M5.5 20c0-3.5 2.9-6 6.5-6s6.5 2.5 6.5 6"/>
+        <a href="{% if current_user.is_authenticated %}{{ url_for('mypage.index') }}{% else %}{{ url_for('auth.login') }}{% endif %}"
+          class="util-btn"
+          aria-label="{% if current_user.is_authenticated %}{{ current_user.full_name or current_user.username }}님 마이페이지{% else %}로그인{% endif %}">
+          <svg class="util-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"
+            aria-hidden="true">
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5.5 20c0-3.5 2.9-6 6.5-6s6.5 2.5 6.5 6" />
           </svg>
         </a>
-        <button type="button" class="util-btn menu-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="side-menu">
-          <svg class="util-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
-            <path d="M4 7h16"/>
-            <path d="M4 12h16"/>
-            <path d="M4 17h16"/>
+        <button type="button" class="util-btn menu-toggle" aria-label="메뉴 열기" aria-expanded="false"
+          aria-controls="side-menu">
+          <svg class="util-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"
+            aria-hidden="true">
+            <path d="M4 7h16" />
+            <path d="M4 12h16" />
+            <path d="M4 17h16" />
           </svg>
         </button>
       </div>
@@ -104,26 +111,22 @@
   <div class="search-panel" id="search-panel" aria-hidden="true">
     <div class="search-panel__header">
       <button type="button" class="search-panel__close" id="search-panel-close" aria-label="닫기">
-        <svg class="panel-close__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18"/>
+        <svg class="panel-close__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.5" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </button>
     </div>
     <form class="search-panel__form" action="{{ url_for('search.results') }}" method="get" role="search">
       <label class="search-panel__label" for="search-input">통합 검색어</label>
       <div class="search-panel__field">
-        <input
-          id="search-input"
-          class="search-panel__input"
-          type="search"
-          name="q"
-          value=""
-          placeholder="브랜드, 상품명을 입력하세요"
-          autocomplete="off"
-          required
-        >
+        <input id="search-input" class="search-panel__input" type="search" name="q" value=""
+          placeholder="브랜드, 상품명을 입력하세요" autocomplete="off" required>
         <button type="submit" class="search-panel__submit" aria-label="검색">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3-3" />
+          </svg>
         </button>
       </div>
     </form>
@@ -131,7 +134,7 @@
       <span class="search-panel__keywords-title">추천 검색어</span>
       <div class="search-panel__chips">
         {% for keyword in recommended_keywords %}
-          <button type="button" class="search-chip" data-keyword="{{ keyword }}">{{ keyword }}</button>
+        <button type="button" class="search-chip" data-keyword="{{ keyword }}">{{ keyword }}</button>
         {% endfor %}
       </div>
     </div>
@@ -142,8 +145,9 @@
   <aside class="side-menu" id="side-menu" aria-hidden="true">
     <div class="side-menu__header">
       <button type="button" class="side-menu__close" id="side-menu-close" aria-label="닫기">
-        <svg class="panel-close__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18"/>
+        <svg class="panel-close__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.5" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </button>
     </div>
@@ -151,9 +155,11 @@
     <nav class="side-menu__nav">
       <div class="side-menu__group side-menu__group--products">
         {% if side_menu_categories %}
-        <a href="{{ url_for('category.listing', slug=side_menu_categories[0].slug) }}" class="side-menu__title side-menu__title-link">상품목록</a>
+        <a href="{{ url_for('category.listing', slug=side_menu_categories[0].slug) }}"
+          class="side-menu__title side-menu__title-link">상품목록</a>
         {% else %}
-        <a href="{{ url_for('category.listing', slug='light') }}" class="side-menu__title side-menu__title-link">상품목록</a>
+        <a href="{{ url_for('category.listing', slug='light') }}"
+          class="side-menu__title side-menu__title-link">상품목록</a>
         {% endif %}
         {% include "components/side_menu_categories.html" %}
       </div>
@@ -163,7 +169,8 @@
           {% if current_user.is_authenticated %}
           <li class="side-menu__user">{{ current_user.full_name or current_user.username }}님</li>
           <li><a href="{{ url_for('mypage.index') }}">마이페이지</a></li>
-          <li><a href="{{ url_for('mypage.wishlist') }}">위시리스트 (<span class="side-menu__wishlist-count">{{ wishlist_count }}</span>)</a></li>
+          <li><a href="{{ url_for('mypage.wishlist') }}">위시리스트 (<span class="side-menu__wishlist-count">{{
+                wishlist_count }}</span>)</a></li>
           <li><a href="{{ url_for('auth.logout') }}">로그아웃</a></li>
           {% else %}
           <li><a href="{{ url_for('auth.login') }}">로그인</a></li>
@@ -180,8 +187,9 @@
   <aside class="cart-drawer" id="cart-drawer" aria-hidden="true" aria-label="장바구니">
     <div class="cart-drawer__header">
       <button type="button" class="cart-drawer__close" id="cart-drawer-close" aria-label="닫기">
-        <svg class="panel-close__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18"/>
+        <svg class="panel-close__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.5" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </button>
     </div>
@@ -214,7 +222,8 @@
 
   {# ---- 위시리스트 담기 확인 모달 ---- #}
   <div class="wishlist-modal-overlay" id="wishlist-modal-overlay" hidden aria-hidden="true">
-    <div class="wishlist-modal" id="wishlist-modal" role="dialog" aria-modal="true" aria-labelledby="wishlist-modal-title">
+    <div class="wishlist-modal" id="wishlist-modal" role="dialog" aria-modal="true"
+      aria-labelledby="wishlist-modal-title">
       <header class="wishlist-modal__header">
         <span class="wishlist-modal__title" id="wishlist-modal-title">WISHLIST</span>
         <button type="button" class="wishlist-modal__close" id="wishlist-modal-close">CLOSE</button>
@@ -248,13 +257,13 @@
   </div>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-          <div class="flash flash-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
+  {% if messages %}
+  <div class="flash-messages">
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
   {% endwith %}
 
   <main class="site-main">
@@ -297,9 +306,11 @@
           <p class="footer-newsletter__title">가입하고 프로모션 & 최신정보 받기</p>
           <form class="footer-newsletter" id="footer-newsletter-form" action="#" method="post" novalidate>
             <label class="visually-hidden" for="footer-name">이름</label>
-            <input id="footer-name" class="footer-newsletter__input" type="text" name="name" placeholder="이름" autocomplete="name">
+            <input id="footer-name" class="footer-newsletter__input" type="text" name="name" placeholder="이름"
+              autocomplete="name">
             <label class="visually-hidden" for="footer-email">이메일</label>
-            <input id="footer-email" class="footer-newsletter__input" type="email" name="email" placeholder="이메일" autocomplete="email" required>
+            <input id="footer-email" class="footer-newsletter__input" type="email" name="email" placeholder="이메일"
+              autocomplete="email" required>
             <button type="submit" class="footer-newsletter__submit">SUBSCRIBE</button>
           </form>
         </div>
@@ -325,18 +336,22 @@
   {# 플로팅 버튼 #}
   <div class="floating-actions">
     <button type="button" class="float-btn float-btn--light" id="scroll-top-btn" aria-label="맨 위로">
-      <svg class="float-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-        <path d="M7 8h10"/>
-        <path d="M12 17V8"/>
-        <path d="M8 12l4-4 4 4"/>
+      <svg class="float-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.5" aria-hidden="true">
+        <path d="M7 8h10" />
+        <path d="M12 17V8" />
+        <path d="M8 12l4-4 4 4" />
       </svg>
     </button>
-    <button type="button" class="float-btn float-btn--chat" id="chat-launcher-btn" aria-label="고객센터" data-chat-url="{{ url_for('support.center') }}">
+    <button type="button" class="float-btn float-btn--chat" id="chat-launcher-btn" aria-label="고객센터"
+      data-chat-url="{{ url_for('support.center') }}">
       <svg class="float-btn__icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 5.5h12a2.5 2.5 0 012.5 2.5v6.5a2.5 2.5 0 01-2.5 2.5H11l-3.5 2.8V17H6a2.5 2.5 0 01-2.5-2.5V8a2.5 2.5 0 012.5-2.5z" fill="#fff"/>
-        <circle cx="9" cy="11.5" r="1" fill="#333"/>
-        <circle cx="12" cy="11.5" r="1" fill="#333"/>
-        <circle cx="15" cy="11.5" r="1" fill="#333"/>
+        <path
+          d="M6 5.5h12a2.5 2.5 0 012.5 2.5v6.5a2.5 2.5 0 01-2.5 2.5H11l-3.5 2.8V17H6a2.5 2.5 0 01-2.5-2.5V8a2.5 2.5 0 012.5-2.5z"
+          fill="#fff" />
+        <circle cx="9" cy="11.5" r="1" fill="#333" />
+        <circle cx="12" cy="11.5" r="1" fill="#333" />
+        <circle cx="15" cy="11.5" r="1" fill="#333" />
       </svg>
     </button>
   </div>
@@ -358,4 +373,5 @@
   <script src="{{ url_for('static', filename='js/inquiry-modal.js') }}?v=20260801a"></script>
   {% block extra_js %}{% endblock %}
 </body>
+
 </html>

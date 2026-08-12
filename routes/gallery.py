@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, abort, jsonify, render_template, request
+from flask import Blueprint, abort, render_template, request
 
 from services.gallery_service import (
     CATEGORY_TO_MOOD_KEY,
@@ -127,56 +127,3 @@ def mood_gallery():
         ),
     )
 
-
-@gallery_bp.route("/api/gallery/hotspot", methods=["POST"])
-def save_hotspot():
-    data = request.get_json(silent=True) or {}
-
-    scene_code = (data.get("scene_code") or "").strip()
-    product_code = (data.get("product_code") or "").strip()
-    x = data.get("x")
-    y = data.get("y")
-
-    if not scene_code or not product_code:
-        return jsonify({
-            "ok": False,
-            "error": "scene_code 또는 product_code가 없습니다."
-        }), 400
-
-    try:
-        x = float(x)
-        y = float(y)
-    except (TypeError, ValueError):
-        return jsonify({
-            "ok": False,
-            "error": "x, y 좌표가 올바르지 않습니다."
-        }), 400
-
-    if not (0 <= x <= 100 and 0 <= y <= 100):
-        return jsonify({
-            "ok": False,
-            "error": "좌표는 0~100 사이여야 합니다."
-        }), 400
-
-    from services.gallery_service import save_manual_hotspot
-
-    saved = save_manual_hotspot(
-        scene_code=scene_code,
-        product_code=product_code,
-        x=x,
-        y=y,
-    )
-
-    if not saved:
-        return jsonify({
-            "ok": False,
-            "error": "핫스팟 저장에 실패했습니다."
-        }), 500
-
-    return jsonify({
-        "ok": True,
-        "scene_code": scene_code,
-        "product_code": product_code,
-        "x": x,
-        "y": y,
-    })

@@ -40,30 +40,22 @@
 /* + 버튼 */
 .scene-hotspot {
   position: absolute;
-
-  width: 34px;
-  height: 34px;
-
+  width: 20px;
+  height: 20px;
   padding: 0;
   margin: 0;
-
   transform: translate(-50%, -50%);
-
   border: 0;
   border-radius: 50%;
-
   background-color: #168bd2;
   color: #fff;
-
   font-family: Arial, sans-serif;
-  font-size: 23px;
+  font-size: 16px;
   font-weight: 300;
-  line-height: 34px;
+  line-height: 20px;
   text-align: center;
-
   cursor: pointer;
   z-index: 20;
-
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
@@ -141,35 +133,4 @@
   transform: scale(1.05);
   border-color: #bbb;
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.1);
-}
-
-.scene-product-card.is-selected {
-  outline: 3px solid #168bd2;
-  outline-offset: 3px;
-}
-
-.scene-detail__image-wrap.is-editing-hotspot {
-  cursor: crosshair;
-}
-
-.scene-detail__image-wrap.is-editing-hotspot::after {
-  content: "상품 위치를 클릭하세요";
-
-  position: absolute;
-  left: 16px;
-  top: 16px;
-
-  padding: 8px 12px;
-
-  background: rgba(0, 0, 0, 0.72);
-  color: #fff;
-
-  border-radius: 4px;
-
-  font-size: 12px;
-  font-weight: 600;
-
-  pointer-events: none;
-
-  z-index: 30;
 }

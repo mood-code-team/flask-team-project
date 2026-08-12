@@ -100,7 +100,7 @@ GALLERY_MOODS: list[tuple[str, str]] = [
 MOOD_DETAIL: dict[str, dict] = {
     "bloom": {
         "title": "BLOOM",
-        "subtitle": "화사한 햇살과 가벼운 소재로 공간에 리듬을 더합니다.",
+        "subtitle": "산뜻한 파스텔 톤과 부드러운 우드가 어우러져 마음까지 맑아지는 공간을 선사합니다.",
         "highlights": [
             ("파스텔 & 라이트 우드", "베이지·민트 패브릭 레이어드로 공간을 가볍게."),
             ("자연광 커튼", "테이블·플로어 조명을 함께 쓰면 저녁 무드 유지."),
@@ -115,7 +115,7 @@ MOOD_DETAIL: dict[str, dict] = {
     },
     "clear": {
         "title": "CLEAR",
-        "subtitle": "시원한 청량감과 투명한 유리 소재로 공간을 시원하게 채웁니다.",
+        "subtitle": "군더더기 없는 쿨톤 컬러감으로 공간을 한층 더 개운하고 넓어 보이게 연출합니다.",
         "highlights": [
             ("쿨 화이트 & 씨글라스", "블루와 아쿠아 톤으로 시원하고 깨끗한 무드 연출."),
             ("시트러스 포인트", "싱그러운 노란색 소품으로 활기찬 여름 분위기 완성."),
@@ -130,7 +130,7 @@ MOOD_DETAIL: dict[str, dict] = {
     },
     "calm": {
         "title": "CALM",
-        "subtitle": "깊이 있는 우드와 따뜻한 오트밀 컬러로 아늑함을 선사합니다.",
+        "subtitle": "선명한 대비와 모던한 무드로 현대적이고 감각적인 라이프스타일을 연출합니다.",
         "highlights": [
             ("오트밀 & 올리브", "차분한 자연 톤으로 마음이 편안해지는 공간 밸런스."),
             ("러스틱 텍스처", "월넛과 러스트 컬러 포인트로 깊이 있는 감성 유지."),
@@ -340,111 +340,6 @@ def get_hotspots(scene_code: str) -> dict[str, dict]:
 
     return hotspots
 
-def save_manual_hotspot(
-    scene_code: str,
-    product_code: str,
-    x: float,
-    y: float,
-) -> bool:
-    """수동으로 수정한 핫스팟 좌표를 CSV에 저장."""
-    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
-
-    if not hotspot_file.is_file():
-        return False
-
-    rows = []
-
-    with hotspot_file.open(
-        encoding="utf-8-sig",
-        newline="",
-    ) as handle:
-        reader = csv.DictReader(handle)
-        fieldnames = reader.fieldnames or []
-
-        for row in reader:
-            rows.append(row)
-
-    required_fields = [
-        "scene_code",
-        "product_code",
-        "product_type",
-        "x",
-        "y",
-        "confidence",
-        "status",
-    ]
-
-    for field in required_fields:
-        if field not in fieldnames:
-            fieldnames.append(field)
-
-    found = False
-
-    for row in rows:
-        if (
-            (row.get("scene_code") or "").strip() == scene_code
-            and
-            (row.get("product_code") or "").strip() == product_code
-        ):
-            row["x"] = f"{x:.1f}"
-            row["y"] = f"{y:.1f}"
-            row["confidence"] = "1.0"
-            row["status"] = "manual"
-            found = True
-            break
-
-    # 기존 failed 행이 없거나 아예 행 자체가 없는 경우
-    if not found:
-        rows.append({
-            "scene_code": scene_code,
-            "product_code": product_code,
-            "product_type": "",
-            "x": f"{x:.1f}",
-            "y": f"{y:.1f}",
-            "confidence": "1.0",
-            "status": "manual",
-        })
-
-    with hotspot_file.open(
-        "w",
-        encoding="utf-8-sig",
-        newline="",
-    ) as handle:
-
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=fieldnames,
-        )
-
-        writer.writeheader()
-        writer.writerows(rows)
-
-    return True
-
-
-def get_scene_detail(scene_code: str) -> dict | None:
-    items = get_all_products()
-
-    for item in items:
-        if item.get("scene_code") != scene_code:
-            continue
-
-        hotspots = get_hotspots(scene_code)
-
-        for product in item.get("products", []):
-            product_code = product.get("code")
-            hotspot = hotspots.get(product_code)
-
-            if hotspot:
-                product["hotspot_x"] = hotspot["x"]
-                product["hotspot_y"] = hotspot["y"]
-                product["hotspot_confidence"] = hotspot["confidence"]
-
-        return item
-
-    return None
-
-
 def get_space_products(space: str, season: str) -> list[dict]:
     products: list[dict] = []
     csv_file = _csv_path(space)
@@ -577,3 +472,26 @@ def build_space_detail_meta(season: str) -> dict:
         "colors": [color["hex"] for color in palette],
         "color_desc": ", ".join(color["name_en"] for color in palette),
     }
+
+def get_scene_detail(scene_code: str) -> dict | None:
+    items = get_all_products()
+
+    for item in items:
+        if item.get("scene_code") != scene_code:
+            continue
+
+        hotspots = get_hotspots(scene_code)
+
+        for product in item.get("products", []):
+            product_code = product.get("code")
+            hotspot = hotspots.get(product_code)
+
+            if hotspot:
+                product["hotspot_x"] = hotspot["x"]
+                product["hotspot_y"] = hotspot["y"]
+                product["hotspot_confidence"] = hotspot["confidence"]
+
+        return item
+
+    return None
+
