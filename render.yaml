@@ -1,0 +1,20 @@
+# Render Blueprint — GitHub main 브랜치 연결 후 자동 배포
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: mood-code
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SOCIAL_DEMO_LOGIN
+        value: "true"
+      - key: PYTHON_VERSION
+        value: 3.12.8

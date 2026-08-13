@@ -23,16 +23,26 @@ except ImportError:
     pass
 
 
+def _normalize_database_url(url: str) -> str:
+    """Render PostgreSQL URL은 postgres:// 로 오므로 SQLAlchemy용으로 변환."""
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql://", 1)
+    return url
+
+
+def _default_sqlite_uri() -> str:
+    return f"sqlite:///{DATABASE_DIR / 'shop.db'}"
+
+
 class Config:
     """공통 설정."""
 
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-interior-shop-secret-key-change-in-prod")
     JSON_AS_ASCII = False
 
-    # SQLAlchemy — database/shop.db (개발용 SQLite)
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL",
-        f"sqlite:///{DATABASE_DIR / 'shop.db'}",
+    # SQLAlchemy — database/shop.db (개발용 SQLite) / Render는 DATABASE_URL 주입
+    SQLALCHEMY_DATABASE_URI = _normalize_database_url(
+        os.environ.get("DATABASE_URL", _default_sqlite_uri())
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = os.environ.get("SQLALCHEMY_ECHO", "false").lower() == "true"
