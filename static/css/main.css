@@ -10,7 +10,7 @@
 
 .hero-ad__bridge {
   position: absolute;
-  top: var(--header-height);
+  top: calc(var(--top-banner-height) + var(--header-height));
   left: calc(clamp(16px, 3vw, 32px) + 13px);
   z-index: 1;
   width: 1px;
@@ -27,7 +27,7 @@
   position: absolute;
   z-index: 12;
   left: clamp(24px, 5vw, 80px);
-  top: calc(var(--header-height) + clamp(40px, 7vw, 72px));
+  top: calc(var(--top-banner-height) + var(--header-height) + clamp(40px, 7vw, 72px));
   max-width: min(520px, 86vw);
   color: #fff;
   pointer-events: none;
@@ -43,6 +43,7 @@
   opacity: 0.86;
   margin-bottom: 22px;
   max-width: 32ch;
+  white-space: nowrap;
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.38);
   transition: opacity 0.45s var(--ease-out-soft), transform 0.45s var(--ease-out-soft);
   white-space: nowrap;
@@ -192,7 +193,7 @@
   bottom: clamp(72px, 12vw, 140px);
   z-index: 2;
   margin: 0;
-  max-width: min(340px, 42vw);
+  max-width: min(500px, 60vw);
   font-size: clamp(28px, 5.5vw, 64px);
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -203,6 +204,7 @@
   pointer-events: none;
   user-select: none;
   word-break: keep-all;
+  white-space: nowrap;
 }
 
 /* 슬라이더 컨트롤 */
@@ -445,6 +447,10 @@ body.page-home.mood-hover-chic .site-footer {
 }
 
 /* ===== Gallery entry (메인 MOOD GALLERY) ===== */
+.gallery-entry__item {
+  scroll-margin-top: calc(var(--top-banner-height) + var(--header-height) + 16px);
+}
+
 .gallery-entry {
   padding: 32px clamp(16px, 3vw, 40px) 72px;
 }
@@ -1016,7 +1022,7 @@ body.season-winter .site-footer {
   }
 
   .hero-ad__copy {
-    top: calc(var(--header-height) + 24px);
+    top: calc(var(--top-banner-height) + var(--header-height) + 24px);
     left: 20px;
     max-width: calc(100% - 40px);
   }
@@ -1078,22 +1084,18 @@ body.season-winter .site-footer {
     aspect-ratio: 16 / 10;
   }
 }
+
 /* ============================================================
    상품 카드 하트(좋아요) 버튼 위치 수정
    ============================================================ */
 
 /* 다른 모든 스타일을 무시하고 오른쪽 아래에 강제 고정 */
-.product-item .wish-btn { 
+.product-item .wish-btn {
   position: absolute !important;
-  right: 12px !important;  /* 오른쪽 여백 */
-  
-  /* 🔴 위쪽 고정을 강제로 해제 */
-  top: auto !important; 
-  
-  /* 🟢 아래쪽 고정을 강제 적용 */
-  bottom: 12px !important; 
-  
-  z-index: 10 !important; /* 이미지 위에 오도록 */
+  right: 12px !important;
+  top: auto !important;
+  bottom: 12px !important;
+  z-index: 10 !important;
 }
 
 /* 메인페이지에서만 스크롤 시 상단 프로모션 숨김 */

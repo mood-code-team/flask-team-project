@@ -103,8 +103,19 @@
     smoothScrollTo(0);
   }
 
+  function resolveScrollId(id) {
+    const aliases = {
+      "season-spring": "gallery-bloom",
+      "season-summer": "gallery-clear",
+      "season-autumn": "gallery-calm",
+      "season-fall": "gallery-calm",
+      "season-winter": "gallery-chic",
+    };
+    return aliases[id] || id;
+  }
+
   function scrollToAnchor(id) {
-    const target = document.getElementById(id);
+    const target = document.getElementById(resolveScrollId(id));
     if (!target) return false;
 
     smoothScrollTo(getAnchorScrollY(target), {
@@ -168,7 +179,7 @@
     const hashTarget = window.location.hash.length > 1
       ? window.location.hash.slice(1)
       : null;
-    const id = queryTarget || hashTarget;
+    const id = resolveScrollId(queryTarget || hashTarget || "");
 
     if (!id || !document.getElementById(id)) return;
 

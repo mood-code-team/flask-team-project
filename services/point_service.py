@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from extensions import db
-from models import PointLedger
+from models import Order, PointLedger
 
 
 class PointError(ValueError):

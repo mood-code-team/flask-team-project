@@ -6,70 +6,77 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-/* ===== 무드 상세 (상단 헤더 & 사진 갤러리) ===== */
+/* ===== 무드 상세 (선영 팀 CLEAR / CALM / CHIC 레이아웃) ===== */
 .mood-detail {
   background: #fff;
 }
 
-/* 🟢 사진 그리드가 위치한 전체 폭과 1:1로 일치하도록 컨테이너 폭 조절 */
 .mood-detail__container {
-  max-width: 1050px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 12px clamp(16px, 3vw, 24px) 72px;
+  padding: 32px clamp(16px, 3vw, 24px) 72px;
 }
 
-/* 🟢 헤더: 양 끝 정렬을 통해 컬러팔레트 우측 테두리가 아래 4번째 사진 우측 끝선과 정확히 일치함 */
 .mood-detail__hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  width: 100%;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
-.mood-detail__hero-text {
+.mood-detail__hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 48px);
+}
+
+.mood-detail__hero-copy {
   flex: 1;
-  padding-right: 24px;
+  min-width: 0;
 }
 
 .mood-detail__title {
-  font-size: 36px;
+  font-size: clamp(32px, 4vw, 42px);
   font-weight: 800;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: #111;
   text-transform: uppercase;
   letter-spacing: -0.02em;
 }
 
 .mood-detail__subtitle {
-  font-size: 15px;
+  font-size: 16px;
   color: #555;
   margin-bottom: 0;
-  line-height: 1.5;
-  max-width: 600px;
+  line-height: 1.6;
+  max-width: 640px;
 }
 
-/* 컬러 팔레트 박스 */
-.mood-detail__panel--palette {
+.mood-detail__panel {
   background: #fff;
-  border: 1px solid #e2e2e2;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 10px 16px;
-  flex-shrink: 0;
+  padding: 16px 18px;
+}
+
+.mood-detail__panel--palette {
+  flex: 0 0 min(100%, 320px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .mood-detail__panel-title {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
+  margin-bottom: 0;
+  letter-spacing: 0.08em;
   color: #333;
 }
 
 .mood-detail__palette {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .mood-detail__swatch {
@@ -77,58 +84,135 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  flex: 1;
 }
 
 .mood-detail__swatch-color {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .mood-detail__swatch-label {
   font-size: 10px;
-  color: #666;
+  color: #555;
   font-weight: 500;
   white-space: nowrap;
 }
 
-/* ===== 사진 갤러리 (핀터레스트 가변 높이 메이슨리 배치) ===== */
-.mood-detail__masonry,
+.mood-detail__matrix {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 1.2vw, 14px);
+  align-items: start;
+}
+
+.mood-detail__matrix-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mood-detail__matrix-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.2vw, 14px);
+}
+
+.mood-detail__spaces {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.mood-detail__space-head {
+  margin-bottom: 14px;
+}
+
+.mood-detail__space-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: -0.02em;
+}
+
+.mood-detail__space-subtitle {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #888;
+}
+
+.mood-detail__space-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mood-detail__space-grid .mood-detail__card-img {
+  aspect-ratio: 3 / 2;
+}
+
 .mood-detail__grid {
-  display: block;
-  column-count: 4;
-  column-gap: 16px;
-  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
 .mood-detail__card {
-  break-inside: avoid;
-  margin-bottom: 16px;
   background: transparent;
+  border-radius: 12px;
   overflow: hidden;
-  border-radius: 4px;
 }
 
 .mood-detail__card-img {
   width: 100%;
   overflow: hidden;
-  background: #f5f5f5;
-  border-radius: 4px;
+  background: #eee;
+  border-radius: 12px;
+}
+
+.mood-detail__card-img--sq {
+  aspect-ratio: 1 / 1;
+}
+
+.mood-detail__card-img--tall {
+  aspect-ratio: 3 / 4;
+}
+
+.mood-detail__card-img--xtall {
+  aspect-ratio: 2 / 3;
+}
+
+.mood-detail__card-img--wide {
+  aspect-ratio: 4 / 3;
+}
+
+.mood-detail__card-img--landscape {
+  aspect-ratio: 3 / 2;
+}
+
+.mood-detail__card-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.mood-detail__card-link:hover img {
+  transform: scale(1.02);
 }
 
 .mood-detail__card-img img {
   width: 100%;
-  height: auto;
-  display: block;
+  height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.mood-detail__card:hover img {
-  transform: scale(1.03);
+  display: block;
+  transition: transform 0.25s ease;
 }
 
 /* ===== 무드 탭 네비 ===== */
@@ -140,40 +224,40 @@
 
 .gallery-mood-nav__inner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
-  padding-bottom: 0;
+  gap: 16px 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .gallery-mood-nav__tabs {
   display: flex;
-  align-items: center;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 4px 8px;
 }
 
 .gallery-mood-nav__tab {
-  display: inline-block;
-  padding: 8px 0 12px;
-  font-size: 13px;
+  padding: 10px 4px;
+  margin-right: 12px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #999;
-  text-decoration: none;
+  letter-spacing: 0.12em;
+  color: var(--color-text-light);
   border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
   transition: color 0.2s, border-color 0.2s;
 }
 
 .gallery-mood-nav__tab:hover {
-  color: #111;
+  color: var(--color-text);
 }
 
 .gallery-mood-nav__tab.is-active {
-  color: #111;
-  border-bottom-color: #111;
+  color: var(--color-text);
+  border-bottom-color: var(--color-text);
+  pointer-events: none;
 }
-
 
 /* ===== 갤러리 선택 (카드 그리드) ===== */
 .gallery-picker {
@@ -251,43 +335,32 @@
   padding: 0 8px;
 }
 
-/* ===== 반응형 레이아웃 ===== */
 @media (max-width: 1024px) {
-  .mood-detail__masonry,
-  .mood-detail__grid {
-    column-count: 3;
+  .mood-detail__matrix {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .mood-detail__grid,
   .gallery-picker__grid {
     grid-template-columns: repeat(2, 1fr);
   }
-}
 
-@media (max-width: 768px) {
-  .mood-detail__hero {
+  .mood-detail__hero-top {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
   }
 
   .mood-detail__panel--palette {
+    flex-basis: auto;
     width: 100%;
   }
 }
 
-@media (max-width: 600px) {
-  .mood-detail__masonry,
-  .mood-detail__grid {
-    column-count: 2;
-    column-gap: 10px;
-  }
-
-  .mood-detail__card {
-    margin-bottom: 10px;
-  }
-}
-
 @media (max-width: 540px) {
+  .mood-detail__matrix {
+    grid-template-columns: 1fr;
+  }
+
+  .mood-detail__grid,
   .gallery-picker__grid {
     grid-template-columns: 1fr;
   }
@@ -295,61 +368,9 @@
   .gallery-mood-nav__inner {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
   }
 
   .mood-detail__title {
     font-size: 28px;
   }
 }
-
-/* ===== 핀터레스트/에디토리얼 스타일: 카드별 비율 다변화 ===== */
-
-/* 이미지 채우기 속성 고정 */
-.mood-detail__card-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 비율이 변해도 이미지가 눌리지 않고 깔끔하게 잘림 */
-}
-
-/* 카드 순서(5개 단위 반복)에 따라 세로/가로 비율을 다채롭게 부여 */
-.mood-detail__card:nth-child(5n+1) .mood-detail__card-img {
-  aspect-ratio: 4 / 3;  /* 약간 가로로 넓은 사진 */
-}
-
-.mood-detail__card:nth-child(5n+2) .mood-detail__card-img {
-  aspect-ratio: 3 / 4;  /* 세로로 길쭉한 사진 */
-}
-
-.mood-detail__card:nth-child(5n+3) .mood-detail__card-img {
-  aspect-ratio: 1 / 1;  /* 정사각형 사진 */
-}
-
-.mood-detail__card:nth-child(5n+4) .mood-detail__card-img {
-  aspect-ratio: 2 / 3;  /* 꽤 긴 세로 사진 */
-}
-
-.mood-detail__card:nth-child(5n+5) .mood-detail__card-img {
-  aspect-ratio: 16 / 10; /* 가로 와이드 사진 */
-}
-
-/* ===== 1. 핀터레스트 스타일: 카드별 기본 비율 ===== */
-.mood-detail__card-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mood-detail__card:nth-child(5n+1) .mood-detail__card-img { aspect-ratio: 4 / 3; }
-.mood-detail__card:nth-child(5n+2) .mood-detail__card-img { aspect-ratio: 3 / 4; }
-.mood-detail__card:nth-child(5n+3) .mood-detail__card-img { aspect-ratio: 1 / 1; }
-.mood-detail__card:nth-child(5n+4) .mood-detail__card-img { aspect-ratio: 2 / 3; }
-.mood-detail__card:nth-child(5n+5) .mood-detail__card-img { aspect-ratio: 16 / 10; }
-
-/* ===== 2. 카드 비율 수동 조절 (중복 제거 및 최종값 유지) ===== */
-.mood-detail__card:nth-child(2) .mood-detail__card-img { aspect-ratio: 2 / 3; }   /* 1열 2번 카드 */
-.mood-detail__card:nth-child(4) .mood-detail__card-img { aspect-ratio: 16 / 10; } /* 1열 4번 카드 */
-.mood-detail__card:nth-child(5) .mood-detail__card-img { aspect-ratio: 4 / 3; } /* 1열 5번 카드 */
-.mood-detail__card:nth-child(8) .mood-detail__card-img { aspect-ratio: 2 / 2.1; }   /* 2열 8번 카드 */
-.mood-detail__card:nth-child(12) .mood-detail__card-img { aspect-ratio: 1 / 1; }  /* 3열 12번 카드 */
-.mood-detail__card:nth-child(16) .mood-detail__card-img { aspect-ratio: 4 / 3; }  /* 4열 16번 카드 */

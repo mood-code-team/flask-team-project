@@ -17,22 +17,37 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 os.chdir(PROJECT_DIR)
 
+from scripts.preflight_server import ensure_server_ready
+
+ensure_server_ready(PROJECT_DIR)
+
 from app import create_app
 
 HOST = "127.0.0.1"
 PORT = 5000
-OPEN_PATH = os.environ.get("MOODCODE_OPEN_URL", "/").strip() or "/"
-if not OPEN_PATH.startswith("/"):
-    OPEN_PATH = f"/{OPEN_PATH}"
-URL = f"http://{HOST}:{PORT}{OPEN_PATH}"
 USE_RELOADER = os.environ.get("FLASK_USE_RELOADER", "0") == "1"
 _browser_opened = False
 
 
+def _browser_path() -> str:
+    """실행_관리자.bat 등에서 MOODCODE_OPEN_URL=/admin/ 로 지정 가능."""
+    path = (os.environ.get("MOODCODE_OPEN_URL") or "/").strip() or "/"
+    if not path.startswith("/"):
+        path = f"/{path}"
+    return path
+
+
+def _server_url() -> str:
+    return f"http://{HOST}:{PORT}/"
+
+
+def _browser_url() -> str:
+    return f"http://{HOST}:{PORT}{_browser_path()}"
+
+
 def _server_ready() -> bool:
-    probe = f"http://{HOST}:{PORT}/"
     try:
-        with urllib.request.urlopen(probe, timeout=1) as response:
+        with urllib.request.urlopen(_server_url(), timeout=1) as response:
             return response.status < 500
     except (urllib.error.URLError, TimeoutError, OSError):
         return False
@@ -53,11 +68,12 @@ def open_browser() -> None:
         return
     _browser_opened = True
 
+    target = _browser_url()
     if sys.platform == "win32":
-        os.startfile(URL)  # type: ignore[attr-defined]
+        os.startfile(target)  # type: ignore[attr-defined]
         return
 
-    webbrowser.open(URL)
+    webbrowser.open(target)
 
 
 def should_open_browser() -> bool:

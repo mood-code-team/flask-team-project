@@ -288,6 +288,58 @@ def get_all_products(*, space: str | None = None) -> list[dict]:
                 )
     return products
 
+def get_hotspots(scene_code: str) -> dict[str, dict]:
+    """scene_code에 해당하는 상품별 핫스팟 좌표를 반환."""
+    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
+
+    if not hotspot_file.is_file():
+        return {}
+
+    hotspots = {}
+
+    with hotspot_file.open(
+        encoding="utf-8-sig",
+        newline="",
+    ) as handle:
+
+        reader = csv.DictReader(handle)
+
+        for row in reader:
+
+            if row.get("scene_code") != scene_code:
+                continue
+
+            product_code = (row.get("product_code") or "").strip()
+
+            if not product_code:
+                continue
+
+            # 탐지 상태
+            status = (row.get("status") or "").strip()
+
+            # FAILED는 좌표가 없으므로 건너뛰기
+            if status == "failed":
+                continue
+
+            x_value = (row.get("x") or "").strip()
+            y_value = (row.get("y") or "").strip()
+
+            # 혹시 좌표가 비어 있으면 안전하게 건너뛰기
+            if not x_value or not y_value:
+                continue
+
+            confidence_value = (
+                row.get("confidence") or "0"
+            ).strip()
+
+            hotspots[product_code] = {
+                "x": float(x_value),
+                "y": float(y_value),
+                "confidence": float(confidence_value),
+                "status": status,
+            }
+
+    return hotspots
 
 def get_space_products(space: str, season: str) -> list[dict]:
     products: list[dict] = []
@@ -351,6 +403,7 @@ def get_mood_gallery_sections(category: str) -> list[dict]:
                 "space": space,
                 "label": SPACE_META[space],
                 "label_en": SPACE_META_EN[space],
+                "item": space_items[0],
                 "scenes": space_items[:4],
             }
         )
@@ -403,55 +456,6 @@ def build_space_detail_meta(season: str) -> dict:
         "colors": [color["hex"] for color in palette],
         "color_desc": ", ".join(color["name_en"] for color in palette),
     }
-
-def get_hotspots(scene_code: str) -> dict[str, dict]:
-    """scene_code에 해당하는 상품별 핫스팟 좌표를 반환."""
-    hotspot_file = ROOT / "static" / "csv" / "gallery_hotspots.csv"
-
-    if not hotspot_file.is_file():
-        return {}
-
-    hotspots = {}
-
-    with hotspot_file.open(
-        encoding="utf-8-sig",
-        newline="",
-    ) as handle:
-        reader = csv.DictReader(handle)
-
-        for row in reader:
-            if row.get("scene_code") != scene_code:
-                continue
-
-            product_code = (row.get("product_code") or "").strip()
-
-            if not product_code:
-                continue
-
-            status = (row.get("status") or "").strip()
-
-            if status == "failed":
-                continue
-
-            x_value = (row.get("x") or "").strip()
-            y_value = (row.get("y") or "").strip()
-
-            if not x_value or not y_value:
-                continue
-
-            confidence_value = (
-                row.get("confidence") or "0"
-            ).strip()
-
-            hotspots[product_code] = {
-                "x": float(x_value),
-                "y": float(y_value),
-                "confidence": float(confidence_value),
-                "status": status,
-            }
-
-    return hotspots
-
 
 def get_scene_detail(scene_code: str) -> dict | None:
     items = get_all_products()

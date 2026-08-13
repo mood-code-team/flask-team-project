@@ -153,7 +153,7 @@ python hspace_server.py
 python database/db.py
 ```
 
-관리자 계정 (시드): `admin@shop.local` / `admin1234`
+관리자 계정 (시드): `gygs1010` / `dnjsdlf@102360` (이메일: gygs1010@gmail.com)
 
 ---
 

@@ -57,10 +57,6 @@ def create_app(config_name: str | None = None) -> Flask:
     if upload_dir:
         upload_dir.mkdir(parents=True, exist_ok=True)
 
-    @app.errorhandler(403)
-    def forbidden(error):
-        return render_template("errors/403.html"), 403
-
     @app.errorhandler(404)
     def not_found(error):
         return render_template("errors/404.html"), 404
@@ -114,4 +110,15 @@ def create_app(config_name: str | None = None) -> Flask:
 app = create_app()
 
 if __name__ == "__main__":
+    from pathlib import Path
+
+    import sys
+
+    project_dir = Path(__file__).resolve().parent
+    if str(project_dir) not in sys.path:
+        sys.path.insert(0, str(project_dir))
+
+    from scripts.preflight_server import ensure_server_ready
+
+    ensure_server_ready(project_dir)
     app.run(host="127.0.0.1", port=5000, debug=True)

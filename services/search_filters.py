@@ -50,6 +50,10 @@ FILTER_GROUPS: dict[str, dict] = {
             "blue": "블루",
         },
     },
+    "brand": {
+        "label": "브랜드",
+        "options": {},
+    },
 }
 
 COLOR_SWATCHES: dict[str, str] = {
@@ -207,6 +211,7 @@ class ActiveFilters:
     style: str = ""
     color: str = ""
     subcategory: str = ""
+    brand: str = ""
 
     def as_query_params(self) -> dict[str, str]:
         params: dict[str, str] = {"sort": self.sort}
@@ -243,7 +248,7 @@ def get_active_filter_tags(
             "swatch": None,
         })
 
-    for key in ("subcategory", "space", "style", "color"):
+    for key in ("subcategory", "space", "style", "color", "brand"):
         value = getattr(filters, key)
         if not value:
             continue
@@ -260,34 +265,55 @@ def get_active_filter_tags(
     return tags
 
 
+def get_brand_options() -> dict[str, str]:
+    """DB에 등록된 브랜드 목록."""
+    from extensions import db
+
+    rows = (
+        db.session.query(Product.brand)
+        .filter(
+            Product.is_active.is_(True),
+            Product.brand.isnot(None),
+            Product.brand != "",
+        )
+        .distinct()
+        .all()
+    )
+    brands = sorted({row[0] for row in rows if row[0]})
+    return {brand: brand for brand in brands}
+
+
 def get_filter_groups() -> dict[str, dict]:
-    """필터 UI — 정렬·공간·스타일·컬러."""
-    return {
+    """필터 UI — 브랜드는 DB에서 동적 로드."""
+    groups = {
         key: {"label": value["label"], "options": dict(value["options"])}
         for key, value in FILTER_GROUPS.items()
     }
+    groups["brand"]["options"] = get_brand_options()
+    if not groups["brand"]["options"]:
+        groups.pop("brand")
+    return groups
 
 
 def get_subcategory_options(category) -> dict[str, str]:
-    """대분류 페이지 — 활성 소분류 필터 옵션."""
-    children = [
-        child for child in category.children
-        if child.is_active
-    ]
+    """대분류 페이지 — 하위 세분류 필터 옵션."""
+    children = [child for child in category.children if child.is_active]
     children.sort(key=lambda item: (item.sort_order, item.id))
     return {child.slug: child.name for child in children}
 
 
 def get_category_filter_groups(category) -> dict[str, dict]:
-    """카테고리 목록 페이지 필터 — 소분류 포함, 브랜드 제외."""
+    """카테고리 목록 페이지 필터 — 세분류 포함, 브랜드 제외."""
     groups = get_filter_groups()
     subcategories = get_subcategory_options(category)
     if subcategories:
         groups = {
             "sort": groups["sort"],
-            "subcategory": {"label": "소분류", "options": subcategories},
+            "subcategory": {"label": "세분류", "options": subcategories},
             **{key: groups[key] for key in ("space", "style", "color")},
         }
+    else:
+        groups.pop("brand", None)
     return groups
 
 
@@ -299,9 +325,13 @@ def parse_filters(args, *, subcategory_options: dict[str, str] | None = None) ->
     if sort not in FILTER_GROUPS["sort"]["options"]:
         sort = "newest"
 
+    brand_options = get_brand_options()
+
     def pick(key: str) -> str:
         value = args.get(key, "").strip()
         options = FILTER_GROUPS[key]["options"]
+        if key == "brand":
+            options = brand_options
         return value if value in options else ""
 
     subcategory = args.get("subcategory", "").strip()
@@ -316,6 +346,7 @@ def parse_filters(args, *, subcategory_options: dict[str, str] | None = None) ->
         style=pick("style"),
         color=pick("color"),
         subcategory=subcategory,
+        brand=pick("brand"),
     )
 
 
@@ -328,6 +359,9 @@ def product_matches_filters(product: Product, filters: ActiveFilters) -> bool:
         return False
 
     if filters.color and (product.filter_color or "") != filters.color:
+        return False
+
+    if filters.brand and (product.brand or "") != filters.brand:
         return False
 
     return True
@@ -358,10 +392,10 @@ def get_product_specs(product: Product) -> list[dict[str, str]]:
     return specs
 
 
-def get_option_label(group_key: str, value: str, *, subcategory_options: dict[str, str] | None = None) -> str:
+def get_option_label(group_key: str, value: str) -> str:
     """필터 값 → 표시 라벨."""
     if not value:
         return ""
-    if group_key == "subcategory":
-        return (subcategory_options or {}).get(value, value)
+    if group_key == "brand":
+        return value
     return FILTER_GROUPS[group_key]["options"].get(value, value)

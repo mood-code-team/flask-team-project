@@ -8,15 +8,18 @@
   <title>{% block full_title %}{% block title %}무드·인테리어 셀렉션샵{% endblock %} — Mood Code{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}무드와 공간의 조화 — Mood Code{% endblock %}">
   <link rel="icon" href="{{ url_for('static', filename='images/mood-code-icon.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=20260803f">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=20260811g">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/inquiry-modal.css') }}?v=20260801a">
   {% block extra_css %}{% endblock %}
 </head>
-
-<body class="{% if not current_user.is_authenticated %}has-header-promo {% endif %}{% block body_class %}{% endblock %}"
+<body
+  class="{% if not current_user.is_authenticated %}has-header-promo {% endif %}{% block body_class %}{% endblock %}"
   data-user-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}"
-  data-login-url="{{ url_for('auth.login') }}" data-register-url="{{ url_for('auth.register') }}">
+  data-login-url="{{ url_for('auth.login') }}"
+  data-register-url="{{ url_for('auth.register') }}"
+>
+
   {% if not current_user.is_authenticated %}
   <div class="header-promo" id="header-promo">
     <a href="{{ url_for('auth.register', next=request.path) }}" class="header-promo__link">
@@ -36,7 +39,7 @@
         </span>
       </a>
 
-      <nav class="main-nav" aria-label="Season menu">
+      <nav class="main-nav" aria-label="Mood menu">
         {% for item in season_nav %}
         {% if item.mode == 'filter' %}
         <a href="{{ item.href }}" {% if item.is_active %} class="is-active" aria-current="true" {% endif %}>{{
@@ -57,15 +60,15 @@
             <path d="M16 16l5.5 5.5" />
           </svg>
         </button>
-        <a href="{% if current_user.is_authenticated %}{{ url_for('mypage.wishlist') }}{% else %}{{ url_for('auth.login', next=url_for('mypage.wishlist')) }}{% endif %}"
+        <a
+          href="{% if current_user.is_authenticated %}{{ url_for('mypage.wishlist') }}{% else %}#{% endif %}"
           class="util-btn util-wishlist{% if wishlist_count %} has-items{% endif %}"
-          aria-label="위시리스트 {{ wishlist_count }}개">
-          <svg class="util-btn__icon util-wishlist__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path class="util-wishlist__bookmark"
-              d="M6 4.5A2.5 2.5 0 018.5 2h7A2.5 2.5 0 0118 4.5V21l-6-3.6L6 21V4.5z" />
-            <path class="util-wishlist__heart"
-              d="M12 13.2l-.9-.82C9.1 10.7 8 9.55 8 8.25A2 2 0 0110 6.2c1.1 0 2 .55 2.5 1.35.5-.8 1.4-1.35 2.5-1.35A2 2 0 0117 8.25c0 1.3-1.1 2.45-3.1 4.13L12 13.2z" />
+          {% if not current_user.is_authenticated %}data-wishlist-guest="true"{% endif %}
+          aria-label="위시리스트 {{ wishlist_count }}개"
+        >
+          <svg class="util-btn__icon util-wishlist__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path class="util-wishlist__bookmark" d="M6 4.5A2.5 2.5 0 018.5 2h7A2.5 2.5 0 0118 4.5V21l-6-3.6L6 21V4.5z"/>
+            <path class="util-wishlist__heart" d="M12 13.2l-.9-.82C9.1 10.7 8 9.55 8 8.25A2 2 0 0110 6.2c1.1 0 2 .55 2.5 1.35.5-.8 1.4-1.35 2.5-1.35A2 2 0 0117 8.25c0 1.3-1.1 2.45-3.1 4.13L12 13.2z"/>
           </svg>
           <span class="util-wishlist__count" aria-hidden="true">{{ wishlist_count }}</span>
         </a>
@@ -172,7 +175,7 @@
           {% else %}
           <li><a href="{{ url_for('auth.login') }}">로그인</a></li>
           <li><a href="{{ url_for('auth.register') }}">회원가입</a></li>
-          <li><a href="{{ url_for('auth.login', next=url_for('mypage.wishlist')) }}">위시리스트</a></li>
+          <li><a href="#" data-wishlist-guest="true">위시리스트</a></li>
           {% endif %}
         </ul>
       </div>
@@ -256,7 +259,7 @@
 
       <div class="wishlist-modal__actions">
 
-        <a href="{{ url_for('auth.register') }}" class="wishlist-modal__link">
+        <a href="{{ url_for('auth.register', next=request.path) }}" class="wishlist-modal__link">
           회원가입
         </a>
 
@@ -317,7 +320,7 @@
         </div>
 
         <div class="footer-col footer-col--newsletter">
-          <p class="footer-newsletter__title">가입하고 프로모션/최신정보 받기</p>
+          <p class="footer-newsletter__title">가입하고 프로모션 & 최신정보 받기</p>
           <form class="footer-newsletter" id="footer-newsletter-form" action="#" method="post" novalidate>
             <label class="visually-hidden" for="footer-name">이름</label>
             <input id="footer-name" class="footer-newsletter__input" type="text" name="name" placeholder="이름"
@@ -373,16 +376,15 @@
   {% include "components/inquiry_modal.html" %}
 
   {% if channel_talk_boot %}
-  <script>
-    window.__MOOD_CHANNEL_TALK__ = {{ channel_talk_boot | tojson }};
-  </script>
-  <script src="{{ url_for('static', filename='js/channel-talk.js') }}?v=20260801a"></script>
+  <script id="channel-talk-boot" type="application/json">{{ channel_talk_boot | tojson }}</script>
+  <script src="{{ url_for('static', filename='js/channel-talk.js') }}?v=20260813a"></script>
   {% endif %}
 
-  <script src="{{ url_for('static', filename='js/scroll-top.js') }}?v=20260801f"></script>
+  <script src="{{ url_for('static', filename='js/header-promo.js') }}?v=20260811a"></script>
+  <script src="{{ url_for('static', filename='js/scroll-top.js') }}?v=20260812a"></script>
   <script src="{{ url_for('static', filename='js/cart.js') }}?v=20260801c"></script>
-  <script src="{{ url_for('static', filename='js/wishlist.js') }}?v=20260801b"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20260801f"></script>
+  <script src="{{ url_for('static', filename='js/wishlist.js') }}?v=20260813a"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20260811g"></script>
   <script src="{{ url_for('static', filename='js/inquiry-modal.js') }}?v=20260801a"></script>
   {% block extra_js %}{% endblock %}
 </body>

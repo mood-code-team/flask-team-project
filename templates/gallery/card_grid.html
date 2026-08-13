@@ -6,7 +6,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260809d">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}?v=20260812a">
 {% endblock %}
 
 {% block content %}
@@ -30,6 +30,7 @@
         <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy" onerror="this.closest('.gallery-picker__card').style.display='none';">
         <div class="gallery-picker__overlay" aria-hidden="true"></div>
       </div>
+      <p class="gallery-picker__label">{{ item.name }}</p>
     </a>
     {% endfor %}
   </div>

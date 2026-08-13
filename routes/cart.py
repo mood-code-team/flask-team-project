@@ -15,7 +15,7 @@ from services.cart_service import (
     set_product_quantity,
 )
 from services.address_utils import compose_address, parse_address
-from services.coupon_service import CouponError, get_coupon_previews
+from services.coupon_service import CouponError, get_order_coupon_options
 from services.order_service import OrderValidationError, calculate_order_totals, create_pending_order, get_lines_for_checkout
 from services.point_service import PointError, get_point_balance
 
@@ -76,11 +76,14 @@ def _checkout_form_defaults() -> dict:
 
 
 def _order_context(lines, form, selected_raw):
-    product_total = sum(line.subtotal for line in lines)
-    discount_total = sum(line.discount_amount for line in lines)
+    base_totals = calculate_order_totals(lines=lines)
+    product_total = base_totals["product_total"]
+    original_total = base_totals["original_total"]
+    discount_total = base_totals["discount_total"]
 
     user_coupon_id = None
     point_used = 0
+    benefit_error = ""
     if _is_member():
         raw_coupon = form.get("user_coupon_id", "").strip()
         if raw_coupon.isdigit():
@@ -98,23 +101,41 @@ def _order_context(lines, form, selected_raw):
             user_id=current_user.id if _is_member() else None,
         )
     except (CouponError, PointError) as exc:
+        benefit_error = str(exc)
         totals = calculate_order_totals(lines=lines)
 
-    coupons = get_coupon_previews(current_user.id) if _is_member() else []
+    coupon_options = (
+        get_order_coupon_options(
+            current_user.id,
+            product_total=base_totals["product_total"],
+            shipping_fee=base_totals["base_shipping_fee"],
+        )
+        if _is_member()
+        else []
+    )
     point_balance = get_point_balance(current_user.id) if _is_member() else 0
+    selected_coupon = next(
+        (item for item in coupon_options if str(item.user_coupon_id) == form.get("user_coupon_id", "")),
+        None,
+    )
 
     return {
         "lines": lines,
         "form": form,
         "selected_ids": selected_raw,
+        "original_total": original_total,
         "product_total": product_total,
         "discount_total": discount_total,
+        "base_shipping_fee": totals["base_shipping_fee"],
         "shipping_fee": totals["shipping_fee"],
         "coupon_discount": totals["coupon_discount"],
+        "shipping_discount": totals["shipping_discount"],
         "point_used": totals["point_used"],
         "grand_total": totals["total_amount"],
-        "coupons": coupons,
+        "coupon_options": coupon_options,
+        "selected_coupon": selected_coupon,
         "point_balance": point_balance,
+        "benefit_error": benefit_error,
     }
 
 
@@ -179,6 +200,71 @@ def order():
     return render_template(
         "cart/order.html",
         **_order_context(lines, _checkout_form_defaults(), selected_raw),
+    )
+
+
+@cart_bp.route("/api/order/preview", methods=["POST"])
+def api_order_preview():
+    """쿠폰·적립금 선택 시 결제 예정 금액 미리보기."""
+    if not _is_member():
+        return jsonify({"ok": False, "message": "회원만 쿠폰·적립금을 사용할 수 있습니다."}), 403
+
+    payload = request.get_json(silent=True) or {}
+    selected_ids = _parse_selected_ids((payload.get("ids") or "").strip())
+    lines = get_lines_for_checkout(selected_ids)
+    if not lines:
+        return jsonify({"ok": False, "message": "주문할 상품이 없습니다."}), 400
+
+    product_total = sum(line.subtotal for line in lines)
+    discount_total = sum(line.discount_amount for line in lines)
+    original_total = sum(line.original_subtotal for line in lines)
+
+    raw_coupon = str(payload.get("user_coupon_id") or "").strip()
+    user_coupon_id = int(raw_coupon) if raw_coupon.isdigit() else None
+    try:
+        point_used = int(payload.get("point_used") or 0)
+    except (TypeError, ValueError):
+        point_used = 0
+
+    benefit_error = ""
+    coupon_title = ""
+    try:
+        totals = calculate_order_totals(
+            lines=lines,
+            user_coupon_id=user_coupon_id,
+            point_used=point_used,
+            user_id=current_user.id,
+        )
+        if totals["coupon_app"]:
+            coupon_title = totals["coupon_app"].user_coupon.coupon.title
+            if (
+                totals["shipping_discount"] == 0
+                and totals["coupon_discount"] == 0
+                and totals["coupon_app"].user_coupon.coupon.discount_type == "shipping"
+            ):
+                benefit_error = "무료 배송 쿠폰이 선택되었지만, 이미 무료 배송 조건입니다."
+    except (CouponError, PointError) as exc:
+        benefit_error = str(exc)
+        totals = calculate_order_totals(lines=lines)
+
+    coupon_discount_total = totals["coupon_discount"] + totals["shipping_discount"]
+
+    return jsonify(
+        {
+            "ok": True,
+            "original_total": totals["original_total"],
+            "product_total": product_total,
+            "discount_total": discount_total,
+            "coupon_discount": totals["coupon_discount"],
+            "shipping_discount": totals["shipping_discount"],
+            "coupon_discount_total": coupon_discount_total,
+            "coupon_title": coupon_title,
+            "point_used": totals["point_used"],
+            "base_shipping_fee": totals["base_shipping_fee"],
+            "shipping_fee": totals["shipping_fee"],
+            "grand_total": totals["total_amount"],
+            "benefit_error": benefit_error,
+        }
     )
 
 

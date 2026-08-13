@@ -25,9 +25,18 @@ class CouponPreview:
     title: str
     description: str
     discount_label: str
+    discount_type: str
     min_amount: int
     expires_at: str
     is_usable: bool
+
+
+@dataclass
+class OrderCouponOption(CouponPreview):
+    """주문 페이지 쿠폰 선택 목록."""
+
+    estimated_discount: int
+    unusable_reason: str
 
 
 @dataclass
@@ -66,10 +75,7 @@ def issue_coupon_to_user(user_id: int, coupon_code: str) -> UserCoupon | None:
 def ensure_tier_coupons(user_id: int) -> None:
     """등급별 쿠폰 자동 발급."""
     label = membership_label(user_id)
-    if label == "MEMBER":
-        issue_coupon_to_user(user_id, "MEMBER5")
-    elif label == "MOOD VIP":
-        issue_coupon_to_user(user_id, "MEMBER5")
+    if label == "MOOD VIP":
         issue_coupon_to_user(user_id, "VIP15")
         issue_coupon_to_user(user_id, "VIPSHIP")
 
@@ -88,11 +94,19 @@ def get_user_coupon_rows(user_id: int) -> list[UserCoupon]:
     return [row for row in rows if row.coupon.expires_at >= now]
 
 
-def get_coupon_previews(user_id: int) -> list[CouponPreview]:
-    """마이페이지 표시용."""
+def get_coupon_previews(
+    user_id: int,
+    *,
+    product_total: int | None = None,
+    shipping_fee: int | None = None,
+) -> list[CouponPreview]:
+    """마이페이지·주문 화면용."""
     previews: list[CouponPreview] = []
     for row in get_user_coupon_rows(user_id):
         coupon = row.coupon
+        is_usable = True
+        if product_total is not None and product_total < coupon.min_amount:
+            is_usable = False
         previews.append(
             CouponPreview(
                 user_coupon_id=row.id,
@@ -100,12 +114,61 @@ def get_coupon_previews(user_id: int) -> list[CouponPreview]:
                 title=coupon.title,
                 description=coupon.description or "",
                 discount_label=_discount_label(coupon),
+                discount_type=coupon.discount_type,
                 min_amount=coupon.min_amount,
                 expires_at=coupon.expires_at.strftime("%Y.%m.%d"),
-                is_usable=True,
+                is_usable=is_usable,
             )
         )
     return previews
+
+
+def get_order_coupon_options(
+    user_id: int,
+    *,
+    product_total: int,
+    shipping_fee: int,
+) -> list[OrderCouponOption]:
+    """주문 페이지 — 예상 할인액·사용 불가 사유 포함."""
+    options: list[OrderCouponOption] = []
+    for row in get_user_coupon_rows(user_id):
+        coupon = row.coupon
+        estimated = 0
+        unusable_reason = ""
+        is_usable = True
+
+        try:
+            application = calculate_coupon_application(
+                user_coupon=row,
+                product_total=product_total,
+                shipping_fee=shipping_fee,
+            )
+            estimated = application.product_discount + application.shipping_discount
+            if coupon.discount_type == "shipping" and shipping_fee == 0 and estimated == 0:
+                unusable_reason = "이미 무료 배송 조건입니다"
+                is_usable = False
+        except CouponError as exc:
+            is_usable = False
+            unusable_reason = str(exc)
+
+        options.append(
+            OrderCouponOption(
+                user_coupon_id=row.id,
+                code=coupon.code,
+                title=coupon.title,
+                description=coupon.description or "",
+                discount_label=_discount_label(coupon),
+                discount_type=coupon.discount_type,
+                min_amount=coupon.min_amount,
+                expires_at=coupon.expires_at.strftime("%Y.%m.%d"),
+                is_usable=is_usable,
+                estimated_discount=estimated,
+                unusable_reason=unusable_reason,
+            )
+        )
+
+    options.sort(key=lambda item: (not item.is_usable, -item.estimated_discount, item.expires_at))
+    return options
 
 
 def calculate_coupon_application(

@@ -1,0 +1,42 @@
+================================================================================
+  gallery 충돌 / merge 주의 (팀원용) — 2026-08-11 사고 복구
+================================================================================
+
+■ 2026-08-11 에 무슨 일이?
+
+  merge 충돌 해결 과정에서 아래 파일이 실수로 삭제됨:
+  - templates/gallery/scene_detail.html
+  - static/csv/gallery_hotspots.csv
+  - static/css/scene_detail.css
+  - scripts/generate_hotspots.py
+  - scripts/generate_hotspots_test.py
+
+  → 장면 상세·핫스팟 기능이 깨짐 (라우트는 있는데 템플릿 없음)
+
+  복구 커밋으로 위 파일 + shop.db 를 되살림.
+
+■ merge 할 때 절대 지우면 안 되는 것
+
+  - templates/gallery/scene_detail.html
+  - static/csv/gallery_hotspots.csv
+  - static/css/scene_detail.css
+  - scripts/generate_hotspots*.py
+  - database/shop.db (팀 공유 DB — 함부로 ours/theirs 선택 X)
+
+■ gallery.py / gallery_service.py 충돌 시
+
+  - 두 파일만 frontend(원격) 버전 사용 가능
+  - 위 scene/핫스팟 파일들은 삭제하지 말 것
+
+■ 자동 해결
+
+  powershell -File scripts/resolve_frontend_pull_conflict.ps1
+
+■ DB 날아갔을 때 (로컬만)
+
+  GitHub frontend 의 shop.db 는 팀 공유본.
+  pull 후 덮어씌워졌다면:
+    git checkout team/frontend -- database/shop.db
+  개인이 넣은 데이터는 Git에 없으면 복구 불가 — 백업 필요.
+
+================================================================================

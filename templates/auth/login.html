@@ -19,10 +19,12 @@
       {% endif %}
     {% endwith %}
 
-    {% if next_url == '/admin' %}
+    {% if next_url.startswith('/admin') %}
     <p class="auth-promo auth-promo--admin">관리자 로그인 — 아이디 <strong>gygs1010</strong></p>
+    {% elif next_url and ('/payment' in next_url or '/order' in next_url) %}
+    {# 결제·주문 흐름 — 가입 유도 문구 생략 #}
     {% else %}
-    <p class="auth-promo">지금 가입하면, 신규 할인 쿠폰 즉시 발급</p>
+    <p class="auth-promo">지금 가입하면 <strong>10,000원</strong> 할인 쿠폰 즉시 발급</p>
     {% endif %}
 
     {% include "components/auth_social_buttons.html" %}
@@ -30,6 +32,9 @@
     <div class="auth-divider" aria-hidden="true"><span>또는</span></div>
 
     <form class="auth-form" method="post" action="{{ url_for('auth.login', next=next_url) if next_url else url_for('auth.login') }}" novalidate>
+      {% if next_url %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+      {% endif %}
       <div class="auth-field">
         <label class="auth-label" for="login-id">아이디 / 이메일</label>
         <input
@@ -62,7 +67,7 @@
       <button type="submit" class="auth-submit">로그인</button>
     </form>
 
-    <a href="{{ url_for('auth.register') }}" class="auth-social__btn auth-social__btn--email">이메일로 가입하기</a>
+    <a href="{{ url_for('auth.register', next=next_url) if next_url else url_for('auth.register') }}" class="auth-social__btn auth-social__btn--email">이메일로 가입하기</a>
 
     <nav class="auth-links" aria-label="계정 메뉴">
       <a href="{{ url_for('auth.find_id') }}">아이디 찾기</a>

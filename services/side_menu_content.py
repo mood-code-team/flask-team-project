@@ -35,9 +35,12 @@ SIDE_MENU_CATEGORIES: tuple[SideMenuCategory, ...] = (
             SideMenuSubItem("모두", category_slug="sofa"),
             SideMenuSubItem("2인소파", category_slug="sofa-2"),
             SideMenuSubItem("3인소파", category_slug="sofa-3"),
+            SideMenuSubItem("4인소파", category_slug="sofa-4"),
+            SideMenuSubItem("리클라이너", category_slug="recliner"),
+            SideMenuSubItem("코너소파", category_slug="corner-sofa"),
             SideMenuSubItem("암체어", category_slug="armchair"),
             SideMenuSubItem("안락의자", category_slug="lounge-chair"),
-            SideMenuSubItem("소파기타", category_slug="sofa-other"),
+            SideMenuSubItem("소파 기타", category_slug="sofa-other"),
         ),
     ),
     SideMenuCategory(
@@ -78,7 +81,8 @@ SIDE_MENU_CATEGORIES: tuple[SideMenuCategory, ...] = (
             SideMenuSubItem("매트리스커버", category_slug="mattress-cover"),
             SideMenuSubItem("소파베드", category_slug="sofa-bed"),
             SideMenuSubItem("수납침대", category_slug="storage-bed"),
-            SideMenuSubItem("기타", category_slug="bed-other"),
+            SideMenuSubItem("침대프레임", category_slug="bed-frame"),
+            SideMenuSubItem("침대 기타", category_slug="bed-other"),
         ),
     ),
     SideMenuCategory(

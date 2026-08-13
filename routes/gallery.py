@@ -48,6 +48,25 @@ def mood_gallery_detail(mood_slug: str):
         abort(404)
     return _render_mood_detail(category, mood_key=mood_slug.lower())
 
+@gallery_bp.route("/gallery/scene/<scene_code>")
+def scene_detail(scene_code: str):
+    """인테리어 장면 상세페이지."""
+    scene = get_scene_detail(scene_code)
+
+    if scene is None:
+        abort(404)
+
+    active_mood = CATEGORY_TO_MOOD_KEY.get(scene.get("category", ""), "bloom")
+
+    return render_template(
+        "gallery/scene_detail.html",
+        **_gallery_context(
+            scene=scene,
+            active_mood=active_mood,
+            mood_key=active_mood,
+        ),
+    )
+
 
 @gallery_bp.route("/gallery")
 def mood_gallery():
@@ -65,19 +84,4 @@ def mood_gallery():
             gallery_mode="mood",
         ),
     )
-
-@gallery_bp.route("/gallery/scene/<scene_code>")
-def scene_detail(scene_code: str):
-    """인테리어 장면 상세페이지."""
-    scene = get_scene_detail(scene_code)
-
-    if scene is None:
-        abort(404)
-
-    return render_template(
-        "gallery/scene_detail.html",
-        scene=scene,
-    )
-
-
 

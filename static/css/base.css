@@ -42,6 +42,63 @@ img { max-width: 100%; display: block; }
 ul { list-style: none; }
 button { font-family: inherit; cursor: pointer; background: none; border: none; }
 
+/* ---- 헤더 프로모 (회원가입 쿠폰) ---- */
+@property --top-banner-height {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+body.has-header-promo {
+  --top-banner-height: 36px;
+  transition: --top-banner-height 0.32s var(--ease-out-soft);
+}
+
+body.has-header-promo.is-promo-hidden {
+  --top-banner-height: 0px;
+}
+
+.header-promo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 210;
+  background: #f2f2f2;
+  text-align: center;
+  padding: 9px 16px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #888;
+  border-bottom: 1px solid #e8e8e8;
+  transform: translateY(0);
+  opacity: 1;
+  transition:
+    transform 0.32s var(--ease-out-soft),
+    opacity 0.28s var(--ease-out-soft);
+  will-change: transform, opacity;
+}
+
+body.is-promo-hidden .header-promo {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.header-promo__link {
+  color: #888;
+  transition: color 0.2s;
+}
+
+.header-promo__link:hover {
+  color: #555;
+}
+
+.header-promo__link strong {
+  color: #666;
+  font-weight: 600;
+}
+
 .container {
   width: 100%;
   max-width: 1400px;
@@ -113,7 +170,9 @@ body.is-promo-hidden .header-promo {
   z-index: 100;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
-  transition: box-shadow 0.4s var(--ease-out-soft);
+  transition:
+    top 0.32s var(--ease-out-soft),
+    box-shadow 0.4s var(--ease-out-soft);
 }
 
 .page-home .site-header {
@@ -128,6 +187,11 @@ body.is-promo-hidden .header-promo {
   backdrop-filter: blur(calc(var(--header-progress) * 12px));
   -webkit-backdrop-filter: blur(calc(var(--header-progress) * 12px));
   box-shadow: 0 8px 24px rgba(0, 0, 0, calc(var(--header-progress) * 0.06));
+  transition:
+    top 0.32s var(--ease-out-soft),
+    background 0.4s var(--ease-out-soft),
+    border-color 0.4s var(--ease-out-soft),
+    box-shadow 0.4s var(--ease-out-soft);
 }
 
 .page-home .site-header .logo,
@@ -163,6 +227,15 @@ body.is-promo-hidden .header-promo {
 }
 
 .page-home main {
+  padding-top: 0;
+}
+
+/* 프로모+고정헤더 아래 본문(홈 제외) */
+body.has-header-promo:not(.page-home) .site-main {
+  padding-top: calc(var(--top-banner-height) + var(--header-height));
+}
+
+body.has-header-promo.page-home .site-main {
   padding-top: 0;
 }
 
@@ -537,9 +610,10 @@ body.search-panel-open {
 
 /* ---- Footer ---- */
 .site-footer {
-  background: #fff;
+  background: #ffffff;
   color: var(--color-text);
-  padding: 56px 0 40px;
+  /* padding: 56px 0 40px; */
+  padding: 72px 0 32px;
   margin-top: 0;
   font-size: 12px;
   border-top: 1px solid var(--color-border);
@@ -549,21 +623,31 @@ body.search-panel-open {
   display: grid;
   grid-template-columns: 1.2fr 0.9fr 0.9fr 1.4fr;
   gap: clamp(20px, 3vw, 40px);
-  padding-bottom: 48px;
+  /* padding-bottom: 48px; */
+  padding-bottom: 36px;
 }
 
-.footer-col__title {
+/* .footer-col__title {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.5px;
   color: var(--color-text);
   margin-bottom: 16px;
+} */
+
+.footer-col__title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  color: #222;
+  margin-bottom: 20px;
 }
 
 .footer-col__list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  /* gap: 10px; */
+  gap: 8px;
 }
 
 .footer-col__list--plain {
@@ -592,11 +676,20 @@ body.search-panel-open {
   min-width: 0;
 }
 
-.footer-newsletter__title {
+/* .footer-newsletter__title {
   font-size: 12px;
   color: var(--color-text);
   margin-bottom: 20px;
   line-height: 1.5;
+} */
+
+.footer-newsletter__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+  letter-spacing:1px;
+  margin-bottom:18px;
+  line-height:1.6;
 }
 
 .footer-newsletter {
@@ -798,7 +891,7 @@ body.side-menu-open {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
-  z-index: 150;
+  z-index: 300;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s;
@@ -821,7 +914,7 @@ body.side-menu-open {
   width: min(360px, 85vw);
   height: 100vh;
   background: #fff;
-  z-index: 160;
+  z-index: 310;
   transform: translateX(100%);
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
@@ -909,6 +1002,54 @@ body.side-menu-open {
 .side-menu__categories {
   list-style: none;
   margin-top: 4px;
+}
+
+.side-menu__category {
+  margin-bottom: 4px;
+}
+
+.side-menu__category-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  padding: 8px 0 4px;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.side-menu__category-btn:hover,
+.side-menu__category.is-open .side-menu__category-btn {
+  color: var(--color-text);
+}
+
+.side-menu__sublist {
+  list-style: none;
+  padding: 2px 0 10px 14px;
+  margin: 0;
+}
+
+.side-menu__sublist[hidden] {
+  display: none;
+}
+
+.side-menu__sublist li {
+  margin-bottom: 8px;
+}
+
+.side-menu__sublist a {
+  font-size: 13px;
+  font-weight: 400;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.side-menu__sublist a:hover {
+  color: var(--color-text);
 }
 
 .side-menu__category-link {

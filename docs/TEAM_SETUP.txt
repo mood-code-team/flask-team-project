@@ -13,8 +13,12 @@ Mood Code — 팀원 설치 · 실행 가이드
 
 ■ 1. 코드 받기 (최초 1회)
 
-  git clone https://github.com/mood-code-team/flask-team-project.git
+  git clone -b frontend https://github.com/mood-code-team/flask-team-project.git
   cd flask-team-project
+
+  ※ 이미 clone 했다면 frontend 브랜치로 맞추기:
+    git checkout frontend
+    git pull origin frontend
 
 
 ■ 2. 실행
@@ -27,10 +31,14 @@ Mood Code — 팀원 설치 · 실행 가이드
     chmod +x run.sh
     ./run.sh
 
-  [터미널 직접]
+  [터미널 직접 — 반드시 ① 패키지 설치 후 ② 서버 실행]
+
+    cd flask-team-project
     pip install -r requirements.txt
-    python scripts/seed_db.py
     python hspace_server.py
+
+  ※ python hspace_server.py 만 실행하면 ModuleNotFoundError 가 날 수 있음
+  ※ Windows 에서는 실행_서버.bat 사용을 권장 (자동 설치)
 
 
 ■ 3. 브라우저
@@ -38,11 +46,15 @@ Mood Code — 팀원 설치 · 실행 가이드
   http://127.0.0.1:5000/
 
 
-■ 4. 테스트 로그인
+■ 4. 테스트 로그인 (관리자)
 
-  아이디: admin
-  이메일: admin@shop.local
-  비밀번호: admin1234
+  URL      : http://127.0.0.1:5000/admin
+  아이디   : gygs1010
+  이메일   : gygs1010@gmail.com
+  비밀번호 : dnjsdlf@102360
+
+  ※ Windows: 실행_관리자.bat 더블클릭 후 /admin 자동 연결
+  ※ 상세: docs/ADMIN_PAGE_GUIDE.txt
 
 
 ■ GitHub frontend 브랜치에 포함된 것 (pull만 하면 됨)
@@ -63,11 +75,19 @@ Mood Code — 팀원 설치 · 실행 가이드
   Python not found
     → Python 재설치, "Add Python to PATH" 체크
 
-  ModuleNotFoundError: flask
-    → pip install -r requirements.txt
+  상품·카테고리가 비어 있음 (또는 30개만 보임)
+    → frontend pull 후 database/shop.db 가 있어야 함 (637개+)
+    → shop.db 가 없으면: python scripts/seed_db.py
+    → CSV 전체 재반영: python scripts/import_csv.py
 
-  상품·카테고리가 비어 있음
-    → python scripts/seed_db.py
+  git pull 후 갤러리·카테고리가 이상함
+    → git checkout frontend && git pull origin frontend
+    → 서버 재시작 후 Ctrl+F5 (브라우저 캐시)
+
+  ModuleNotFoundError (flask 등)
+    → Windows: 실행_서버.bat (venv 자동 생성)
+    → Mac/Linux: ./run.sh
+    → 또는: pip install -r requirements.txt
 
   Mac에서 .bat 안 됨
     → ./run.sh 사용
@@ -75,11 +95,16 @@ Mood Code — 팀원 설치 · 실행 가이드
   5000 포트 사용 중
     → 실행 중인 서버 Ctrl+C 종료
 
+  설치 확인 (선택)
+    → python scripts/team_smoke_test.py
+    → [OK] 가 나오면 pull·DB·주요 페이지 정상
+
 
 ■ 최신 코드 받기
 
   cd flask-team-project
-  git pull
+  git checkout frontend
+  git pull origin frontend
 
 
 ■ 수정 후 올리기

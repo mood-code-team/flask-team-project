@@ -44,10 +44,16 @@ _EMPTY_GUEST_FORM = {"recipient_name": "", "order_number": ""}
 _EMPTY_FIND_FORM = {"name": "", "contact": "", "username": ""}
 
 
+def _safe_next_url(raw: str | None) -> str:
+    """내부 경로만 허용."""
+    url = (raw or "").strip()
+    if url.startswith("/") and not url.startswith("//"):
+        return url
+    return ""
+
+
 def _auth_template_context(**extra):
-    next_url = request.args.get("next", "")
-    if next_url and not next_url.startswith("/"):
-        next_url = ""
+    next_url = _safe_next_url(request.args.get("next"))
     return {
         "kakao_login_enabled": is_kakao_enabled(),
         "apple_login_enabled": is_apple_enabled(),
@@ -70,7 +76,10 @@ def _complete_social_login(user: User, *, created: bool) -> str:
 
     on_user_login(user.id)
     if created:
-        flash(f"{user.full_name or user.username}님, Mood Code 회원가입을 환영합니다!", "success")
+        flash(
+            f"{user.full_name or user.username}님, 가입을 환영합니다! 10,000원 할인 쿠폰이 발급되었습니다.",
+            "success",
+        )
     else:
         flash(f"{user.full_name or user.username}님, 환영합니다!", "success")
     next_url = pop_oauth_next()
@@ -104,8 +113,8 @@ def login():
             from services.user_session_service import on_user_login
 
             on_user_login(user.id)
-            next_url = request.args.get("next")
-            if next_url and next_url.startswith("/"):
+            next_url = _safe_next_url(request.args.get("next") or request.form.get("next"))
+            if next_url:
                 return redirect(next_url)
             return redirect(url_for("main.index"))
 
@@ -213,6 +222,8 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
+    next_url = _safe_next_url(request.args.get("next") or request.form.get("next"))
+
     if request.method == "POST":
         form = {
             "username": request.form.get("username", "").strip(),
@@ -229,13 +240,13 @@ def register():
             flash("이용약관에 동의해 주세요.", "error")
             return render_template(
                 "auth/register.html",
-                **_auth_template_context(form=form, regions=KOREA_REGIONS),
+                **_auth_template_context(form=form, regions=KOREA_REGIONS, next_url=next_url),
             )
         if request.form.get("agree_privacy") != "on":
             flash("개인정보 수집·이용에 동의해 주세요.", "error")
             return render_template(
                 "auth/register.html",
-                **_auth_template_context(form=form, regions=KOREA_REGIONS),
+                **_auth_template_context(form=form, regions=KOREA_REGIONS, next_url=next_url),
             )
 
         try:
@@ -258,23 +269,26 @@ def register():
             flash(str(exc), "error")
             return render_template(
                 "auth/register.html",
-                **_auth_template_context(form=form, regions=KOREA_REGIONS),
+                **_auth_template_context(form=form, regions=KOREA_REGIONS, next_url=next_url),
             )
         except IntegrityError:
             db.session.rollback()
             flash("이미 사용 중인 아이디 또는 이메일입니다.", "error")
             return render_template(
                 "auth/register.html",
-                **_auth_template_context(form=form, regions=KOREA_REGIONS),
+                **_auth_template_context(form=form, regions=KOREA_REGIONS, next_url=next_url),
             )
 
         login_user(user)
-        flash(f"{user.full_name or user.username}님, Mood Code 회원가입을 환영합니다!", "success")
-        return redirect(url_for("main.index"))
+        flash(
+            f"{user.full_name or user.username}님, 가입을 환영합니다! 10,000원 할인 쿠폰이 발급되었습니다.",
+            "success",
+        )
+        return redirect(next_url or url_for("main.index"))
 
     return render_template(
         "auth/register.html",
-        **_auth_template_context(form=EMPTY_REGISTER_FORM, regions=KOREA_REGIONS),
+        **_auth_template_context(form=EMPTY_REGISTER_FORM, regions=KOREA_REGIONS, next_url=next_url),
     )
 
 
