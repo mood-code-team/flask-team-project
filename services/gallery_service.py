@@ -242,6 +242,7 @@ def _build_gallery_item(
         "season": season,
         "image_url": _image_url(space, season, image_name),
         "primary_product": primary_product,
+        "staging_description": (row.get("staging_description") or "").strip(),
         "products": scene_products,
     }
     if category:

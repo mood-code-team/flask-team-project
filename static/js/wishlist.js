@@ -4,19 +4,6 @@
 (function () {
   "use strict";
 
-  function isLoggedIn() {
-    return document.body.dataset.userLoggedIn === "true";
-  }
-
-  function currentPathQuery() {
-    return window.location.pathname + window.location.search;
-  }
-
-  function registerUrl() {
-    const base = document.body.dataset.registerUrl || "/register";
-    return `${base}?next=${encodeURIComponent(currentPathQuery())}`;
-  }
-
   function updateHeaderCount(count) {
     document.querySelectorAll(".util-wishlist__count").forEach((el) => {
       el.textContent = String(count);
@@ -30,13 +17,46 @@
     });
   }
 
+  function isLoggedIn() {
+    return document.body.dataset.userLoggedIn === "true";
+  }
+
+  function openGuestWishlistModal() {
+    const overlay = document.getElementById("wishlist-guest-modal-overlay");
+    if (!overlay) return;
+
+    overlay.hidden = false;
+    overlay.setAttribute("aria-hidden", "false");
+
+    requestAnimationFrame(() => {
+      overlay.classList.add("is-visible");
+    });
+
+    document.body.classList.add("wishlist-modal-open");
+  }
+
+  function closeGuestWishlistModal() {
+    const overlay = document.getElementById("wishlist-guest-modal-overlay");
+    if (!overlay) return;
+
+    overlay.classList.remove("is-visible");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("wishlist-modal-open");
+
+    setTimeout(() => {
+      overlay.hidden = true;
+    }, 280);
+  }
+
+
   function updateToggleButtons(productId, inWishlist) {
     document.querySelectorAll(`[data-wishlist-toggle="${productId}"]`).forEach((btn) => {
       btn.classList.toggle("is-active", inWishlist);
       btn.setAttribute("aria-pressed", inWishlist ? "true" : "false");
+      const label = btn.dataset.labelToggle || btn.textContent.trim();
       if (btn.dataset.labelAdd && btn.dataset.labelRemove) {
         btn.textContent = inWishlist ? btn.dataset.labelRemove : btn.dataset.labelAdd;
-      } else if (btn.textContent.includes("위시리스트")) {
+      } else if (label.includes("위시리스트")) {
         btn.textContent = inWishlist ? "위시리스트 해제" : "위시리스트";
       }
     });
@@ -54,94 +74,77 @@
   }
 
   async function refreshWishlistUI() {
-    if (!isLoggedIn()) return;
     const data = await fetchWishlist();
     if (!data || !data.ok) return;
     updateHeaderCount(data.count || 0);
     (data.items || []).forEach((item) => updateToggleButtons(item.id, true));
   }
 
-  function bindModal(overlay, closeBtn, onOpen) {
-    if (!overlay) return { open: () => {}, close: () => {} };
+  function initWishlistModal() {
+    const overlay = document.getElementById("wishlist-modal-overlay");
+    const closeBtn = document.getElementById("wishlist-modal-close");
+
+    if (!overlay) return;
 
     function openModal() {
       overlay.hidden = false;
       overlay.setAttribute("aria-hidden", "false");
-      requestAnimationFrame(() => overlay.classList.add("is-visible"));
+
+      requestAnimationFrame(() => {
+        overlay.classList.add("is-visible");
+      });
+
       document.body.classList.add("wishlist-modal-open");
       closeBtn?.focus();
-      onOpen?.();
     }
 
     function closeModal() {
       overlay.classList.remove("is-visible");
       overlay.setAttribute("aria-hidden", "true");
       document.body.classList.remove("wishlist-modal-open");
+
       setTimeout(() => {
         overlay.hidden = true;
       }, 280);
     }
 
     closeBtn?.addEventListener("click", closeModal);
-    overlay.addEventListener("click", (event) => {
-      if (event.target === overlay) closeModal();
-    });
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && overlay.classList.contains("is-visible")) {
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) {
         closeModal();
       }
     });
 
-    return { open: openModal, close: closeModal };
-  }
+    const guestOverlay = document.getElementById("wishlist-guest-modal-overlay");
+    const guestCloseBtn = document.getElementById("wishlist-guest-modal-close");
 
-  function initWishlistModal() {
-    const overlay = document.getElementById("wishlist-modal-overlay");
-    const closeBtn = document.getElementById("wishlist-modal-close");
-    const modal = bindModal(overlay, closeBtn);
-    window.MoodCodeWishlist = window.MoodCodeWishlist || {};
-    window.MoodCodeWishlist.openAddedModal = modal.open;
-    window.MoodCodeWishlist.closeAddedModal = modal.close;
-  }
+    guestCloseBtn?.addEventListener("click", closeGuestWishlistModal);
 
-  function initWishlistSignupModal() {
-    const overlay = document.getElementById("wishlist-signup-overlay");
-    const closeBtn = document.getElementById("wishlist-signup-close");
-    const registerLink = document.getElementById("wishlist-signup-register");
-    const loginLink = document.getElementById("wishlist-signup-login");
-    const modal = bindModal(overlay, closeBtn, () => {
-      const next = encodeURIComponent(currentPathQuery());
-      if (registerLink) registerLink.href = `${document.body.dataset.registerUrl || "/register"}?next=${next}`;
-      if (loginLink) loginLink.href = `${document.body.dataset.loginUrl || "/login"}?next=${next}`;
+    guestOverlay?.addEventListener("click", (event) => {
+      if (event.target === guestOverlay) {
+        closeGuestWishlistModal();
+      }
     });
 
-    document.querySelectorAll("[data-wishlist-guest]").forEach((el) => {
-      el.addEventListener("click", (event) => {
-        event.preventDefault();
-        modal.open();
-      });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (overlay.classList.contains("is-visible")) {
+          closeModal();
+        }
+
+        if (guestOverlay?.classList.contains("is-visible")) {
+          closeGuestWishlistModal();
+        }
+      }
     });
 
     window.MoodCodeWishlist = window.MoodCodeWishlist || {};
-    window.MoodCodeWishlist.openSignupModal = modal.open;
-  }
-
-  function promptSignupForWishlist() {
-    if (window.MoodCodeWishlist?.openSignupModal) {
-      window.MoodCodeWishlist.openSignupModal();
-      return true;
-    }
-    window.location.href = registerUrl();
-    return true;
+    window.MoodCodeWishlist.openAddedModal = openModal;
+    window.MoodCodeWishlist.closeAddedModal = closeModal;
   }
 
   async function toggleWishlist(productId) {
-    if (!isLoggedIn()) {
-      promptSignupForWishlist();
-      return null;
-    }
-
     const res = await fetch("/api/wishlist/toggle", {
       method: "POST",
       credentials: "same-origin",
@@ -151,7 +154,7 @@
     const data = await res.json();
 
     if (res.status === 401) {
-      promptSignupForWishlist();
+      window.location.href = "/login?next=" + encodeURIComponent(window.location.pathname);
       return null;
     }
     if (!res.ok || !data.ok) {
@@ -165,11 +168,6 @@
   }
 
   async function addToWishlist(productId) {
-    if (!isLoggedIn()) {
-      promptSignupForWishlist();
-      return null;
-    }
-
     const res = await fetch("/api/wishlist/add", {
       method: "POST",
       credentials: "same-origin",
@@ -179,7 +177,7 @@
     const data = await res.json();
 
     if (res.status === 401) {
-      promptSignupForWishlist();
+      window.location.href = "/login?next=" + encodeURIComponent(window.location.pathname);
       return null;
     }
     if (!res.ok || !data.ok) {
@@ -197,6 +195,11 @@
       btn.addEventListener("click", async () => {
         const productId = btn.dataset.wishlistToggle;
         if (!productId || btn.disabled) return;
+
+        if (!isLoggedIn()) {
+          openGuestWishlistModal();
+          return;
+        }
 
         btn.disabled = true;
         const data = await toggleWishlist(productId);
@@ -217,7 +220,7 @@
         if (!productId || btn.disabled) return;
 
         if (!isLoggedIn()) {
-          promptSignupForWishlist();
+          openGuestWishlistModal();
           return;
         }
 
@@ -240,7 +243,6 @@
 
   function init() {
     initWishlistModal();
-    initWishlistSignupModal();
     initWishlistButtons();
     refreshWishlistUI();
   }
@@ -252,7 +254,6 @@
     updateHeaderCount,
     openAddedModal: null,
     closeAddedModal: null,
-    openSignupModal: null,
   };
 
   if (document.readyState === "loading") {

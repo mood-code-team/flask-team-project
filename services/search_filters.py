@@ -29,10 +29,10 @@ FILTER_GROUPS: dict[str, dict] = {
     "style": {
         "label": "스타일",
         "options": {
-            "spring": "Spring",
-            "summer": "Summer",
-            "fall": "Fall",
-            "winter": "Winter",
+            "spring": "BLOOM",
+            "summer": "CLEAR",
+            "fall": "CALM",
+            "winter": "CHIC",
             "all": "All Season",
         },
     },

@@ -7,7 +7,7 @@
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 48px 24px 100px;
+  padding: 80px 24px 100px;
 }
 
 /* 큰 사진 + 오른쪽 정보 영역 */
@@ -133,4 +133,20 @@
   transform: scale(1.05);
   border-color: #bbb;
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.1);
+}
+
+.scene-detail__left {
+  width: 100%;
+  min-width: 0;
+}
+
+.scene-detail__description {
+  width: 100%;
+  margin-top: 18px;
+  padding: 0 4px 18px;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #666;
+  box-sizing: border-box;
 }

@@ -396,7 +396,7 @@ body.page-home.mood-hover-bloom .site-main,
 body.page-home.mood-hover-bloom .hero-ad,
 body.page-home.mood-hover-bloom .gallery-entry,
 body.page-home.mood-hover-bloom .site-footer {
-  background-color: var(--season-spring) !important;
+  background-color: #F4F2E8  !important;
 }
 
 body.page-home.mood-hover-clear,
@@ -404,7 +404,7 @@ body.page-home.mood-hover-clear .site-main,
 body.page-home.mood-hover-clear .hero-ad,
 body.page-home.mood-hover-clear .gallery-entry,
 body.page-home.mood-hover-clear .site-footer {
-  background-color: var(--season-summer) !important;
+  background-color: #D8E8F1  !important;
 }
 
 body.page-home.mood-hover-calm,
@@ -412,7 +412,7 @@ body.page-home.mood-hover-calm .site-main,
 body.page-home.mood-hover-calm .hero-ad,
 body.page-home.mood-hover-calm .gallery-entry,
 body.page-home.mood-hover-calm .site-footer {
-  background-color: var(--season-autumn) !important;
+  background-color: #E7E1D6 !important;
 }
 
 body.page-home.mood-hover-chic,
@@ -420,7 +420,7 @@ body.page-home.mood-hover-chic .site-main,
 body.page-home.mood-hover-chic .hero-ad,
 body.page-home.mood-hover-chic .gallery-entry,
 body.page-home.mood-hover-chic .site-footer {
-  background-color: var(--season-winter) !important;
+  background-color: #D6D3CE !important;
 }
 
 .season-card__body {
@@ -452,7 +452,14 @@ body.page-home.mood-hover-chic .site-footer {
 }
 
 .gallery-entry {
-  padding: 48px clamp(16px, 3vw, 40px) 72px;
+  padding: 32px clamp(16px, 3vw, 40px) 72px;
+}
+
+#gallery-bloom,
+#gallery-clear,
+#gallery-calm,
+#gallery-chic {
+  scroll-margin-top: 220px;
 }
 
 .gallery-entry__header {
@@ -1076,4 +1083,30 @@ body.season-winter .site-footer {
   .season-card__image {
     aspect-ratio: 16 / 10;
   }
+}
+
+/* ============================================================
+   상품 카드 하트(좋아요) 버튼 위치 수정
+   ============================================================ */
+
+/* 다른 모든 스타일을 무시하고 오른쪽 아래에 강제 고정 */
+.product-item .wish-btn {
+  position: absolute !important;
+  right: 12px !important;
+  top: auto !important;
+  bottom: 12px !important;
+  z-index: 10 !important;
+}
+
+/* 메인페이지에서만 스크롤 시 상단 프로모션 숨김 */
+.page-home #header-promo {
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+
+.page-home.is-promo-hidden #header-promo {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
 }

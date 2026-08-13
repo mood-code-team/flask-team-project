@@ -31,11 +31,11 @@
   {# ---- 메인 헤더 ---- #}
   <header class="site-header" id="site-header">
     <div class="header-inner">
-      <a href="{{ url_for('main.index') }}" class="logo" aria-label="Mood 홈">
+      <a href="{{ url_for('main.index') }}" class="logo" aria-label="Mood Code 홈">
         <img class="logo__icon" src="{{ url_for('static', filename='images/mood-code-icon.svg') }}" width="28"
           height="28" alt="">
         <span class="logo__stack">
-          <span class="logo__text">Mood</span>
+          <span class="logo__text">Mood Code</span>
         </span>
       </a>
 
@@ -235,6 +235,41 @@
       <div class="wishlist-modal__actions">
         <a href="{{ url_for('mypage.wishlist') }}" class="wishlist-modal__link">위시리스트 이동</a>
       </div>
+    </div>
+  </div>
+  {# ---- 비회원 위시리스트 회원가입 안내 모달 ---- #}
+  <div class="wishlist-modal-overlay" id="wishlist-guest-modal-overlay" hidden aria-hidden="true">
+
+    <div class="wishlist-modal" role="dialog" aria-modal="true" aria-labelledby="wishlist-guest-modal-title">
+
+      <header class="wishlist-modal__header">
+        <span class="wishlist-modal__title" id="wishlist-guest-modal-title">
+          WISHLIST
+        </span>
+
+        <button type="button" class="wishlist-modal__close" id="wishlist-guest-modal-close">
+          CLOSE
+        </button>
+      </header>
+
+      <div class="wishlist-modal__body">
+        <p>위시리스트는 회원 전용 기능입니다.</p>
+        <p>회원가입 후 마음에 드는 상품을 저장해보세요.</p>
+      </div>
+
+      <div class="wishlist-modal__actions">
+
+        <a href="{{ url_for('auth.register') }}" class="wishlist-modal__link">
+          회원가입
+        </a>
+
+        <a href="{{ url_for('auth.login', next=request.path) }}"
+          class="wishlist-modal__link wishlist-modal__link--secondary">
+          로그인
+        </a>
+
+      </div>
+
     </div>
   </div>
 

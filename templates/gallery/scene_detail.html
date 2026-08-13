@@ -15,19 +15,27 @@
     <main class="scene-detail">
       <div class="scene-detail__container">
         <div class="scene-detail__top">
-          <div class="scene-detail__image-wrap">
-            <img src="{{ scene.image_url }}" alt="Interior scene" class="scene-detail__image">
+          <div class="scene-detail__left">
+            <div class="scene-detail__image-wrap">
+              <img src="{{ scene.image_url }}" alt="Interior scene" class="scene-detail__image">
 
-            {% if scene.products %}
-            {% for product in scene.products %}
-            {% if product.hotspot_x is defined and product.hotspot_y is defined %}
-            <a href="{{ product.url }}" class="scene-hotspot" data-product-code="{{ product.code }}"
-              style="left: {{ product.hotspot_x }}%; top: {{ product.hotspot_y }}%;"
-              aria-label="{{ product.name }} 상품 상세보기">
-              +
-            </a>
-            {% endif %}
-            {% endfor %}
+              {% if scene.products %}
+              {% for product in scene.products %}
+              {% if product.hotspot_x is defined and product.hotspot_y is defined %}
+              <a href="{{ product.url }}" class="scene-hotspot" data-product-code="{{ product.code }}"
+                style="left: {{ product.hotspot_x }}%; top: {{ product.hotspot_y }}%;"
+                aria-label="{{ product.name }} 상품 상세보기">
+                +
+              </a>
+              {% endif %}
+              {% endfor %}
+              {% endif %}
+            </div>
+
+            {% if scene["staging_description"] %}
+            <div class="scene-detail__description">
+              {{ scene["staging_description"] }}
+            </div>
             {% endif %}
           </div>
 
