@@ -13,23 +13,33 @@
 
         <div class="scene-detail__top">
 
-            <!-- 왼쪽 큰 장면 이미지 -->
-            <div class="scene-detail__image-wrap">
+            <!-- 왼쪽 큰 장면 이미지 + 설명 -->
+            <div class="scene-detail__left">
 
-                <img src="{{ scene.image_url }}" alt="Interior scene" class="scene-detail__image">
+                <div class="scene-detail__image-wrap">
 
-                {% if scene.products %}
-                {% for product in scene.products %}
+                    <img src="{{ scene.image_url }}" alt="Interior scene" class="scene-detail__image">
 
-                {% if product.hotspot_x is defined and product.hotspot_y is defined %}
-                <a href="{{ product.url }}" class="scene-hotspot" data-product-code="{{ product.code }}"
-                    style="left: {{ product.hotspot_x }}%; top: {{ product.hotspot_y }}%;"
-                    aria-label="{{ product.name }} 상품 상세보기">
-                    +
-                </a>
-                {% endif %}
+                    {% if scene.products %}
+                    {% for product in scene.products %}
 
-                {% endfor %}
+                    {% if product.hotspot_x is defined and product.hotspot_y is defined %}
+                    <a href="{{ product.url }}" class="scene-hotspot" data-product-code="{{ product.code }}"
+                        style="left: {{ product.hotspot_x }}%; top: {{ product.hotspot_y }}%;"
+                        aria-label="{{ product.name }} 상품 상세보기">
+                        +
+                    </a>
+                    {% endif %}
+
+                    {% endfor %}
+                    {% endif %}
+
+                </div>
+
+                {% if scene["staging_description"] %}
+                <div class="scene-detail__description">
+                    {{ scene["staging_description"] }}
+                </div>
                 {% endif %}
 
             </div>
@@ -68,4 +78,3 @@
 </main>
 
 {% endblock %}
-

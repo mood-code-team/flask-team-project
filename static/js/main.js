@@ -148,3 +148,36 @@ function initFloatingActions() {
     }
   });
 }
+
+
+/* 메인페이지 — 스크롤하면 상단 회원가입 프로모션 숨김 */
+(function () {
+  "use strict";
+
+  function initHomePromoScroll() {
+    const body = document.body;
+
+    // 메인페이지에서만 실행
+    if (!body.classList.contains("page-home")) {
+      return;
+    }
+
+    function updatePromo() {
+      if (window.scrollY > 20) {
+        body.classList.add("is-promo-hidden");
+      } else {
+        body.classList.remove("is-promo-hidden");
+      }
+    }
+
+    window.addEventListener("scroll", updatePromo, { passive: true });
+
+    updatePromo();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initHomePromoScroll);
+  } else {
+    initHomePromoScroll();
+  }
+})();
