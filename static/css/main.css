@@ -1015,53 +1015,91 @@ body.season-winter .site-footer {
     grid-template-columns: 1fr;
   }
 
+  .hero-slide {
+    height: 72vh;
+    min-height: 520px;
+    max-height: 680px;
+  }
+
+  .hero-slide__img {
+    object-position: center;
+  }
+
   .hero-ad__copy {
-    top: calc(var(--header-height) + 24px);
+    top: calc(var(--header-height) + 36px);
     left: 20px;
-    max-width: calc(100% - 40px);
+    right: 20px;
+    max-width: none;
   }
 
   .hero-ad__headline {
-    font-size: clamp(30px, 9vw, 44px);
-    margin-bottom: 12px;
+    font-size: clamp(30px, 8vw, 40px);
+    line-height: 1.08;
+    margin-bottom: 10px;
+    white-space: normal;
+    max-width: 90%;
   }
 
   .hero-ad__lead {
     font-size: 13px;
+    line-height: 1.5;
     margin-bottom: 18px;
+    white-space: normal;
+    max-width: 90%;
   }
 
   .hero-ad__bridge {
-    left: calc(20px + 13px);
-    height: 40px;
+    left: 20px;
+    height: 44px;
+  }
+
+  .hero-ad__cta {
+    min-width: 112px;
+    padding: 10px 16px;
+    font-size: 10px;
   }
 
   .hero-slide__concept {
     right: 20px;
-    bottom: 64px;
-    font-size: clamp(22px, 7vw, 32px);
-    max-width: 58vw;
+    bottom: 84px;
+    font-size: clamp(30px, 10vw, 46px);
+    max-width: 70vw;
   }
 
   .hero-slide__content {
-    padding: 32px 20px 56px;
+    padding: 24px 20px 44px;
+  }
+
+  .hero-slide__title {
+    font-size: 20px;
   }
 
   .hero-slider__prev,
   .hero-slider__next {
-    opacity: 1;
-    width: 36px;
-    height: 36px;
-    font-size: 22px;
+    display: none;
   }
 
   .hero-slider__ui {
     padding: 0 20px 10px;
   }
 
+  .hero-slider__dots {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .hero-slider__dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .hero-slider__dot.is-active {
+    width: 18px;
+  }
+
   .hero-slider__counter {
-    text-align: left;
-    font-size: 12px;
+    text-align: right;
+    font-size: 11px;
   }
 }
 
@@ -1072,12 +1110,50 @@ body.season-winter .site-footer {
 
   .gallery-entry__grid {
     grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .gallery-entry__card-img {
+    aspect-ratio: 4 / 5;
+  }
+
+  .gallery-entry__card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery-entry__body {
+    padding: 10px 2px 0;
+  }
+
+  .gallery-entry__card-label {
+    font-size: 14px;
+    margin-bottom: 0;
   }
 
   .season-card__image {
     aspect-ratio: 16 / 10;
   }
+  
+  .gallery-entry__header {
+    margin-bottom: 18px;
+    padding: 0 2px;
+  }
+
+  .gallery-entry__section-title {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    margin-bottom: 6px;
+  }
+
+  .gallery-entry__section-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    max-width: 95%;
+  }
 }
+
 /* ============================================================
    상품 카드 하트(좋아요) 버튼 위치 수정
    ============================================================ */

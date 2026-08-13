@@ -102,9 +102,17 @@
   background: #111;
 }
 
-.badge-new { background: #111; }
-.badge-best { background: #333; }
-.badge-sale { background: #c0392b; }
+.badge-new {
+  background: #111;
+}
+
+.badge-best {
+  background: #333;
+}
+
+.badge-sale {
+  background: #c0392b;
+}
 
 .product-info {
   padding: 14px 2px 0;
@@ -1100,15 +1108,34 @@
 }
 
 /* legacy aliases kept for other pages */
-.product-detail__category { font-size: 12px; color: var(--color-text-light); }
-.product-detail__specs { display: none; }
-.product-detail__meta { display: none; }
-.product-detail__desc { display: none; }
-.product-detail__badge { display: none; }
-.product-detail__section { display: none; }
+.product-detail__category {
+  font-size: 12px;
+  color: var(--color-text-light);
+}
+
+.product-detail__specs {
+  display: none;
+}
+
+.product-detail__meta {
+  display: none;
+}
+
+.product-detail__desc {
+  display: none;
+}
+
+.product-detail__badge {
+  display: none;
+}
+
+.product-detail__section {
+  display: none;
+}
 
 /* ---- Responsive ---- */
 @media (max-width: 1024px) {
+
   .product-grid,
   .product-grid--compact {
     grid-template-columns: repeat(3, 1fr);
@@ -1124,17 +1151,61 @@
   .search-filters__row {
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding-bottom: 6px;
     scrollbar-width: none;
+    gap: 8px;
   }
 
   .search-filters__row::-webkit-scrollbar {
     display: none;
   }
 
+  .search-filter {
+    flex: 0 0 auto;
+  }
+
+  .search-filter__trigger {
+    min-height: 38px;
+    padding: 0 13px;
+    font-size: 13px;
+  }
+
   .product-grid,
   .product-grid--compact {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .product-grid,
+  .product-grid--compact {
+    gap: 28px 14px;
+  }
+
+  .product-info {
+    padding: 10px 2px 0;
+  }
+
+  .product-category {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .product-name {
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 7px;
+  }
+
+  .product-price {
+    font-size: 14px;
+  }
+
+  .product-price .discount-rate {
+    font-size: 12px;
+    margin-right: 4px;
+  }
+
+  .product-price .original {
+    font-size: 11px;
   }
 
   .product-detail--hpix {
@@ -1178,46 +1249,49 @@
 }
 
 @media (max-width: 480px) {
-  .product-grid,
-  .product-grid--compact {
-    grid-template-columns: 1fr;
+
+  /* 하트 이미지 크기 조절 */
+  .wish-img {
+    width: 24px;
+    /* 원하시는 크기로 조절하세요 */
+    height: 24px;
+    display: block;
   }
-}
 
-/* 하트 이미지 크기 조절 */
-.wish-img {
-  width: 24px;  /* 원하시는 크기로 조절하세요 */
-  height: 24px;
-  display: block;
-}
+  /* 하트 버튼의 흰색 배경상자, 테두리, 그림자 제거 */
+  .product-card__wishlist {
+    background: transparent !important;
+    /* 배경을 투명하게 */
+    background-color: transparent !important;
+    /* 배경색 제거 */
+    box-shadow: none !important;
+    /* 그림자 효과 제거 */
+  }
 
-/* 하트 버튼의 흰색 배경상자, 테두리, 그림자 제거 */
-.product-card__wishlist {
-  background: transparent !important;       /* 배경을 투명하게 */
-  background-color: transparent !important; /* 배경색 제거 */
-  box-shadow: none !important;              /* 그림자 효과 제거 */
-}
+  /* 하트를 더 오른쪽 끝으로 이동 */
+  .product-card__wishlist {
+    right: 1px !important;
+    /* 🟢 수치가 작아질수록 오른쪽 벽으로 바짝 붙습니다 (기존 12px -> 4px) */
+    top: 3px !important;
+    /* 🟢 수치가 작아질수록 위쪽 끝에 바짝 붙습니다 (예: 8px -> 4px -> 0px) */
+  }
 
-/* 하트를 더 오른쪽 끝으로 이동 */
-.product-card__wishlist {
-  right: 1px !important; /* 🟢 수치가 작아질수록 오른쪽 벽으로 바짝 붙습니다 (기존 12px -> 4px) */
-  top: 3px !important;        /* 🟢 수치가 작아질수록 위쪽 끝에 바짝 붙습니다 (예: 8px -> 4px -> 0px) */
-}
-/* 1. 썸네일 상자 배경을 흰색으로 고정하고 안쪽 여백(padding)으로 이미지 크기 축소 */
-.product-thumb {
-  background-color: #ffffff !important;
-  background: #ffffff !important;
-  padding: 24px !important;            /* 🟢 여백 크기 (12px ~ 24px 사이로 조정) */
-  box-sizing: border-box !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
+  /* 1. 썸네일 상자 배경을 흰색으로 고정하고 안쪽 여백(padding)으로 이미지 크기 축소 */
+  .product-thumb {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    padding: 24px !important;
+    /* 🟢 여백 크기 (12px ~ 24px 사이로 조정) */
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
 
-/* 2. 이미지 비율 및 크기 맞춤 */
-.product-thumb img {
-  width: 90% !important;
-  height: 90% !important;
-  object-fit: contain !important;
-  display: block !important;
-}
+  /* 2. 이미지 비율 및 크기 맞춤 */
+  .product-thumb img {
+    width: 90% !important;
+    height: 90% !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
