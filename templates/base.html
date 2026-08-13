@@ -8,7 +8,7 @@
   <title>{% block full_title %}{% block title %}무드·인테리어 셀렉션샵{% endblock %} — Mood Code{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}무드와 공간의 조화 — Mood Code{% endblock %}">
   <link rel="icon" href="{{ url_for('static', filename='images/mood-code-icon.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=20260803f">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=20260813a">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/inquiry-modal.css') }}?v=20260801a">
   {% block extra_css %}{% endblock %}
@@ -298,9 +298,9 @@
       <div class="footer-bottom">
         <div class="footer-bottom__info">
           <p>
-            상호명 Mood Code &nbsp;|&nbsp; 대표 홍길동 &nbsp;|&nbsp; 서울특별시 강남구 테헤란로 123 Mood Code 빌딩<br>
+            상호명 Mood Code &nbsp;|&nbsp; (주)무드코드 &nbsp;|&nbsp; 서울특별시 강남구 테헤란로 123 Mood Code 빌딩<br>
             이메일 moodcode@shop.local &nbsp;|&nbsp; 사업자등록번호 123-45-67890 &nbsp;|&nbsp; 통신판매업신고 2026-서울강남-0000<br>
-            개인정보보호책임자 홍길동 &nbsp;|&nbsp; 호스팅 제공자 Mood Code
+            개인정보보호책임자 (주)무드코드 &nbsp;|&nbsp; 호스팅 제공자 Mood Code
           </p>
           <div class="footer-bottom__links">
             <a href="#">ABOUT</a>
@@ -344,10 +344,11 @@
   <script src="{{ url_for('static', filename='js/channel-talk.js') }}?v=20260801a"></script>
   {% endif %}
 
+  <script src="{{ url_for('static', filename='js/header-promo.js') }}?v=20260813a"></script>
   <script src="{{ url_for('static', filename='js/scroll-top.js') }}?v=20260801f"></script>
   <script src="{{ url_for('static', filename='js/cart.js') }}?v=20260801c"></script>
   <script src="{{ url_for('static', filename='js/wishlist.js') }}?v=20260801b"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20260801f"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20260813a"></script>
   <script src="{{ url_for('static', filename='js/inquiry-modal.js') }}?v=20260801a"></script>
   {% block extra_js %}{% endblock %}
 </body>

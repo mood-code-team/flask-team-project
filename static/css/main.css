@@ -1095,16 +1095,3 @@ body.season-winter .site-footer {
   
   z-index: 10 !important; /* 이미지 위에 오도록 */
 }
-
-/* 메인페이지에서만 스크롤 시 상단 프로모션 숨김 */
-.page-home #header-promo {
-  transition:
-    transform 0.35s ease,
-    opacity 0.35s ease;
-}
-
-.page-home.is-promo-hidden #header-promo {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
