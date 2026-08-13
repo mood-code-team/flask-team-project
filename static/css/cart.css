@@ -176,14 +176,46 @@ body.wishlist-modal-open {
 
 .wishlist-modal__actions {
   display: flex;
-  gap: 20px;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 24px;
 }
 
 .wishlist-modal__link {
-  font-size: 14px;
-  color: var(--color-text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 13px 20px;
+
+  background: #111;
+  border: 1px solid #111;
+  color: #fff;
+
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* 오른쪽 로그인 버튼 */
+.wishlist-modal__link--secondary {
+  background: #fff;
+  color: #111;
+}
+
+.wishlist-modal__link:hover {
+  opacity: 0.8;
+}
+
+.wishlist-modal__link--secondary:hover {
+  background: #f5f5f5;
+  opacity: 1;
 }
 
 .wishlist-modal__link:hover {

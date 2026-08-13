@@ -17,6 +17,38 @@
     });
   }
 
+  function isLoggedIn() {
+    return document.body.dataset.userLoggedIn === "true";
+  }
+
+  function openGuestWishlistModal() {
+    const overlay = document.getElementById("wishlist-guest-modal-overlay");
+    if (!overlay) return;
+
+    overlay.hidden = false;
+    overlay.setAttribute("aria-hidden", "false");
+
+    requestAnimationFrame(() => {
+      overlay.classList.add("is-visible");
+    });
+
+    document.body.classList.add("wishlist-modal-open");
+  }
+
+  function closeGuestWishlistModal() {
+    const overlay = document.getElementById("wishlist-guest-modal-overlay");
+    if (!overlay) return;
+
+    overlay.classList.remove("is-visible");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("wishlist-modal-open");
+
+    setTimeout(() => {
+      overlay.hidden = true;
+    }, 280);
+  }
+
+
   function updateToggleButtons(productId, inWishlist) {
     document.querySelectorAll(`[data-wishlist-toggle="${productId}"]`).forEach((btn) => {
       btn.classList.toggle("is-active", inWishlist);
@@ -51,12 +83,17 @@
   function initWishlistModal() {
     const overlay = document.getElementById("wishlist-modal-overlay");
     const closeBtn = document.getElementById("wishlist-modal-close");
+
     if (!overlay) return;
 
     function openModal() {
       overlay.hidden = false;
       overlay.setAttribute("aria-hidden", "false");
-      requestAnimationFrame(() => overlay.classList.add("is-visible"));
+
+      requestAnimationFrame(() => {
+        overlay.classList.add("is-visible");
+      });
+
       document.body.classList.add("wishlist-modal-open");
       closeBtn?.focus();
     }
@@ -65,19 +102,40 @@
       overlay.classList.remove("is-visible");
       overlay.setAttribute("aria-hidden", "true");
       document.body.classList.remove("wishlist-modal-open");
+
       setTimeout(() => {
         overlay.hidden = true;
       }, 280);
     }
 
     closeBtn?.addEventListener("click", closeModal);
+
     overlay.addEventListener("click", (event) => {
-      if (event.target === overlay) closeModal();
+      if (event.target === overlay) {
+        closeModal();
+      }
+    });
+
+    const guestOverlay = document.getElementById("wishlist-guest-modal-overlay");
+    const guestCloseBtn = document.getElementById("wishlist-guest-modal-close");
+
+    guestCloseBtn?.addEventListener("click", closeGuestWishlistModal);
+
+    guestOverlay?.addEventListener("click", (event) => {
+      if (event.target === guestOverlay) {
+        closeGuestWishlistModal();
+      }
     });
 
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && overlay.classList.contains("is-visible")) {
-        closeModal();
+      if (event.key === "Escape") {
+        if (overlay.classList.contains("is-visible")) {
+          closeModal();
+        }
+
+        if (guestOverlay?.classList.contains("is-visible")) {
+          closeGuestWishlistModal();
+        }
       }
     });
 
@@ -138,6 +196,11 @@
         const productId = btn.dataset.wishlistToggle;
         if (!productId || btn.disabled) return;
 
+        if (!isLoggedIn()) {
+          openGuestWishlistModal();
+          return;
+        }
+
         btn.disabled = true;
         const data = await toggleWishlist(productId);
         btn.disabled = false;
@@ -155,6 +218,11 @@
 
         const productId = btn.dataset.wishlistAdd;
         if (!productId || btn.disabled) return;
+
+        if (!isLoggedIn()) {
+          openGuestWishlistModal();
+          return;
+        }
 
         if (btn.classList.contains("is-active")) {
           const data = await toggleWishlist(productId);
