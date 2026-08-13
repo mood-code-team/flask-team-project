@@ -2,7 +2,15 @@
 (function () {
   "use strict";
 
-  const config = window.__MOOD_CHANNEL_TALK__;
+  const bootNode = document.getElementById("channel-talk-boot");
+  let config = window.__MOOD_CHANNEL_TALK__;
+  if (bootNode?.textContent) {
+    try {
+      config = JSON.parse(bootNode.textContent);
+    } catch {
+      config = null;
+    }
+  }
   if (!config || !config.pluginKey) {
     return;
   }

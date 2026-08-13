@@ -80,6 +80,16 @@
     (data.items || []).forEach((item) => updateToggleButtons(item.id, true));
   }
 
+  function initGuestWishlistLinks() {
+    document.querySelectorAll("[data-wishlist-guest]").forEach((el) => {
+      el.addEventListener("click", (event) => {
+        if (isLoggedIn()) return;
+        event.preventDefault();
+        openGuestWishlistModal();
+      });
+    });
+  }
+
   function initWishlistModal() {
     const overlay = document.getElementById("wishlist-modal-overlay");
     const closeBtn = document.getElementById("wishlist-modal-close");
@@ -243,6 +253,7 @@
 
   function init() {
     initWishlistModal();
+    initGuestWishlistLinks();
     initWishlistButtons();
     refreshWishlistUI();
   }

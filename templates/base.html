@@ -259,7 +259,7 @@
 
       <div class="wishlist-modal__actions">
 
-        <a href="{{ url_for('auth.register') }}" class="wishlist-modal__link">
+        <a href="{{ url_for('auth.register', next=request.path) }}" class="wishlist-modal__link">
           회원가입
         </a>
 
@@ -270,24 +270,6 @@
 
       </div>
 
-    </div>
-  </div>
-
-  {# ---- 비회원 찜 → 회원가입 유도 ---- #}
-  <div class="wishlist-modal-overlay" id="wishlist-signup-overlay" hidden aria-hidden="true">
-    <div class="wishlist-modal" id="wishlist-signup-modal" role="dialog" aria-modal="true" aria-labelledby="wishlist-signup-title">
-      <header class="wishlist-modal__header">
-        <span class="wishlist-modal__title" id="wishlist-signup-title">WISHLIST</span>
-        <button type="button" class="wishlist-modal__close" id="wishlist-signup-close">CLOSE</button>
-      </header>
-      <div class="wishlist-modal__body">
-        <p>찜(위시리스트)은 회원 전용 기능입니다.</p>
-        <p>지금 가입하면 <strong>10,000원 할인 쿠폰</strong>을 드립니다.</p>
-      </div>
-      <div class="wishlist-modal__actions wishlist-modal__actions--stack">
-        <a href="{{ url_for('auth.register', next=request.path) }}" class="wishlist-modal__link wishlist-modal__link--primary" id="wishlist-signup-register">회원가입</a>
-        <a href="{{ url_for('auth.login', next=request.path) }}" class="wishlist-modal__link" id="wishlist-signup-login">로그인</a>
-      </div>
     </div>
   </div>
 
@@ -394,16 +376,14 @@
   {% include "components/inquiry_modal.html" %}
 
   {% if channel_talk_boot %}
-  <script>
-    window.__MOOD_CHANNEL_TALK__ = {{ channel_talk_boot | tojson }};
-  </script>
-  <script src="{{ url_for('static', filename='js/channel-talk.js') }}?v=20260801a"></script>
+  <script id="channel-talk-boot" type="application/json">{{ channel_talk_boot | tojson }}</script>
+  <script src="{{ url_for('static', filename='js/channel-talk.js') }}?v=20260813a"></script>
   {% endif %}
 
   <script src="{{ url_for('static', filename='js/header-promo.js') }}?v=20260811a"></script>
   <script src="{{ url_for('static', filename='js/scroll-top.js') }}?v=20260812a"></script>
   <script src="{{ url_for('static', filename='js/cart.js') }}?v=20260801c"></script>
-  <script src="{{ url_for('static', filename='js/wishlist.js') }}?v=20260811a"></script>
+  <script src="{{ url_for('static', filename='js/wishlist.js') }}?v=20260813a"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}?v=20260811g"></script>
   <script src="{{ url_for('static', filename='js/inquiry-modal.js') }}?v=20260801a"></script>
   {% block extra_js %}{% endblock %}
